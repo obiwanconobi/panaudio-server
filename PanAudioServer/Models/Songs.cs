@@ -12,10 +12,11 @@
         public string AlbumPicture { get; set;}
         public bool? Favourite { get; set;}
         public string Length { get; set;}
+        public string Path { get; set; }
 
         public Songs(string id = null, int? trackNumber = null, string title = null, string album = null,
                      string albumId = null, string artist = null, string artistId = null,
-                     string albumPicture = null, bool? favourite = null, string length = null)
+                     string albumPicture = null, bool? favourite = null, string length = null, string path = null)
         {
             Id = id;
             TrackNumber = trackNumber;
@@ -27,6 +28,7 @@
             AlbumPicture = albumPicture;
             Favourite = favourite;
             Length = length;
+            Path = path;
         }
     }
 

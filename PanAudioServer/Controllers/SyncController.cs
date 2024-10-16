@@ -17,6 +17,7 @@ namespace PanAudioServer.Controllers
             DirectoryHelper dirHelper = new DirectoryHelper();
 
             dirHelper.getDirectory(_totalPath);
+            
             try
             {
 

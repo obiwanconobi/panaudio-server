@@ -40,6 +40,18 @@ namespace PanAudioServer.Helper
         }
 
 
+        public async Task<Songs> GetSongById(string songId)
+        {
+            _context = new SqliteContext();
+            return _context.Songs.FirstOrDefault(x => x.Id == songId);
+        }
+
+        public async Task<Songs> GetSong(string artist, string album, string title)
+        {
+            _context = new SqliteContext();
+            return _context.Songs.FirstOrDefault(x => x.Artist == artist && x.Album == album  && x.Title == title);
+        }
+
 
         public async void UploadArtist(Artists artists)
         {
@@ -74,8 +86,6 @@ namespace PanAudioServer.Helper
                    
                     Console.WriteLine(ex.ToString());
                 }
-
-
 
             }
 

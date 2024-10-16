@@ -32,7 +32,7 @@ namespace PanAudioServer.Helper
                 }
                 else
                 {
-                    getSongs(dd[count]?? d);
+                    getSongs(d); //maybe need to do a dd[count]??
                 }
 
                 Console.WriteLine();
@@ -83,22 +83,30 @@ namespace PanAudioServer.Helper
                     }
 
 
-                    var song = new Songs
-                        (
-                            id: songId,
-                            title: file.Tag.Title,
-                            trackNumber: Convert.ToInt32(file.Tag.Track),
-                            album: file.Tag.Album,
-                            albumId: albumId,
-                            artist: file.Tag.AlbumArtists[0],
-                            artistId: artistId,
-                            albumPicture: "",
-                            favourite: false,
-                            length: ""
+                    var song = await sqliteHelper.GetSong(file.Tag.AlbumArtists[0], file.Tag.Album, file.Tag.Title);
+                    if (song == null)
+                    {
+                         var songAdd = new Songs
+                          (
+                              id: songId,
+                              title: file.Tag.Title,
+                              trackNumber: Convert.ToInt32(file.Tag.Track),
+                              album: file.Tag.Album,
+                              albumId: albumId,
+                              artist: file.Tag.AlbumArtists[0],
+                              artistId: artistId,
+                              albumPicture: "",
+                              favourite: false,
+                              length: "",
+                              path: f.ToString()
 
-                        );
 
-                    sqliteHelper.UploadSong(song);
+                          );
+
+                        sqliteHelper.UploadSong(songAdd);
+                    }
+
+                  
 
                 }
                 catch (Exception ex)

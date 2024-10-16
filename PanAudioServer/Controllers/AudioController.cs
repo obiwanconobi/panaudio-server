@@ -4,6 +4,7 @@ using System.IO.Pipes;
 using System.Reflection;
 using static System.Net.Mime.MediaTypeNames;
 using TagLib;
+using PanAudioServer.Helper;
 
 
 namespace PanAudioServer.Controllers
@@ -13,13 +14,13 @@ namespace PanAudioServer.Controllers
     public class AudioController : Controller
     {
         private readonly string _basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-        private readonly String _filePath = "\\Media\\2 - Neurotic.flac";
+        private readonly String _filePath = "\\Media\\Test\\2 - Neurotic.flac";
+        SqliteHelper sqliteHelper = new SqliteHelper();
 
         [HttpGet("audio-dl")]
         public IActionResult DownloadAudio()
         {
             string _totalPath = _basePath + _filePath;
-
 
             try
             {
@@ -44,10 +45,12 @@ namespace PanAudioServer.Controllers
 
 
         [HttpGet("audio-stream")]
-        public IActionResult NewStreamAudio()
+        public async Task<IActionResult> NewStreamAudio(string songId)
         {
-            string _totalPath = _basePath + _filePath;
-            var fileInfo = new FileInfo(_totalPath);
+            var song = sqliteHelper.GetSongById(songId).Result;
+            string _totalPath = song.Path;
+           // string _totalPath = _basePath + _filePath;
+            var fileInfo = new FileInfo(song.Path);
             var rangeHeader = Request.Headers["Range"];
 
             if (rangeHeader.Count > 0)
