@@ -74,12 +74,14 @@ namespace PanAudioServer.Helper
         {
             var files = Directory.GetFiles(directory);
             String albumId = Guid.NewGuid().ToString();
-            var songCounter = 0;
+
+            Console.WriteLine("Getting Files in directory: " + directory);
+
             foreach (var f in files)
             {
                 try
                 {
-
+                    
                     // Load the file
                     var file = TagLib.File.Create(f);
                     if(file.Properties.MediaTypes == TagLib.MediaTypes.Audio)
@@ -130,7 +132,6 @@ namespace PanAudioServer.Helper
                              );
 
                             sqliteHelper.UploadSong(songAdd);
-                            songCounter++;
                         }
                     }
                     
