@@ -26,6 +26,7 @@ namespace PanAudioServer.Helper
             string _totalPath = directory;
 
             var directories = getDirectories(_totalPath);
+
             if(directories == null)
             {
                 //get songs
@@ -34,7 +35,7 @@ namespace PanAudioServer.Helper
             }
             else
             {
-
+                Console.WriteLine("Total number of directories witin: " + directories.Length + " within " + directory);
                 int count = 0;
 
                 foreach (var d in directories)
