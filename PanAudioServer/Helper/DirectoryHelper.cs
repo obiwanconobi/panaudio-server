@@ -88,7 +88,7 @@ namespace PanAudioServer.Helper
                     {
                         String songId = Guid.NewGuid().ToString();
                         string artistId = "";
-                        string artistName = file.Tag.AlbumArtists[0] ?? file.Tag.Performers[0];
+                        string artistName = file.Tag.FirstAlbumArtist ?? file.Tag.FirstPerformer;
                         var artist = await sqliteHelper.GetArtist(artistName); 
 
                         if (artist == null)
