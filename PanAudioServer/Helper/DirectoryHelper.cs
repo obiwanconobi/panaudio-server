@@ -96,11 +96,12 @@ namespace PanAudioServer.Helper
                             artistId = Guid.NewGuid().ToString();
                             //set artistId,
                             sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
-
+                            Console.WriteLine("Info: Inserted Artist: " + artistName);
                         }
                         else
                         {
                             artistId = artist.Id;
+                            Console.WriteLine("Info: Artist already existed: " + artistName);
                         }
 
 
@@ -109,9 +110,10 @@ namespace PanAudioServer.Helper
                         if (album == null)
                         {
                             sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
+                            Console.WriteLine("Info: Inserted Album: " + file.Tag.Album);
                         }
 
-
+                        
                         var song = await sqliteHelper.GetSong(artistName, file.Tag.Album, file.Tag.Title);
                         if (song == null)
                         {
@@ -133,6 +135,7 @@ namespace PanAudioServer.Helper
                              );
 
                             sqliteHelper.UploadSong(songAdd);
+                            Console.WriteLine("Info: Inserted Song:" + songAdd.Title + " : " + songAdd.Artist );
                         }
                     }
                     
