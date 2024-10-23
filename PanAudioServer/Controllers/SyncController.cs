@@ -13,7 +13,7 @@ namespace PanAudioServer.Controllers
         [HttpGet("all")]
         public void Sync()
         {
-            string _totalPath = _basePath + @"\Music\";
+            string _totalPath = _basePath + @"/Music/";
             DirectoryHelper dirHelper = new DirectoryHelper();
 
             dirHelper.getDirectory(_totalPath);
