@@ -32,6 +32,18 @@ namespace PanAudioServer.Helper
             }
         }
 
+        public List<Songs> GetAllSongs()
+        {
+            _context = new SqliteContext();
+            return _context.Songs.OrderBy(x => x.Title).ToList();
+        }
+
+        public List<Artists> GetAllArtists()
+        {
+            _context =  new SqliteContext();
+            return _context.Artists.OrderBy(x => x.Name).ToList();
+        }
+
 
         public async Task<Artists> GetArtist(string artist)
         {

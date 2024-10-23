@@ -30,7 +30,6 @@ namespace PanAudioServer.Data
             modelBuilder.Entity<Artists>().HasKey(x => x.Id);
         }
 
-        //public DbSet<Employee> Employees{ get; set; }
         public DbSet<Songs> Songs { get; set; }
         public DbSet<Album> Album { get; set; }
         public DbSet<Artists> Artists { get; set; }

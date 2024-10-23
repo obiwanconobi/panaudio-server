@@ -5,6 +5,7 @@ using System.Reflection;
 using static System.Net.Mime.MediaTypeNames;
 using TagLib;
 using PanAudioServer.Helper;
+using System.Net.Mime;
 
 
 namespace PanAudioServer.Controllers
@@ -69,13 +70,21 @@ namespace PanAudioServer.Controllers
 
                 Response.Headers.Add("Content-Length", length.ToString());
                 Response.Headers.Add("Content-Range", $"bytes {start}-{end}/{fileInfo.Length}");
-                return File(fileStream, GetContentType(_totalPath));
+                return new FileStreamResult(fileStream, GetContentType(_totalPath))
+                {
+                    EnableRangeProcessing = true
+                };
+                // return File(fileStream, GetContentType(_totalPath));
             }
             else
             {
-                var fileStream = new FileStream(_totalPath, FileMode.Open);
+                //var fileStream = new FileStream(_totalPath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 var contentType = GetContentType(_totalPath);
-                return File(fileStream, contentType);
+                return PhysicalFile(_totalPath, contentType, enableRangeProcessing: true);
+
+
+
+
             }
         }
 
