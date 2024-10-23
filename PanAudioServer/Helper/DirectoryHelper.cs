@@ -88,13 +88,14 @@ namespace PanAudioServer.Helper
                     {
                         String songId = Guid.NewGuid().ToString();
                         string artistId = "";
-                        var artist = await sqliteHelper.GetArtist(file.Tag.AlbumArtists[0]);
+                        string artistName = file.Tag.AlbumArtists[0] ?? file.Tag.Performers[0];
+                        var artist = await sqliteHelper.GetArtist(artistName); 
 
                         if (artist == null)
                         {
                             artistId = Guid.NewGuid().ToString();
                             //set artistId,
-                            sqliteHelper.UploadArtist(new Artists(id: artistId, name: file.Tag.AlbumArtists[0], picture: ""));
+                            sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
 
                         }
                         else
@@ -103,15 +104,15 @@ namespace PanAudioServer.Helper
                         }
 
 
-                        var album = await sqliteHelper.GetAlbum(file.Tag.AlbumArtists[0], file.Tag.Album);
+                        var album = await sqliteHelper.GetAlbum(artistName, file.Tag.Album);
 
                         if (album == null)
                         {
-                            sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: file.Tag.AlbumArtists[0], picture: ""));
+                            sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
                         }
 
 
-                        var song = await sqliteHelper.GetSong(file.Tag.AlbumArtists[0], file.Tag.Album, file.Tag.Title);
+                        var song = await sqliteHelper.GetSong(artistName, file.Tag.Album, file.Tag.Title);
                         if (song == null)
                         {
                             var songAdd = new Songs
@@ -121,7 +122,7 @@ namespace PanAudioServer.Helper
                                  trackNumber: Convert.ToInt32(file.Tag.Track),
                                  album: file.Tag.Album,
                                  albumId: albumId,
-                                 artist: file.Tag.AlbumArtists[0],
+                                 artist: artistName,
                                  artistId: artistId,
                                  albumPicture: "",
                                  favourite: false,
