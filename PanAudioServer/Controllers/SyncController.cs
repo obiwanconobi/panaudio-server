@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PanAudioServer.Helper;
+using System.Formats.Asn1;
 using System.Reflection;
 
 namespace PanAudioServer.Controllers
@@ -11,31 +12,23 @@ namespace PanAudioServer.Controllers
         private readonly string _basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
       
         [HttpGet("all")]
-        public void Sync()
+        public async void Sync()
         {
-            string _totalPath = _basePath + @"/Music/";
+            string _totalPath = @"\\192.168.1.15\ubuntu_media\nextcloud_2\conner\files\Music\";
+           // string _totalPath = Path.Combine(_basePath, "app", "Music");
+          //  string _totalPath = _basePath + @"\Music\";
             DirectoryHelper dirHelper = new DirectoryHelper();
 
-            dirHelper.getDirectory(_totalPath);
-            
-            try
-            {
+            await dirHelper.directoryGetter(_totalPath);
+            await dirHelper.saveData();
+         
+        }
 
-
-                // Load the file
-                var file = TagLib.File.Create(_totalPath);
-
-                // Access metadata properties
-                Console.WriteLine("Title: " + file.Tag.Title);
-                Console.WriteLine("Artist: " + file.Tag.Performers[0]);
-                Console.WriteLine("Album: " + file.Tag.Album);
-                Console.WriteLine("Year: " + file.Tag.Year);
-                Console.WriteLine("Duration: " + file.Properties.Duration.ToString());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error: " + ex.Message);
-            }
+        [HttpGet("clear")]
+        public async void Clear()
+        {
+            DatabaseHelper helper = new DatabaseHelper();
+            helper.clearAll();
         }
 
        
