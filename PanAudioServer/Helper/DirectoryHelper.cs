@@ -66,7 +66,7 @@ namespace PanAudioServer.Helper
 
                     if (dd.Length > 0)
                     {
-                        getDirectory(dd[count], 1);
+                        await getDirectory(dd[count], 1);
                     }
 
                     Console.WriteLine();
