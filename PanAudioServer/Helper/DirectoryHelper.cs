@@ -23,7 +23,7 @@ namespace PanAudioServer.Helper
         }
 
 
-        public void getDirectory(String directory, int depth = 0)
+        public async Task getDirectory(String directory, int depth = 0)
         {
             string _totalPath = directory;
 
@@ -49,7 +49,7 @@ namespace PanAudioServer.Helper
                     {
                         //get songs
                         getSongs(d);
-                        break;
+                        continue;
                     }
 
                     if (dd.Length > 0)
@@ -62,7 +62,6 @@ namespace PanAudioServer.Helper
 
 
             }
-
             
         }
 
@@ -99,7 +98,7 @@ namespace PanAudioServer.Helper
                         String songId = Guid.NewGuid().ToString();
                         string artistId = "";
                         string artistName = file.Tag.FirstAlbumArtist ?? file.Tag.FirstPerformer;
-                        var artist = await sqliteHelper.GetArtist(artistName); 
+                        var artist = await sqliteHelper.GetArtist(artistName) ?? artists.Where(x => x.Name == artistName).FirstOrDefault();
 
                         if (artist == null)
                         {
@@ -116,7 +115,7 @@ namespace PanAudioServer.Helper
                         }
 
 
-                        var album = await sqliteHelper.GetAlbum(artistName, file.Tag.Album);
+                        var album = await sqliteHelper.GetAlbum(artistName, file.Tag.Album) ?? albums.Where(x => x.Artist == artistName && x.Title == file.Tag.Album).FirstOrDefault();
 
                         if (album == null)
                         {
@@ -150,9 +149,6 @@ namespace PanAudioServer.Helper
                             Console.WriteLine("Info: Inserted Song:" + songAdd.Title + " : " + songAdd.Artist );
                         }
                     }
-
-
-                    saveData();
 
                 }
                 catch (Exception ex)
