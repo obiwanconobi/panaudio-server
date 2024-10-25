@@ -127,7 +127,10 @@ namespace PanAudioServer.Helper
                 {
 
                     // Load the file
-
+                    if (f.EndsWith(".xml"))
+                    {
+                        continue;
+                    }
                     Track file = new Track(f);
                     
                     //var file = TagLib.File.Create(f);
