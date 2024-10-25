@@ -16,7 +16,7 @@ namespace PanAudioServer.Controllers
         {
            // string _totalPath = @"\\192.168.1.15\ubuntu_media\nextcloud_2\conner\files\Music\";
           //  string _totalPath = Path.Combine(_basePath, "app", "Music");
-            string _totalPath = _basePath + @"\Music\";
+            string _totalPath = _basePath + @"/Music/";
             DirectoryHelper dirHelper = new DirectoryHelper();
 
             await dirHelper.directoryGetter(_totalPath);
