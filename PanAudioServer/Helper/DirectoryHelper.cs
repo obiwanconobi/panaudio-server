@@ -60,13 +60,13 @@ namespace PanAudioServer.Helper
                     if (dd == null)
                     {
                         //get songs
-                        getSongs(d);
+                        await getSongs(d);
                         continue;
                     }
 
                     if (dd.Length > 0)
                     {
-                        await getDirectory(dd[count], 1);
+                        await getDirectory(dd[count], depth++);
                     }
 
                     Console.WriteLine();
@@ -102,7 +102,7 @@ namespace PanAudioServer.Helper
         }
 
 
-        public async void getSongs(String directory)
+        public async Task getSongs(String directory)
         {
             var files = Directory.GetFiles(directory);
             String albumId = Guid.NewGuid().ToString();
