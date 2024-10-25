@@ -28,6 +28,10 @@ namespace PanAudioServer.Helper
         {
             var directories = Directory.GetDirectories(path);
             Console.WriteLine("Getting current Path: " + path);
+            foreach(var dir in directories)
+            {
+                Console.WriteLine(dir);
+            }
             if(directories.Length > 0)
             {
                 return directories;
