@@ -23,6 +23,18 @@ namespace PanAudioServer.Helper
         }
 
 
+        public async Task directoryGetter(String directory)
+        {
+            try
+            {
+                await getDirectory(directory);
+            }
+            catch (Exception e)
+            {
+                saveData();
+            }
+        }
+
         public async Task getDirectory(String directory, int depth = 0)
         {
             string _totalPath = directory;
@@ -172,7 +184,6 @@ namespace PanAudioServer.Helper
                 catch (Exception ex)
                 {
                     Console.WriteLine("Error: " + ex.Message);
-                    saveData();
                 }
             }
         }
