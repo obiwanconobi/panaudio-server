@@ -16,6 +16,23 @@ namespace PanAudioServer.Helper
             return _context.Album.FirstOrDefault(x => x.Title == album && x.Artist == artist);
         }
 
+        public async void UploadAlbums(List<Album> album)
+        {
+            _context = new SqliteContext();
+            using (var context = new SqliteContext())
+            {
+                try
+                {
+                    _context.Album.AddRange(album);
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+        }
+
         public async void UploadAlbum(Album album)
         {
             _context = new SqliteContext();
@@ -64,6 +81,23 @@ namespace PanAudioServer.Helper
             return _context.Songs.FirstOrDefault(x => x.Artist == artist && x.Album == album  && x.Title == title);
         }
 
+        public async void UploadArtists(List<Artists> artists)
+        {
+            _context = new SqliteContext();
+            using (var context = new SqliteContext())
+            {
+                try
+                {
+                    context.Artists.AddRange(artists);
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+        }
+
 
         public async void UploadArtist(Artists artists)
         {
@@ -79,6 +113,29 @@ namespace PanAudioServer.Helper
                     Console.WriteLine(ex.ToString());
                 }
             }
+        }
+
+
+        public async void UploadSongs(List<Songs> song)
+        {
+            _context ??= new SqliteContext();
+            using (var context = new SqliteContext())
+            {
+
+                try
+                {
+                    context.Songs.AddRange(song);
+                    await context.SaveChangesAsync();
+
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine(ex.ToString());
+                }
+
+            }
+
         }
 
         public async void UploadSong(Songs song)

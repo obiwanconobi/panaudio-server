@@ -7,7 +7,9 @@ namespace PanAudioServer.Helper
     {
        // private readonly string _basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
        SqliteHelper sqliteHelper  = new SqliteHelper();
-
+        List<Songs> songs = new List<Songs>();
+        List<Album> albums = new List<Album>();
+        List<Artists> artists = new List<Artists>();
 
         public string[]? getDirectories(String path)
         {
@@ -70,6 +72,13 @@ namespace PanAudioServer.Helper
             return await sqliteHelper.GetArtist(artist);
         }
 
+        public void saveData()
+        {
+            sqliteHelper.UploadArtists(artists);
+            sqliteHelper.UploadAlbums(albums);
+            sqliteHelper.UploadSongs(songs);
+        }
+
 
         public async void getSongs(String directory)
         {
@@ -96,7 +105,8 @@ namespace PanAudioServer.Helper
                         {
                             artistId = Guid.NewGuid().ToString();
                             //set artistId,
-                            sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
+                           // sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
+                            artists.Add(new Artists(id: artistId, name: artistName, picture: ""));
                             Console.WriteLine("Info: Inserted Artist: " + artistName);
                         }
                         else
@@ -110,7 +120,8 @@ namespace PanAudioServer.Helper
 
                         if (album == null)
                         {
-                            sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
+                            //sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
+                            albums.Add(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
                             Console.WriteLine("Info: Inserted Album: " + file.Tag.Album);
                         }
 
@@ -134,14 +145,14 @@ namespace PanAudioServer.Helper
 
 
                              );
-
-                            sqliteHelper.UploadSong(songAdd);
+                            songs.Add(songAdd);
+                            //sqliteHelper.UploadSong(songAdd);
                             Console.WriteLine("Info: Inserted Song:" + songAdd.Title + " : " + songAdd.Artist );
                         }
                     }
-                    
 
-                  
+
+                    saveData();
 
                 }
                 catch (Exception ex)
