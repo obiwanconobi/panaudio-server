@@ -135,8 +135,15 @@ namespace PanAudioServer.Helper
                             Console.WriteLine("Info: Inserted Album: " + file.Tag.Album);
                         }
 
+
+                        if(file.Tag.Title == null)
+                        {
+                            continue;
+                        }
                         
                         var song = await sqliteHelper.GetSong(artistName, file.Tag.Album, file.Tag.Title);
+
+                        
                         if (song == null)
                         {
                             var songAdd = new Songs
