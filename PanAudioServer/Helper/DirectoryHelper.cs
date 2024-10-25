@@ -73,9 +73,20 @@ namespace PanAudioServer.Helper
 
         public void saveData()
         {
-            sqliteHelper.UploadArtists(artists);
-            sqliteHelper.UploadAlbums(albums);
-            sqliteHelper.UploadSongs(songs);
+            try
+            {
+                Console.WriteLine("Trying To Save Artists count: " + artists.Count);
+                sqliteHelper.UploadArtists(artists);
+                Console.WriteLine("Trying To Save Album count: " + albums.Count);
+                sqliteHelper.UploadAlbums(albums);
+                Console.WriteLine("Trying To Save Songs count: " + songs.Count);
+                sqliteHelper.UploadSongs(songs);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ERROR SAVING DATA: " + e.Message);
+            }
+           
         }
 
 
@@ -111,7 +122,7 @@ namespace PanAudioServer.Helper
                         else
                         {
                             artistId = artist.Id;
-                            Console.WriteLine("Info: Artist already existed: " + artistName);
+                           // Console.WriteLine("Info: Artist already existed: " + artistName);
                         }
 
 
