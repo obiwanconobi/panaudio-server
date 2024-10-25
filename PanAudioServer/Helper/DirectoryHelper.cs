@@ -136,7 +136,7 @@ namespace PanAudioServer.Helper
                         String songId = Guid.NewGuid().ToString();
                         string artistId = "";
                         string artistName = file.AlbumArtist;
-                        if(artistName == null)
+                        if(artistName == "")
                         {
                             artistName = file.Artist;
                         }
