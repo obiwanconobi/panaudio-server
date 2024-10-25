@@ -165,7 +165,7 @@ namespace PanAudioServer.Helper
                 catch (Exception ex)
                 {
                     Console.WriteLine("Error: " + ex.Message);
-                    
+                    saveData();
                 }
             }
         }
