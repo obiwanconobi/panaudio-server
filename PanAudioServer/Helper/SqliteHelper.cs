@@ -1,4 +1,5 @@
-﻿using PanAudioServer.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using PanAudioServer.Data;
 using PanAudioServer.Models;
 using System.Diagnostics.Contracts;
 
@@ -16,7 +17,16 @@ namespace PanAudioServer.Helper
             return _context.Album.FirstOrDefault(x => x.Title == album && x.Artist == artist);
         }
 
-        public async void UploadAlbums(List<Album> album)
+        public async void Clear()
+        {
+            _context = new SqliteContext();
+            _context.Album.ExecuteDelete();
+            _context.Artists.ExecuteDelete();
+            _context.Songs.ExecuteDelete();
+        }
+
+
+        public async Task UploadAlbums(List<Album> album)
         {
             _context = new SqliteContext();
             using (var context = new SqliteContext())
@@ -47,6 +57,12 @@ namespace PanAudioServer.Helper
 
                 }
             }
+        }
+
+        public List<Album> GetAllAblums()
+        {
+            _context = new SqliteContext();
+            return _context.Album.OrderBy(x => x.Title).ToList();
         }
 
         public List<Songs> GetAllSongs()
@@ -81,7 +97,7 @@ namespace PanAudioServer.Helper
             return _context.Songs.FirstOrDefault(x => x.Artist == artist && x.Album == album  && x.Title == title);
         }
 
-        public async void UploadArtists(List<Artists> artists)
+        public async Task UploadArtists(List<Artists> artists)
         {
             _context = new SqliteContext();
             using (var context = new SqliteContext())
@@ -116,7 +132,7 @@ namespace PanAudioServer.Helper
         }
 
 
-        public async void UploadSongs(List<Songs> song)
+        public async Task UploadSongs(List<Songs> song)
         {
             _context ??= new SqliteContext();
             using (var context = new SqliteContext())

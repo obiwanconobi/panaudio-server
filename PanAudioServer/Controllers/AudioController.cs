@@ -3,7 +3,6 @@ using System.IO;
 using System.IO.Pipes;
 using System.Reflection;
 using static System.Net.Mime.MediaTypeNames;
-using TagLib;
 using PanAudioServer.Helper;
 using System.Net.Mime;
 

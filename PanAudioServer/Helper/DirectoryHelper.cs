@@ -1,5 +1,7 @@
 ﻿using PanAudioServer.Models;
 using System.Reflection;
+using ATL.AudioData;
+using ATL;
 
 namespace PanAudioServer.Helper
 {
@@ -10,6 +12,17 @@ namespace PanAudioServer.Helper
         List<Songs> songs = new List<Songs>();
         List<Album> albums = new List<Album>();
         List<Artists> artists = new List<Artists>();
+
+        List<Songs> dbSongs = new List<Songs>();
+        List<Album> dbAlbums = new List<Album>();
+        List<Artists> dbArtists = new List<Artists>();
+
+        public DirectoryHelper()
+        {
+            dbSongs = sqliteHelper.GetAllSongs();
+            dbArtists = sqliteHelper.GetAllArtists();
+            dbAlbums = sqliteHelper.GetAllAblums();
+        }
 
         public string[]? getDirectories(String path)
         {
@@ -27,15 +40,15 @@ namespace PanAudioServer.Helper
         {
             try
             {
-                await getDirectory(directory);
+                await getDirectory(directory, 1);
             }
             catch (Exception e)
             {
-                saveData();
+               // await saveData();
             }
         }
 
-        public async Task getDirectory(String directory, int depth = 0)
+        public async Task getDirectory(String directory, int depth)
         {
             string _totalPath = directory;
 
@@ -44,30 +57,30 @@ namespace PanAudioServer.Helper
             if(directories == null)
             {
                 //get songs
-                getSongs(directory);
+                 await getSongs(directory);
 
             }
             else
             {
                 Console.WriteLine("Total number of directories witin: " + directories.Length + " within " + directory);
-                int count = 0;
 
                 foreach (var d in directories)
                 {
                     // var directories = Directory.GetDirectories(d);
                     var dd = getDirectories(d);
 
-                    if (dd == null)
-                    {
+                    
                         //get songs
                         await getSongs(d);
-                        continue;
+                    if(dd != null)
+                    {
+                        foreach (var dir in dd)
+                        {
+                            await getDirectory(dir, depth++);
+                        }
                     }
 
-                    if (dd.Length > 0)
-                    {
-                        await getDirectory(dd[count], depth++);
-                    }
+
 
                     Console.WriteLine();
                 }
@@ -83,16 +96,16 @@ namespace PanAudioServer.Helper
             return await sqliteHelper.GetArtist(artist);
         }
 
-        public void saveData()
+        public async Task saveData()
         {
             try
             {
                 Console.WriteLine("Trying To Save Artists count: " + artists.Count);
-                sqliteHelper.UploadArtists(artists);
+                await sqliteHelper.UploadArtists(artists);
                 Console.WriteLine("Trying To Save Album count: " + albums.Count);
-                sqliteHelper.UploadAlbums(albums);
+                await sqliteHelper.UploadAlbums(albums);
                 Console.WriteLine("Trying To Save Songs count: " + songs.Count);
-                sqliteHelper.UploadSongs(songs);
+                await sqliteHelper.UploadSongs(songs);
             }
             catch (Exception e)
             {
@@ -105,23 +118,29 @@ namespace PanAudioServer.Helper
         public async Task getSongs(String directory)
         {
             var files = Directory.GetFiles(directory);
-            String albumId = Guid.NewGuid().ToString();
-
+            String albumId = "";
             Console.WriteLine("Getting Files in directory: " + directory);
 
             foreach (var f in files)
             {
                 try
                 {
-                    
+
                     // Load the file
-                    var file = TagLib.File.Create(f);
-                    if(file.Properties.MediaTypes == TagLib.MediaTypes.Audio)
+
+                    Track file = new Track(f);
+                    
+                    //var file = TagLib.File.Create(f);
+                    if(file.AudioFormat.Name != "Unknown")
                     {
                         String songId = Guid.NewGuid().ToString();
                         string artistId = "";
-                        string artistName = file.Tag.FirstAlbumArtist ?? file.Tag.FirstPerformer;
-                        var artist = await sqliteHelper.GetArtist(artistName) ?? artists.Where(x => x.Name == artistName).FirstOrDefault();
+                        string artistName = file.AlbumArtist;
+                        if(artistName == null)
+                        {
+                            artistName = file.Artist;
+                        }
+                        var artist = dbArtists.Where(x => x.Name == artistName).FirstOrDefault() ?? artists.Where(x => x.Name == artistName).FirstOrDefault();
 
                         if (artist == null)
                         {
@@ -138,38 +157,48 @@ namespace PanAudioServer.Helper
                         }
 
 
-                        var album = await sqliteHelper.GetAlbum(artistName, file.Tag.Album) ?? albums.Where(x => x.Artist == artistName && x.Title == file.Tag.Album).FirstOrDefault();
+                        var album = dbAlbums.Where(x => x.Artist == artistName && x.Title == file.Album).FirstOrDefault() ?? albums.Where(x => x.Artist == artistName && x.Title == file.Album).FirstOrDefault();
 
                         if (album == null)
                         {
+
+                            if(file.Album == "Gusher")
+                            {
+                                Console.WriteLine();
+                            }
                             //sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
-                            albums.Add(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
-                            Console.WriteLine("Info: Inserted Album: " + file.Tag.Album);
+                            albumId = Guid.NewGuid().ToString();
+                            albums.Add(new Album(id: albumId, title: file.Album, artist: artistName, picture: ""));
+                            Console.WriteLine("Info: Inserted Album: " + file.Album);
+                        }
+                        else
+                        {
+                            albumId = album.Id;
                         }
 
 
-                        if(file.Tag.Title == null)
+                        if(file.Title == null)
                         {
                             continue;
                         }
                         
-                        var song = await sqliteHelper.GetSong(artistName, file.Tag.Album, file.Tag.Title);
+                    //    var song = await sqliteHelper.GetSong(artistName, file.Tag.Album, file.Tag.Title);
+                           var song = dbSongs.Where(x => x.Artist == artistName && x.Title == file.Title && x.Album == file.Album).FirstOrDefault();
 
-                        
                         if (song == null)
                         {
                             var songAdd = new Songs
                              (
                                  id: songId,
-                                 title: file.Tag.Title,
-                                 trackNumber: Convert.ToInt32(file.Tag.Track),
-                                 album: file.Tag.Album,
+                                 title: file.Title,
+                                 trackNumber: Convert.ToInt32(file.TrackNumber),
+                                 album: file.Album,
                                  albumId: albumId,
                                  artist: artistName,
                                  artistId: artistId,
                                  albumPicture: "",
                                  favourite: false,
-                                 length: file.Properties.Duration.TotalSeconds.ToString(),
+                                 length: file.Duration.ToString(),
                                  path: f.ToString()
 
 
