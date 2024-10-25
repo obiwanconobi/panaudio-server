@@ -27,6 +27,7 @@ namespace PanAudioServer.Helper
         public string[]? getDirectories(String path)
         {
             var directories = Directory.GetDirectories(path);
+            Console.WriteLine("Getting current Path: " + path);
             if(directories.Length > 0)
             {
                 return directories;
