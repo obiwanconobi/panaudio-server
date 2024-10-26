@@ -146,24 +146,6 @@ namespace PanAudioServer.Helper
             }
         }
 
-
-        public string extractImageFromFile(Track file, string path)
-        {
-            var embeddedPictures = file.EmbeddedPictures;
-            if (embeddedPictures != null && embeddedPictures.Count > 0)
-            {
-                PictureInfo firstPicture = embeddedPictures[0];
-                string outputPath = @"C:\YourPath\cover.jpg"; // Replace with your desired path
-                path = Path.Combine(path, "cover.jpg").ToString();
-                using (Image image = Image.Load(firstPicture.PictureData))
-                {
-                    image.Save(path, new JpegEncoder());
-                    return "cover.jpg";
-                }
-            }
-            return null;
-        }
-
         public string returnLikelyImage(List<string> imagesInFolder)
         {
 
@@ -271,7 +253,7 @@ namespace PanAudioServer.Helper
 
                             //sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
                             albumId = Guid.NewGuid().ToString();
-                            albums.Add(new Album(id: albumId, title: file.Album, artist: artistName, picture: Path.GetFileName(returnLikelyImage(imagesInFolder)) ?? extractImageFromFile(file, directory), albumPath: directory));
+                            albums.Add(new Album(id: albumId, title: file.Album, artist: artistName, picture: Path.GetFileName(returnLikelyImage(imagesInFolder)), albumPath: directory, year: file.Year ?? null));
                             Console.WriteLine("Info: Inserted Album: " + file.Album);
                         }
                         else
