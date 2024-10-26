@@ -143,6 +143,28 @@ namespace PanAudioServer.Helper
             }
         }
 
+        public void UpdateSong(Songs song)
+        {
+            _context ??= new SqliteContext();
+            using (var context = new SqliteContext())
+            {
+
+                try
+                {
+                    context.Songs.Update(song);
+                    context.SaveChangesAsync();
+
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine(ex.ToString());
+                }
+
+            }
+
+        }
+
 
         public async Task UploadSongs(List<Songs> song)
         {

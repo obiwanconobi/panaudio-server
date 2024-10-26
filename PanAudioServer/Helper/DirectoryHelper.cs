@@ -2,6 +2,8 @@
 using System.Reflection;
 using ATL.AudioData;
 using ATL;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp;
 
 namespace PanAudioServer.Helper
 {
@@ -145,6 +147,23 @@ namespace PanAudioServer.Helper
         }
 
 
+        public string extractImageFromFile(Track file, string path)
+        {
+            var embeddedPictures = file.EmbeddedPictures;
+            if (embeddedPictures != null && embeddedPictures.Count > 0)
+            {
+                PictureInfo firstPicture = embeddedPictures[0];
+                string outputPath = @"C:\YourPath\cover.jpg"; // Replace with your desired path
+                path = Path.Combine(path, "cover.jpg").ToString();
+                using (Image image = Image.Load(firstPicture.PictureData))
+                {
+                    image.Save(path, new JpegEncoder());
+                    return "cover.jpg";
+                }
+            }
+            return null;
+        }
+
         public string returnLikelyImage(List<string> imagesInFolder)
         {
 
@@ -156,6 +175,7 @@ namespace PanAudioServer.Helper
 
             if (imagesInFolder.Any(x => x.Contains("folder", StringComparison.OrdinalIgnoreCase)))
                 return imagesInFolder.First(x => x.Contains("folder", StringComparison.OrdinalIgnoreCase));
+
             return null;
         }
 
@@ -219,6 +239,7 @@ namespace PanAudioServer.Helper
                     //var file = TagLib.File.Create(f);
                     if(file.AudioFormat.Name != "Unknown")
                     {
+                        
                         String songId = Guid.NewGuid().ToString();
                         string artistId = "";
                         string artistName = file.AlbumArtist;
@@ -244,12 +265,13 @@ namespace PanAudioServer.Helper
 
 
                         var album = dbAlbums.Where(x => x.Artist == artistName && x.Title == file.Album).FirstOrDefault() ?? albums.Where(x => x.Artist == artistName && x.Title == file.Album).FirstOrDefault();
-
+                        
                         if (album == null)
                         {
+
                             //sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
                             albumId = Guid.NewGuid().ToString();
-                            albums.Add(new Album(id: albumId, title: file.Album, artist: artistName, picture: Path.GetFileName(returnLikelyImage(imagesInFolder)), albumPath: directory));
+                            albums.Add(new Album(id: albumId, title: file.Album, artist: artistName, picture: Path.GetFileName(returnLikelyImage(imagesInFolder)) ?? extractImageFromFile(file, directory), albumPath: directory));
                             Console.WriteLine("Info: Inserted Album: " + file.Album);
                         }
                         else
