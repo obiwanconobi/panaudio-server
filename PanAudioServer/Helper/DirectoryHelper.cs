@@ -66,7 +66,7 @@ namespace PanAudioServer.Helper
                 Console.WriteLine();
             }
 
-            
+            input.Replace("’", "'");
 
             input.Replace(HyphenFigureDash, HyphenMinus);
             input.Replace(HyphenEnDash, HyphenMinus);
