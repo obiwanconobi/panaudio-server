@@ -6,8 +6,8 @@
         public string Title { get; set;}
         public string Artist { get; set;}
         public int? Year { get; set;}
-        public string Picture { get; set;}
-        public string AlbumPath { get; set; }
+        public string? Picture { get; set;}
+        public string? AlbumPath { get; set; }
 
         public Album(string id = null, string title = null, string artist = null, int? year = null, string picture = null, string albumPath = null)
         {
