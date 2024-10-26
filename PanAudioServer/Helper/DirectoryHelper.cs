@@ -4,6 +4,7 @@ using ATL.AudioData;
 using ATL;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace PanAudioServer.Helper
 {
@@ -47,6 +48,30 @@ namespace PanAudioServer.Helper
           
         }
 
+
+        public string removeShittyCharacters(string input)
+        {
+            if (input.Contains('‐'))
+            {
+                Console.WriteLine();
+            }
+            char HyphenMinus = '\u002D';        // Regular hyphen-minus: -
+             char HyphenFigureDash = '\u2012';   // Figure dash: ‒
+             char HyphenEnDash = '\u2013';       // En dash: –
+             char HyphenEmDash = '\u2014';       // Em dash: —
+             char HyphenNonBreakingHyphen = '\u2011'; // Non-breaking hyphen: ‑
+
+            input.Replace(HyphenFigureDash, HyphenMinus);
+            input.Replace(HyphenEnDash, HyphenMinus);
+            input.Replace(HyphenEmDash, HyphenMinus);
+            input.Replace(HyphenNonBreakingHyphen, HyphenMinus);
+
+
+           
+           // input.Replace('‐', '-');
+            input.Replace("`", "'");
+            return input;
+        }
 
         public async Task directoryGetter(String directory)
         {
@@ -224,7 +249,7 @@ namespace PanAudioServer.Helper
                         
                         String songId = Guid.NewGuid().ToString();
                         string artistId = "";
-                        string artistName = file.AlbumArtist;
+                        string artistName = removeShittyCharacters(file.AlbumArtist);
                         if(artistName == "")
                         {
                             artistName = file.Artist;
@@ -253,7 +278,7 @@ namespace PanAudioServer.Helper
 
                             //sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
                             albumId = Guid.NewGuid().ToString();
-                            albums.Add(new Album(id: albumId, title: file.Album, artist: artistName, picture: Path.GetFileName(returnLikelyImage(imagesInFolder)), albumPath: directory, year: file.Year ?? null));
+                            albums.Add(new Album(id: albumId, title:removeShittyCharacters(file.Album), artist: artistName, picture: Path.GetFileName(returnLikelyImage(imagesInFolder)), albumPath: directory, year: file.Year ?? null));
                             Console.WriteLine("Info: Inserted Album: " + file.Album);
                         }
                         else
@@ -275,7 +300,7 @@ namespace PanAudioServer.Helper
                             var songAdd = new Songs
                              (
                                  id: songId,
-                                 title: file.Title,
+                                 title: removeShittyCharacters(file.Title),
                                  trackNumber: Convert.ToInt32(file.TrackNumber),
                                  album: file.Album,
                                  albumId: albumId,

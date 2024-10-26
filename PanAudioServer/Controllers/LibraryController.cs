@@ -34,6 +34,13 @@ namespace PanAudioServer.Controllers
             return sqliteHelper.GetSongById(songId);
         }
 
+
+        [HttpGet]
+        public List<Album> GetAlbumsForArtist(string artistName)
+        {
+            return sqliteHelper.GetAllAblumsForArtist(artistName);
+        }
+
         [HttpPost("favourite")]
         public void SetFavourite(string songId, bool favourite)
         {

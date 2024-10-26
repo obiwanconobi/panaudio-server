@@ -65,6 +65,12 @@ namespace PanAudioServer.Helper
             }
         }
 
+        public List<Album> GetAllAblumsForArtist(string artistName)
+        {
+            _context = new SqliteContext();
+            return _context.Album.Where(x => x.Artist == artistName).ToList();
+        }
+
         public List<Album> GetAllAblums()
         {
             _context = new SqliteContext();
