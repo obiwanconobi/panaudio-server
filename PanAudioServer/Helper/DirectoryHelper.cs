@@ -234,7 +234,6 @@ namespace PanAudioServer.Helper
             {
                 try
                 {
-
                     var pathExtension = Path.GetExtension(f);
                     
                     // this needs changing
@@ -267,7 +266,7 @@ namespace PanAudioServer.Helper
                         {
                             artistName = file.Artist;
                         }
-                        var artist = dbArtists.Where(x => x.Name == artistName).FirstOrDefault() ?? artists.Where(x => x.Name == artistName).FirstOrDefault();
+                        var artist = dbArtists.Where(x => x.Name.ToLower() == artistName.ToLower()).FirstOrDefault() ?? artists.Where(x => x.Name.ToLower() == artistName.ToLower()).FirstOrDefault();
 
                         if (artist == null)
                         {
@@ -284,7 +283,7 @@ namespace PanAudioServer.Helper
                         }
 
 
-                        var album = dbAlbums.Where(x => x.Artist == artistName && x.Title == file.Album).FirstOrDefault() ?? albums.Where(x => x.Artist == artistName && x.Title == file.Album).FirstOrDefault();
+                        var album = dbAlbums.Where(x => x.Artist.ToLower() == artistName.ToLower() && x.Title == file.Album).FirstOrDefault() ?? albums.Where(x => x.Artist.ToLower() == artistName.ToLower() && x.Title == file.Album).FirstOrDefault();
                         
                         if (album == null)
                         {
@@ -306,7 +305,7 @@ namespace PanAudioServer.Helper
                         }
                         
                     //    var song = await sqliteHelper.GetSong(artistName, file.Tag.Album, file.Tag.Title);
-                           var song = dbSongs.Where(x => x.Artist == artistName && x.Title == file.Title && x.Album == file.Album).FirstOrDefault();
+                           var song = dbSongs.Where(x => x.Artist.ToLower() == artistName.ToLower() && x.Title == file.Title && x.Album == file.Album).FirstOrDefault();
 
                         if (song == null)
                         {
