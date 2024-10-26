@@ -47,12 +47,12 @@ namespace PanAudioServer.Controllers
         [HttpGet("audio-stream")]
         public async Task<IActionResult> NewStreamAudio(string songId)
         {
-            var song = sqliteHelper.GetSongById(songId).Result;
+            var song = sqliteHelper.GetSongById(songId);
             string _totalPath = song.Path;
            // string _totalPath = _basePath + _filePath;
             var fileInfo = new FileInfo(song.Path);
             var rangeHeader = Request.Headers["Range"];
-
+           
             if (rangeHeader.Count > 0)
             {
                 var range = rangeHeader.ToString().Replace("bytes=", "").Split('-');
@@ -80,8 +80,6 @@ namespace PanAudioServer.Controllers
                 //var fileStream = new FileStream(_totalPath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 var contentType = GetContentType(_totalPath);
                 return PhysicalFile(_totalPath, contentType, enableRangeProcessing: true);
-
-
 
 
             }

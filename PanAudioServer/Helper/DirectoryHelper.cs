@@ -26,18 +26,23 @@ namespace PanAudioServer.Helper
 
         public string[]? getDirectories(String path)
         {
-            var directories = Directory.GetDirectories(path);
-            Console.WriteLine("Getting current Path: " + path);
-            foreach(var dir in directories)
+            try
             {
-                Console.WriteLine(dir);
-            }
-            if(directories.Length > 0)
-            {
-                return directories;
-            }
+                var directories = Directory.GetDirectories(path);
+                Console.WriteLine("Getting current Path: " + path);
+              
+                if (directories.Length > 0)
+                {
+                    return directories;
+                }
 
-            return null;
+                return null;
+            }catch(Exception e)
+            {
+                Console.WriteLine("Error Getting Directory. Probably Invalid Character");
+                return null;
+            }
+          
         }
 
 
@@ -98,7 +103,7 @@ namespace PanAudioServer.Helper
         //remove
         public async Task<Artists> getArtist(string artist) 
         {
-            return await sqliteHelper.GetArtist(artist);
+            return sqliteHelper.GetArtist(artist);
         }
 
         public async Task saveData()
@@ -119,23 +124,96 @@ namespace PanAudioServer.Helper
            
         }
 
+        private bool IsImage(string fileExtension)
+        {
+            switch (fileExtension.ToLower())
+            {
+                case ".jpg":
+                case ".jpeg":
+                    return true;
+                case ".png":
+                    return true;
+                case ".gif":
+                    return true;
+                case ".bmp":
+                    return true;
+                case ".webp":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+
+        public string returnLikelyImage(List<string> imagesInFolder)
+        {
+
+            if (imagesInFolder.Any(x => x.Contains("cover", StringComparison.OrdinalIgnoreCase)))
+                return imagesInFolder.First(x => x.Contains("cover", StringComparison.OrdinalIgnoreCase));
+
+            if (imagesInFolder.Any(x => x.Contains("album", StringComparison.OrdinalIgnoreCase)))
+                return imagesInFolder.First(x => x.Contains("album", StringComparison.OrdinalIgnoreCase));
+
+            if (imagesInFolder.Any(x => x.Contains("folder", StringComparison.OrdinalIgnoreCase)))
+                return imagesInFolder.First(x => x.Contains("folder", StringComparison.OrdinalIgnoreCase));
+            return null;
+        }
+
+
+        private static readonly Dictionary<string, int> ExtensionPriority = new()
+    {
+        {".jpg", 1},
+        {".png", 2},
+        {".webp", 3},
+        {".gif", 3},
+        {".flac", 4},
+        {".wav", 4},
+        {".aac", 5},
+        {".mp3", 5},
+        {".lrc", 7},
+        {".xml", 7},
+        {".nfo", 7},
+        {".cue", 7},
+
+        // Add more extensions as needed
+         };
+
+        private static int GetExtensionPriority(string extension)
+        {
+            extension = extension.ToLowerInvariant();
+            return ExtensionPriority.TryGetValue(extension, out int priority)
+                ? priority
+                : int.MaxValue; // Unspecified extensions go to the end
+        }
+
 
         public async Task getSongs(String directory)
         {
-            var files = Directory.GetFiles(directory);
+            var files = Directory.GetFiles(directory).OrderBy(f => GetExtensionPriority(Path.GetExtension(f))).ToList();
+
+           // files.OrderBy(f => GetExtensionPriority(Path.GetExtension(f)));
             String albumId = "";
             Console.WriteLine("Getting Files in directory: " + directory);
-
+            List<string> imagesInFolder = new List<string>();
             foreach (var f in files)
             {
                 try
                 {
 
-                    // Load the file
-                    if (f.EndsWith(".xml"))
+                    var pathExtension = Path.GetExtension(f);
+                    
+                    // this needs changing
+                    if (f.EndsWith(".xml") || f.EndsWith(".lrc"))
                     {
                         continue;
                     }
+
+                    if (IsImage(pathExtension)){
+                        imagesInFolder.Add(f);
+                        continue;
+                    }
+                    
+
                     Track file = new Track(f);
                     
                     //var file = TagLib.File.Create(f);
@@ -169,14 +247,9 @@ namespace PanAudioServer.Helper
 
                         if (album == null)
                         {
-
-                            if(file.Album == "Gusher")
-                            {
-                                Console.WriteLine();
-                            }
                             //sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
                             albumId = Guid.NewGuid().ToString();
-                            albums.Add(new Album(id: albumId, title: file.Album, artist: artistName, picture: ""));
+                            albums.Add(new Album(id: albumId, title: file.Album, artist: artistName, picture: Path.GetFileName(returnLikelyImage(imagesInFolder)), albumPath: directory));
                             Console.WriteLine("Info: Inserted Album: " + file.Album);
                         }
                         else

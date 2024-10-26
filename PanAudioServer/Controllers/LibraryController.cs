@@ -28,5 +28,11 @@ namespace PanAudioServer.Controllers
             return sqliteHelper.GetAllSongs();
         }
 
+        [HttpGet("song")]
+        public Songs GetSong(string songId)
+        {
+            return sqliteHelper.GetSongById(songId);
+        }
+
     }
 }

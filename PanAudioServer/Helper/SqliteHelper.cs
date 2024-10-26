@@ -71,6 +71,12 @@ namespace PanAudioServer.Helper
             return _context.Songs.OrderBy(x => x.Title).ToList();
         }
 
+        //public Songs GetSongById(String songId)
+        //{
+        //    _context = new SqliteContext();
+        //    return _context.Songs.OrderBy(x => x.Id == songId).First();
+        //}
+
         public List<Artists> GetAllArtists()
         {
             _context =  new SqliteContext();
@@ -78,23 +84,23 @@ namespace PanAudioServer.Helper
         }
 
 
-        public async Task<Artists> GetArtist(string artist)
+        public Artists GetArtist(string artist)
         {
             _context = new SqliteContext();
-            return _context.Artists.FirstOrDefault(x => x.Name == artist);
+            return _context.Artists.First(x => x.Name == artist);
         }
 
 
-        public async Task<Songs> GetSongById(string songId)
+        public Songs GetSongById(string songId)
         {
             _context = new SqliteContext();
-            return _context.Songs.FirstOrDefault(x => x.Id == songId);
+            return _context.Songs.First(x => x.Id == songId);
         }
 
-        public async Task<Songs> GetSong(string artist, string album, string title)
+        public Songs GetSong(string artist, string album, string title)
         {
             _context = new SqliteContext();
-            return _context.Songs.FirstOrDefault(x => x.Artist == artist && x.Album == album  && x.Title == title);
+            return _context.Songs.First(x => x.Artist == artist && x.Album == album  && x.Title == title);
         }
 
         public async Task UploadArtists(List<Artists> artists)
