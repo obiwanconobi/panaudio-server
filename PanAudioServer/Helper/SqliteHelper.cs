@@ -17,6 +17,12 @@ namespace PanAudioServer.Helper
             return _context.Album.FirstOrDefault(x => x.Title == album && x.Artist == artist);
         }
 
+        public Album GetAlbumById(string albumId)
+        {
+            _context = new SqliteContext();
+            return _context.Album.First(x => x.Id == albumId);
+        }
+
         public async void Clear()
         {
             _context = new SqliteContext();
