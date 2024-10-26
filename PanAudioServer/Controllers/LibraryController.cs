@@ -35,7 +35,7 @@ namespace PanAudioServer.Controllers
         }
 
 
-        [HttpGet]
+        [HttpGet("albums-for-artist")]
         public List<Album> GetAlbumsForArtist(string artistName)
         {
             return sqliteHelper.GetAllAblumsForArtist(artistName);

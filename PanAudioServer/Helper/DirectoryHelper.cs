@@ -51,7 +51,7 @@ namespace PanAudioServer.Helper
 
         public string removeShittyCharacters(string input)
         {
-            if (input.Contains('‐'))
+            if (input.Contains("blink"))
             {
                 Console.WriteLine();
             }
@@ -61,11 +61,19 @@ namespace PanAudioServer.Helper
              char HyphenEmDash = '\u2014';       // Em dash: —
              char HyphenNonBreakingHyphen = '\u2011'; // Non-breaking hyphen: ‑
 
+            if (input.Contains(HyphenNonBreakingHyphen))
+            {
+                Console.WriteLine();
+            }
+
+            
+
             input.Replace(HyphenFigureDash, HyphenMinus);
             input.Replace(HyphenEnDash, HyphenMinus);
             input.Replace(HyphenEmDash, HyphenMinus);
             input.Replace(HyphenNonBreakingHyphen, HyphenMinus);
 
+            input.Replace("-", "-");
 
            
            // input.Replace('‐', '-');
@@ -246,7 +254,12 @@ namespace PanAudioServer.Helper
                     //var file = TagLib.File.Create(f);
                     if(file.AudioFormat.Name != "Unknown")
                     {
-                        
+                        if (file.Album == "California")
+                        {
+
+                        }
+
+
                         String songId = Guid.NewGuid().ToString();
                         string artistId = "";
                         string artistName = removeShittyCharacters(file.AlbumArtist);
