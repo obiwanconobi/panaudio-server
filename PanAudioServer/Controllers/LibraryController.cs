@@ -16,6 +16,12 @@ namespace PanAudioServer.Controllers
             return sqliteHelper.GetAllArtists();
         }
 
+        [HttpGet("albums-by-id")]
+        public Album GetAlbumById(string albumId)
+        {
+            return sqliteHelper.GetAlbumById(albumId);
+        }
+
         [HttpGet("albums")]
         public List<Album> GetAlbums()
         {
