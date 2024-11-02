@@ -77,10 +77,34 @@ namespace PanAudioServer.Helper
             return _context.Album.OrderBy(x => x.Title).ToList();
         }
 
+        public List<Album> GetFavouriteAblums()
+        {
+            _context = new SqliteContext();
+            return _context.Album.Where(x => x.Favourite == true).ToList();
+        }
+
+        public List<Album> GetRecentAblums()
+        {
+            _context = new SqliteContext();
+            return _context.Album.OrderBy(x => x.DateAdded).Take(20).ToList();
+        }
+
+        public List<Album> GetRecentReleasedAlbums()
+        {
+            _context = new SqliteContext();
+            return _context.Album.Where(x => x.Year != 0).OrderByDescending(x => x.Year).Take(40).ToList();
+        }
+
         public List<Songs> GetAllSongs()
         {
             _context = new SqliteContext();
             return _context.Songs.OrderBy(x => x.Title).ToList();
+        }
+
+        public List<Songs> GetFavouriteSongs()
+        {
+            _context = new SqliteContext();
+            return _context.Songs.Where(x => x.Favourite == true).ToList();
         }
 
         //public Songs GetSongById(String songId)
@@ -102,6 +126,12 @@ namespace PanAudioServer.Helper
             return _context.Artists.First(x => x.Name == artist);
         }
 
+
+        public List<Artists> GetFavouriteArtists()
+        {
+            _context = new SqliteContext();
+            return _context.Artists.Where(x => x.Favourite == true).ToList();
+        }
 
         public Songs GetSongById(string songId)
         {

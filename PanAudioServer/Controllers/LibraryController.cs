@@ -28,6 +28,18 @@ namespace PanAudioServer.Controllers
             return sqliteHelper.GetAllAblums();
         }
 
+        [HttpGet("recent-albums")]
+        public List<Album> GetRecentAlbums()
+        {
+            return sqliteHelper.GetRecentAblums();
+        }
+
+        [HttpGet("recent-released-albums")]
+        public List<Album> GetRecentReleasedAlbums()
+        {
+            return sqliteHelper.GetRecentReleasedAlbums();
+        }
+        
         [HttpGet("songs")]
         public List<Songs> GetSongs() 
         {
@@ -55,5 +67,23 @@ namespace PanAudioServer.Controllers
             sqliteHelper.UpdateSong(song);
         }
 
+        [HttpGet("favourite-albums")]
+        public List<Album> GetFavouriteAlbums()
+        {
+            return sqliteHelper.GetFavouriteAblums();
+        }
+
+        [HttpGet("favourite-artists")]
+        public List<Artists> GetFavouriteArtists()
+        {
+            return sqliteHelper.GetFavouriteArtists();
+        }
+
+        [HttpGet("favourite-songs")]
+        public List<Songs> GetFavouriteSongs()
+        {
+            return sqliteHelper.GetFavouriteSongs();
+        }
     }
+
 }

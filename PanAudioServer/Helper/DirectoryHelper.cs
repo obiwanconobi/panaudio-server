@@ -273,7 +273,7 @@ namespace PanAudioServer.Helper
                             artistId = Guid.NewGuid().ToString();
                             //set artistId,
                            // sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
-                            artists.Add(new Artists(id: artistId, name: artistName, picture: ""));
+                            artists.Add(new Artists(id: artistId, name: artistName, picture: "", favourite: false));
                             Console.WriteLine("Info: Inserted Artist: " + artistName);
                         }
                         else
@@ -290,7 +290,7 @@ namespace PanAudioServer.Helper
 
                             //sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
                             albumId = Guid.NewGuid().ToString();
-                            albums.Add(new Album(id: albumId, title:removeShittyCharacters(file.Album), artist: artistName, picture: Path.GetFileName(returnLikelyImage(imagesInFolder)), albumPath: directory, year: file.Year ?? null));
+                            albums.Add(new Album(id: albumId, title:removeShittyCharacters(file.Album), artist: artistName, picture: Path.GetFileName(returnLikelyImage(imagesInFolder)), albumPath: directory, year: file.Year ?? null, favourite: false));
                             Console.WriteLine("Info: Inserted Album: " + file.Album);
                         }
                         else
