@@ -67,6 +67,22 @@ namespace PanAudioServer.Controllers
             sqliteHelper.UpdateSong(song);
         }
 
+        [HttpPost("favourite-album")]
+        public void SetAlbumFavourite(string albumId, bool favourite)
+        {
+            var album = sqliteHelper.GetAlbumById(albumId);
+            album.Favourite = favourite;
+            sqliteHelper.UpdateAlbum(album);
+        }
+
+        [HttpPost("favourite-artist")]
+        public void SetArtistFavourite(string artistId, bool favourite)
+        {
+            var artist = sqliteHelper.GetArtistById(artistId);
+            artist.Favourite = favourite;
+            sqliteHelper.UpdateArtist(artist);
+        }
+
         [HttpGet("favourite-albums")]
         public List<Album> GetFavouriteAlbums()
         {

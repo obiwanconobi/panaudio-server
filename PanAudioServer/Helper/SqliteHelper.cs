@@ -126,6 +126,12 @@ namespace PanAudioServer.Helper
             return _context.Artists.First(x => x.Name == artist);
         }
 
+        public Artists GetArtistById(string artistId)
+        {
+            _context = new SqliteContext();
+            return _context.Artists.First(x => x.Name == artistId);
+        }
+
 
         public List<Artists> GetFavouriteArtists()
         {
@@ -177,6 +183,50 @@ namespace PanAudioServer.Helper
                     Console.WriteLine(ex.ToString());
                 }
             }
+        }
+
+        public void UpdateArtist(Artists artist)
+        {
+            _context ??= new SqliteContext();
+            using (var context = new SqliteContext())
+            {
+
+                try
+                {
+                    context.Artists.Update(artist);
+                    context.SaveChangesAsync();
+
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine(ex.ToString());
+                }
+
+            }
+
+        }
+
+        public void UpdateAlbum(Album album)
+        {
+            _context ??= new SqliteContext();
+            using (var context = new SqliteContext())
+            {
+
+                try
+                {
+                    context.Album.Update(album);
+                    context.SaveChangesAsync();
+
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine(ex.ToString());
+                }
+
+            }
+
         }
 
         public void UpdateSong(Songs song)
