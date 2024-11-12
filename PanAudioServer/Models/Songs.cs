@@ -13,6 +13,7 @@
         public bool? Favourite { get; set;}
         public string Length { get; set;}
         public string Path { get; set; }
+        public string MusicBrainzId { get; set;}
 
         public Songs(string id = null, int? trackNumber = null, string title = null, string album = null,
                      string albumId = null, string artist = null, string artistId = null,

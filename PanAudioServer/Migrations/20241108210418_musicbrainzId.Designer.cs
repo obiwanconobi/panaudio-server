@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PanAudioServer.Data;
 
@@ -10,9 +11,11 @@ using PanAudioServer.Data;
 namespace PanAudioServer.Migrations
 {
     [DbContext(typeof(SqliteContext))]
-    partial class SqliteContextModelSnapshot : ModelSnapshot
+    [Migration("20241108210418_musicbrainzId")]
+    partial class musicbrainzId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
@@ -79,40 +82,6 @@ namespace PanAudioServer.Migrations
                     b.ToTable("Artists");
                 });
 
-            modelBuilder.Entity("PanAudioServer.Models.PlaylistItems", b =>
-                {
-                    b.Property<string>("PlaylistItemId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PlaylistId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SongId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("PlaylistItemId");
-
-                    b.HasIndex("PlaylistId");
-
-                    b.ToTable("PlaylistItems");
-                });
-
-            modelBuilder.Entity("PanAudioServer.Models.Playlists", b =>
-                {
-                    b.Property<string>("PlaylistId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PlaylistName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("PlaylistId");
-
-                    b.ToTable("Playlists");
-                });
-
             modelBuilder.Entity("PanAudioServer.Models.Songs", b =>
                 {
                     b.Property<string>("Id")
@@ -163,22 +132,6 @@ namespace PanAudioServer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Songs");
-                });
-
-            modelBuilder.Entity("PanAudioServer.Models.PlaylistItems", b =>
-                {
-                    b.HasOne("PanAudioServer.Models.Playlists", "Playlist")
-                        .WithMany("PlaylistItems")
-                        .HasForeignKey("PlaylistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Playlist");
-                });
-
-            modelBuilder.Entity("PanAudioServer.Models.Playlists", b =>
-                {
-                    b.Navigation("PlaylistItems");
                 });
 #pragma warning restore 612, 618
         }

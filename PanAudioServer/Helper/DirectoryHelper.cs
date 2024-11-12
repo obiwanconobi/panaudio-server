@@ -19,6 +19,7 @@ namespace PanAudioServer.Helper
         List<Songs> dbSongs = new List<Songs>();
         List<Album> dbAlbums = new List<Album>();
         List<Artists> dbArtists = new List<Artists>();
+        MusicBrainzHelper musicBrainzHelper = new MusicBrainzHelper();
 
         public DirectoryHelper()
         {
@@ -267,13 +268,14 @@ namespace PanAudioServer.Helper
                             artistName = file.Artist;
                         }
                         var artist = dbArtists.Where(x => x.Name.ToLower() == artistName.ToLower()).FirstOrDefault() ?? artists.Where(x => x.Name.ToLower() == artistName.ToLower()).FirstOrDefault();
+                        var musicBrainzArtistId = await musicBrainzHelper.getArtistIdAsync(artistName);
 
                         if (artist == null)
                         {
                             artistId = Guid.NewGuid().ToString();
                             //set artistId,
                            // sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
-                            artists.Add(new Artists(id: artistId, name: artistName, picture: "", favourite: false));
+                            artists.Add(new Artists(id: artistId, name: artistName, picture: "", favourite: false, musicBrainzId: musicBrainzArtistId));
                             Console.WriteLine("Info: Inserted Artist: " + artistName);
                         }
                         else

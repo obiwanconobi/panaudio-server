@@ -296,5 +296,58 @@ namespace PanAudioServer.Helper
 
         }
 
+        public async Task CreateNewPlaylist(string playlistTitle)
+        {
+            _context ??= new SqliteContext();
+            using (var context = new SqliteContext())
+            {
+
+                try
+                {
+                    context.Playlists.Add(new Playlists() { PlaylistId = Guid.NewGuid().ToString(), PlaylistName = playlistTitle });
+                    await context.SaveChangesAsync();
+
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine(ex.ToString());
+                }
+
+            }
+        }
+
+        public List<Playlists> GetPlaylists()
+        {
+            _context ??= new SqliteContext();
+            return _context.Playlists.Include(p => p.PlaylistItems).ToList();
+        }
+        public async Task DeletePlaylist(string playlistId)
+        {
+            _context ??= new SqliteContext();
+            try
+            {
+                _context.Playlists.Where(x => x.PlaylistId == playlistId).ExecuteDelete();
+                await _context.SaveChangesAsync();
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        public async Task AddSongToPlaylist(string playlistId, string songId)
+        {
+            _context ??= new SqliteContext();
+            try
+            {
+                _context.PlaylistItems.Add(new PlaylistItems() { PlaylistId = playlistId, PlaylistItemId = Guid.NewGuid().ToString(), SongId = songId });
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
     }
 }

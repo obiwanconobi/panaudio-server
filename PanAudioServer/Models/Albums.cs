@@ -10,8 +10,9 @@
         public string? AlbumPath { get; set; }
         public DateTime DateAdded { get; set; }
         public bool Favourite { get; set; }
+        public string MusicBrainzId { get; set; }
 
-        public Album(string id = null, string title = null, string artist = null, int? year = null, string picture = null, string albumPath = null, DateTime dateAdded = default, bool favourite = false)
+        public Album(string id = null, string title = null, string artist = null, int? year = null, string picture = null, string albumPath = null, DateTime dateAdded = default, bool favourite = false, string musicBrainzId = null)
         {
             Id = id;
             Title = title;
@@ -21,6 +22,7 @@
             AlbumPath = albumPath;
             DateAdded = dateAdded;
             Favourite = favourite;
+            MusicBrainzId = musicBrainzId;
         }
     }
 
