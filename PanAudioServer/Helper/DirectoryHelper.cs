@@ -268,14 +268,14 @@ namespace PanAudioServer.Helper
                             artistName = file.Artist;
                         }
                         var artist = dbArtists.Where(x => x.Name.ToLower() == artistName.ToLower()).FirstOrDefault() ?? artists.Where(x => x.Name.ToLower() == artistName.ToLower()).FirstOrDefault();
-                        var musicBrainzArtistId = await musicBrainzHelper.getArtistIdAsync(artistName);
+                       // var musicBrainzArtistId = await musicBrainzHelper.getArtistIdAsync(artistName);
 
                         if (artist == null)
                         {
                             artistId = Guid.NewGuid().ToString();
                             //set artistId,
                            // sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
-                            artists.Add(new Artists(id: artistId, name: artistName, picture: "", favourite: false, musicBrainzId: musicBrainzArtistId));
+                            artists.Add(new Artists(id: artistId, name: artistName, picture: "", favourite: false, musicBrainzId: ""));
                             Console.WriteLine("Info: Inserted Artist: " + artistName);
                         }
                         else
