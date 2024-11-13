@@ -317,10 +317,16 @@ namespace PanAudioServer.Helper
             }
         }
 
+        public Playlists GetPlaylist(string playlistId)
+        {
+            _context ??= new SqliteContext();
+            return _context.Playlists.Where(x => x.PlaylistId == playlistId).Include(x => x.PlaylistItems).ThenInclude(p => p.Song).FirstOrDefault();
+        }
+
         public List<Playlists> GetPlaylists()
         {
             _context ??= new SqliteContext();
-            return _context.Playlists.Include(p => p.PlaylistItems).ToList();
+            return _context.Playlists.ToList();
         }
         public async Task DeletePlaylist(string playlistId)
         {
@@ -349,5 +355,18 @@ namespace PanAudioServer.Helper
             }
         }
 
+        public async Task DeleteSongFromPlaylist(string playlistId, string songId)
+        {
+            _context ??= new SqliteContext();
+            try
+            {
+                _context.PlaylistItems.Where(x => x.PlaylistId == playlistId).Where(y => y.SongId == songId).ExecuteDelete();
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
     }
 }

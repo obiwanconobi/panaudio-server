@@ -7,6 +7,7 @@ namespace PanAudioServer.Models
         public required string PlaylistItemId { get; set; }
         public required string PlaylistId { get; set; }
         public required string SongId { get; set; }
+        public virtual Songs Song { get; set; }
         public virtual Playlists Playlist { get; set; }  
     }
 }

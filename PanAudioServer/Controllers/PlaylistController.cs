@@ -15,6 +15,12 @@ namespace PanAudioServer.Controllers
             return sqliteHelper.GetPlaylists();
         }
 
+        [HttpGet("playlist")]
+        public Playlists GetPlaylist(string playlistId)
+        {
+            return sqliteHelper.GetPlaylist(playlistId);
+        }
+
         [HttpPut("playlist")]
         public async Task CreateNewPlaylist(string playlistName)
         {
@@ -25,6 +31,12 @@ namespace PanAudioServer.Controllers
         public async Task AddSongToPlaylist(string playlistId, string songId)
         {
             await sqliteHelper.AddSongToPlaylist(playlistId, songId);
+        }
+
+        [HttpPut("deleteSong")]
+        public async Task DeleteSongFromPlaylist(string playlistId, string songId)
+        {
+            await sqliteHelper.DeleteSongFromPlaylist(playlistId, songId);
         }
 
         [HttpDelete("playlist")]
