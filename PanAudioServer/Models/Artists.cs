@@ -6,7 +6,7 @@
         public string Name { get; set;}
         public string Picture { get; set;}
         public bool Favourite { get; set;}
-        public string MusicBrainzId { get; set; }
+        public string? MusicBrainzId { get; set; }
 
         public Artists(string id = null, string name = null, string picture = null, bool favourite = false, string musicBrainzId = null)
         {
