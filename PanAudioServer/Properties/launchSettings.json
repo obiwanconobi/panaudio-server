@@ -5,7 +5,8 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "SqliteDB": "Data Source=Data\\FoxessWebbus.db"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7053;http://localhost:5027"
@@ -15,7 +16,8 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "SqliteDB": "Data Source=Data\\FoxessWebbus.db"
       }
     },
     "Docker": {
@@ -23,7 +25,8 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
-        "ASPNETCORE_URLS": "https://+:443;http://+:80"
+        "ASPNETCORE_URLS": "https://+:443;http://+:80",
+        "SqliteDB": "Data Source=Data\\FoxessWebbus.db"
       },
       "publishAllPorts": true,
       "useSSL": true
