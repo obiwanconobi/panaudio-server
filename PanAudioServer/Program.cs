@@ -35,7 +35,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 var db = new SqliteContext();
-db.Database.EnsureCreated();
 db.Database.Migrate();
 app.Run();
 
