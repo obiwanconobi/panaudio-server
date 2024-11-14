@@ -20,7 +20,7 @@ namespace PanAudioServer.Data
 
 
 
-            optionsBuilder.UseSqlite(@"Data Source=Data\\Data\\panaudio.db");
+            optionsBuilder.UseSqlite(@"Data Source=Data//panaudio.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
