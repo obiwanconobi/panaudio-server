@@ -311,22 +311,22 @@ namespace PanAudioServer.Helper
 
                         if (song == null)
                         {
-                            var songAdd = new Songs
-                             (
-                                 id: songId,
-                                 title: removeShittyCharacters(file.Title),
-                                 trackNumber: Convert.ToInt32(file.TrackNumber),
-                                 album: file.Album,
-                                 albumId: albumId,
-                                 artist: artistName,
-                                 artistId: artistId,
-                                 albumPicture: "",
-                                 favourite: false,
-                                 length: file.Duration.ToString(),
-                                 path: f.ToString()
+                            var songAdd = new Songs()
+                            {
+                                Id = songId,
+                                Title = removeShittyCharacters(file.Title),
+                                TrackNumber = Convert.ToInt32(file.TrackNumber),
+                                Album = file.Album,
+                                AlbumId = albumId,
+                                Artist = artistName,
+                                ArtistId = artistId,
+                                AlbumPicture = "",
+                                Favourite = false,
+                                Length = file.Duration.ToString(),
+                                Path = f.ToString()
 
 
-                             );
+                            };
                             songs.Add(songAdd);
                             //sqliteHelper.UploadSong(songAdd);
                             Console.WriteLine("Info: Inserted Song:" + songAdd.Title + " : " + songAdd.Artist );

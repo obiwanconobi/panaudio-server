@@ -16,22 +16,7 @@
         public string? MusicBrainzId { get; set;}
         public int PlayCount { get; set;}
 
-        public Songs(string id = null, int? trackNumber = null, string title = null, string album = null,
-                     string albumId = null, string artist = null, string artistId = null,
-                     string albumPicture = null, bool? favourite = null, string length = null, string path = null)
-        {
-            Id = id;
-            TrackNumber = trackNumber;
-            Title = title;
-            Album = album;
-            AlbumId = albumId;
-            Artist = artist;
-            ArtistId = artistId;
-            AlbumPicture = albumPicture;
-            Favourite = favourite;
-            Length = length;
-            Path = path;
-        }
+       
     }
 
 }

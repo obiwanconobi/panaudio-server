@@ -96,7 +96,29 @@ namespace PanAudioServer.Helper
         public List<Songs> GetAllSongs()
         {
             _context = new SqliteContext();
-            return _context.Songs.OrderBy(x => x.Title).ToList();
+            return _context.Songs
+                .GroupJoin(
+                    _context.PlaybackHistory,
+                    song => song.Id,
+                    playback => playback.SongId,
+                    (song, playbacks) => new Songs
+                    {
+                        Id = song.Id,
+                        TrackNumber = song.TrackNumber ?? null,  // Handle nullable int explicitly
+                        Title = song.Title ?? "",                // Handle nullable strings explicitly
+                        Album = song.Album ?? "",
+                        AlbumId = song.AlbumId ?? "",
+                        Artist = song.Artist ?? "",
+                        ArtistId = song.ArtistId ?? "",
+                        AlbumPicture = song.AlbumPicture ?? "",
+                        Favourite = song.Favourite,
+                        Length = song.Length ?? "",
+                        Path = song.Path ?? "",
+                        MusicBrainzId = song.MusicBrainzId ?? "",
+                        PlayCount = playbacks.Count()
+                    })
+                .OrderBy(x => x.Title)
+                .ToList();
         }
 
         public List<Songs> GetFavouriteSongs()
