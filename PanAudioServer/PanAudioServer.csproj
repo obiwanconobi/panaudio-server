@@ -9,11 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Data\panaudio" />
+    <None Remove="Data\panaudio.db" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Data\panaudio">
+    <EmbeddedResource Include="Data\panaudio.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

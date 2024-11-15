@@ -6,7 +6,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "SqliteDB": "Data Source=Data\\FoxessWebbus.db"
+        "SqliteDB": "Data Source=Data\\panaudio.db"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7053;http://localhost:5027"
@@ -17,7 +17,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "SqliteDB": "Data Source=Data\\FoxessWebbus.db"
+        "SqliteDB": "Data Source=Data\\panaudio.db"
       }
     },
     "Docker": {
@@ -26,7 +26,7 @@
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
         "ASPNETCORE_URLS": "https://+:443;http://+:80",
-        "SqliteDB": "Data Source=Data\\FoxessWebbus.db"
+        "SqliteDB": "Data Source=Data\\panaudio.dbb"
       },
       "publishAllPorts": true,
       "useSSL": true

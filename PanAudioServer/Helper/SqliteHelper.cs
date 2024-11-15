@@ -105,12 +105,6 @@ namespace PanAudioServer.Helper
             return _context.Songs.Where(x => x.Favourite == true).ToList();
         }
 
-        //public Songs GetSongById(String songId)
-        //{
-        //    _context = new SqliteContext();
-        //    return _context.Songs.OrderBy(x => x.Id == songId).First();
-        //}
-
         public List<Artists> GetAllArtists()
         {
             _context =  new SqliteContext();
@@ -140,7 +134,9 @@ namespace PanAudioServer.Helper
         public Songs GetSongById(string songId)
         {
             _context = new SqliteContext();
-            return _context.Songs.First(x => x.Id == songId);
+            var song = _context.Songs.First(x => x.Id == songId);
+            song.PlayCount = _context.PlaybackHistory.Count(x => x.SongId == songId);
+            return song;
         }
 
         public Songs GetSong(string artist, string album, string title)
@@ -365,6 +361,34 @@ namespace PanAudioServer.Helper
             {
                 Console.WriteLine(ex.ToString());
             }
+        }
+
+
+        //Playback
+        public async Task StartRecordPlayback(string songId)
+        {
+            _context ??= new SqliteContext();
+            DateTime playbackStartTime = DateTime.Now;
+            try
+            {
+                await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        public async Task<List<PlaybackCounts>> GetPlaybackHistory()
+        {
+            _context ??= new SqliteContext();
+            var songPlaybackCounts = _context.PlaybackHistory
+                 .GroupBy(x => x.SongId)
+                 .Select(g => new PlaybackCounts{ SongId = g.Key, PlaybackCount = g.Count() })
+                 .OrderByDescending(x => x.PlaybackCount)
+                 .ToList();
+            return songPlaybackCounts;
         }
     }
 }

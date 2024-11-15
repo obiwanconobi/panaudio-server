@@ -31,6 +31,7 @@ namespace PanAudioServer.Data
             modelBuilder.Entity<Artists>().HasKey(x => x.Id);
             modelBuilder.Entity<Playlists>().HasKey(x => x.PlaylistId);
             modelBuilder.Entity<PlaylistItems>().HasKey(x => x.PlaylistItemId);
+            modelBuilder.Entity<PlaybackHistory>().HasKey(x => x.PlaybackId);
 
             modelBuilder.Entity<Playlists>(entity =>
             {
@@ -55,5 +56,6 @@ namespace PanAudioServer.Data
         public DbSet<Artists> Artists { get; set; }
         public DbSet<Playlists> Playlists { get; set; }
         public DbSet<PlaylistItems> PlaylistItems { get; set; }
+        public DbSet<PlaybackHistory> PlaybackHistory { get; set; }
     }
 }
