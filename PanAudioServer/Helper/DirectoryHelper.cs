@@ -297,7 +297,7 @@ namespace PanAudioServer.Helper
                             var artistDir = Directory.GetParent(directory);
                             //set artistId,
                             // sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
-                            artists.Add(new Artists(id: artistId, name: artistName,artistPath: artistDir!.FullName, picture: Path.GetFileName(returnLikelyArtistImage(artistDir!.FullName, artistName)), favourite: false, musicBrainzId: ""));
+                            artists.Add(new Artists(id: artistId, name: removeShittyCharacters(artistName),artistPath: artistDir!.FullName, picture: Path.GetFileName(returnLikelyArtistImage(artistDir!.FullName, artistName)), favourite: false, musicBrainzId: ""));
                             Console.WriteLine("Info: Inserted Artist: " + artistName);
                         }
                         else
