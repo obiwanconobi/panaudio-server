@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PanAudioServer.Data;
 
@@ -10,9 +11,11 @@ using PanAudioServer.Data;
 namespace PanAudioServer.Migrations
 {
     [DbContext(typeof(SqliteContext))]
-    partial class SqliteContextModelSnapshot : ModelSnapshot
+    [Migration("20241116205250_artistPath")]
+    partial class artistPath
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
@@ -59,6 +62,7 @@ namespace PanAudioServer.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ArtistPath")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("Favourite")
@@ -72,6 +76,7 @@ namespace PanAudioServer.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Picture")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

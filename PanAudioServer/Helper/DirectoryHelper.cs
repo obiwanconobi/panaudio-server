@@ -180,6 +180,28 @@ namespace PanAudioServer.Helper
             }
         }
 
+        public string returnLikelyArtistImage(string path, string artistName)
+        {
+
+            List<string> imagesInArtistFolder = new List<string>();
+            var files = Directory.GetFiles(path);
+            foreach (var file in files)
+            {
+                if (IsImage(Path.GetExtension(file)))
+                {
+                    imagesInArtistFolder.Add(file);
+                }
+            }
+
+            if (imagesInArtistFolder.Any(x => x.Contains(artistName, StringComparison.OrdinalIgnoreCase)))
+                return imagesInArtistFolder.First(x => x.Contains(artistName, StringComparison.OrdinalIgnoreCase));
+
+            if (imagesInArtistFolder.Any(x => x.Contains("fanart", StringComparison.OrdinalIgnoreCase)))
+                return imagesInArtistFolder.First(x => x.Contains("fanart", StringComparison.OrdinalIgnoreCase));
+
+            return null;
+        }
+
         public string returnLikelyImage(List<string> imagesInFolder)
         {
 
@@ -226,8 +248,7 @@ namespace PanAudioServer.Helper
         public async Task getSongs(String directory)
         {
             var files = Directory.GetFiles(directory).OrderBy(f => GetExtensionPriority(Path.GetExtension(f))).ToList();
-
-           // files.OrderBy(f => GetExtensionPriority(Path.GetExtension(f)));
+            // files.OrderBy(f => GetExtensionPriority(Path.GetExtension(f)));
             String albumId = "";
             Console.WriteLine("Getting Files in directory: " + directory);
             List<string> imagesInFolder = new List<string>();
@@ -273,9 +294,10 @@ namespace PanAudioServer.Helper
                         if (artist == null)
                         {
                             artistId = Guid.NewGuid().ToString();
+                            var artistDir = Directory.GetParent(directory);
                             //set artistId,
-                           // sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
-                            artists.Add(new Artists(id: artistId, name: artistName, picture: "", favourite: false, musicBrainzId: ""));
+                            // sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
+                            artists.Add(new Artists(id: artistId, name: artistName,artistPath: artistDir!.FullName, picture: Path.GetFileName(returnLikelyArtistImage(artistDir!.FullName, artistName)), favourite: false, musicBrainzId: ""));
                             Console.WriteLine("Info: Inserted Artist: " + artistName);
                         }
                         else

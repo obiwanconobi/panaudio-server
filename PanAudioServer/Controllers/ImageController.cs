@@ -11,6 +11,7 @@ namespace PanAudioServer.Controllers
     public class ImageController : Controller
     {
         ImageHelper imageHelper = new ImageHelper();
+
         [HttpGet("albumArt")]
         public IActionResult GetAlbumArt(string albumId)
         {
@@ -31,6 +32,29 @@ namespace PanAudioServer.Controllers
             // Return the file with proper content type
             return File(imageBytes, contentType);
         }
+
+
+        [HttpGet("artistArt")]
+        public IActionResult GetArtistArt(string artistId)
+        {
+            string albumArtPath = imageHelper.ArtistImagePath(artistId);
+            // Check if file exists
+            if (!System.IO.File.Exists(albumArtPath))
+            {
+                return NotFound($"Artist art not found for ID: {artistId}");
+                //return extractImageFromFile(albumArtPath);
+            }
+
+            // Read the image file
+            var imageBytes = System.IO.File.ReadAllBytes(albumArtPath);
+
+            // Determine content type based on file extension
+            var contentType = GetContentType(Path.GetExtension(albumArtPath));
+
+            // Return the file with proper content type
+            return File(imageBytes, contentType);
+        }
+
 
         private IActionResult extractImageFromFile(string path)
         {
