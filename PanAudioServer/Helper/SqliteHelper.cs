@@ -140,10 +140,10 @@ namespace PanAudioServer.Helper
             return _context.Artists.First(x => x.Name == artist);
         }
 
-        public Artists GetArtistById(string artistId)
+        public Artists? GetArtistById(string artistId)
         {
             _context = new SqliteContext();
-            return _context.Artists.First(x => x.Id == artistId);
+            return _context.Artists.FirstOrDefault(x => x.Id == artistId);
         }
 
 

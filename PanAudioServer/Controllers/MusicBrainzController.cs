@@ -31,7 +31,7 @@ namespace PanAudioServer.Controllers
         [HttpGet("setalbumpicture")]
         public async Task setAlbums(string artistName, string albumName)
         {
-             helper.setAlbum(artistName, albumName);
+            await helper.setAlbum(artistName, albumName);
           
         }
     }
