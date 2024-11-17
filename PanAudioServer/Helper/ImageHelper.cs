@@ -13,7 +13,17 @@
         public string ArtistImagePath(string artistId)
         {
             var artist = sqliteHelper.GetArtistById(artistId);
-            return Path.Combine(artist.ArtistPath ?? "", artist.Picture ?? "");
+            var fullPath = "";
+            try
+            {
+                fullPath = Path.Combine(artist.ArtistPath ?? "", artist.Picture ?? "");
+            }catch(Exception ex)
+            {
+                Console.WriteLine("Error Getting Image for " + artist.Name);
+            }
+
+
+            return "";
         }
     }
 }
