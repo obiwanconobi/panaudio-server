@@ -393,13 +393,26 @@ namespace PanAudioServer.Helper
             DateTime playbackStartTime = DateTime.Now;
             try
             {
-                await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
-                await _context.SaveChangesAsync();
+                var playbackDate = await GetLastPlayDate(songId);
+                var dateDiff = playbackStartTime - playbackDate;
+                if (dateDiff.Seconds > 20){
+                    await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
+                    await _context.SaveChangesAsync();
+                }
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
+        }
+
+        public async Task<DateTime> GetLastPlayDate(string songId)
+        {
+            _context ??= new SqliteContext();
+            var value = await _context.PlaybackHistory.Where(x => x.SongId == songId).OrderByDescending(y => y.PlaybackStart).FirstOrDefaultAsync();
+            if(value == null)return DateTime.Now.AddDays(-1);
+            return value.PlaybackStart;
         }
 
         public async Task<List<PlaybackCounts>> GetPlaybackHistory()
