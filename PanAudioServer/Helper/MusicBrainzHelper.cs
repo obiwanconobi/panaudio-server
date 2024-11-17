@@ -78,8 +78,8 @@ namespace PanAudioServer.Helper
             byte[] imageBytes = await _httpClient.GetByteArrayAsync(albumUrl);
             try
             {
-                await File.WriteAllBytesAsync(Path.Combine(savePlace, album + ".jpg"), imageBytes);
-                albumSave.Picture = album + ".jpg";
+                await File.WriteAllBytesAsync(Path.Combine(savePlace, "cover.jpg"), imageBytes);
+                albumSave.Picture = "cover.jpg";
                 sqliteHelper.UpdateAlbum(albumSave);
             }catch (Exception ex) {
                 
