@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Formats.Asn1;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,6 +39,17 @@ namespace PanAudioServer.Helper
             responseBody.Replace("artist-credit", "artistcredit");
             var albums = JsonSerializer.Deserialize<MusicBrainzReleases>(responseBody);
             return albums.releases[0].id;
+        }
+
+
+        public async Task setArtistId(string artistName)
+        {
+            var id = await getAlbumArtAsync(artistName);
+            var artist = sqliteHelper.GetArtist(artistName);
+            artist.MusicBrainzId = id;
+            sqliteHelper.UpdateArtist(artist);
+
+
         }
 
         public async Task<string> getArtistIdAsync(string artistName)

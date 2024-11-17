@@ -26,6 +26,12 @@ namespace PanAudioServer.Controllers
             return null;
         }
 
+        [HttpGet("SetArtistId")]
+        public async Task setArtistId(string artistName)
+        {
+            await helper.setArtistId(artistName);
+        }
+
 
 
         [HttpGet("setalbumpicture")]
