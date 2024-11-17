@@ -15,7 +15,7 @@ namespace PanAudioServer.Helper
         SqliteHelper sqliteHelper = new SqliteHelper();
         ImageHelper imageHelper = new ImageHelper();
         public MusicBrainzHelper() {
-            _httpClient.DefaultRequestHeaders.Add("User-Agent", "panaudio-server-beta");
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "panaudio-server-beta/0.0.5 (panaudio-support@panaro.co.uk)");
         }
 
         public async Task<String> getAlbumArtAsync(string id)

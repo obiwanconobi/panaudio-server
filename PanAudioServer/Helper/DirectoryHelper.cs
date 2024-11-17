@@ -297,7 +297,14 @@ namespace PanAudioServer.Helper
                         {
                             artistId = Guid.NewGuid().ToString();
                             var artistDir = Directory.GetParent(directory);
-                            var musicBrainzArtistId = await musicBrainzHelper.getArtistIdAsync(artistName);
+                            var musicBrainzArtistId = "";
+                            try
+                            {
+                                musicBrainzArtistId = await musicBrainzHelper.getArtistIdAsync(artistName);
+                            }
+                            catch (Exception) { }
+
+                            
                             //set artistId,
                             // sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
                             artists.Add(new Artists(id: artistId, name: removeShittyCharacters(artistName),artistPath: artistDir!.FullName, picture: Path.GetFileName(returnLikelyArtistImage(artistDir!.FullName, artistName)), favourite: false, musicBrainzId: musicBrainzArtistId));
