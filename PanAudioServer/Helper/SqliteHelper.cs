@@ -425,5 +425,13 @@ namespace PanAudioServer.Helper
                  .ToList();
             return songPlaybackCounts;
         }
+
+        public async Task<string> GetMusicBrainzUrl(string artist, string ablum)
+        {
+            _context ??= new SqliteContext();
+            var mbid = _context.Album.Where(x => x.Artist == artist).Where(y =>y.Title == ablum).FirstOrDefault();
+            if (mbid == null) return null;
+            return mbid.MusicBrainzId ?? "";
+        }
     }
 }

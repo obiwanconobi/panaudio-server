@@ -10,18 +10,29 @@ namespace PanAudioServer.Controllers
         MusicBrainzHelper helper = new MusicBrainzHelper();
 
         [HttpGet("album-art")]
-        public async Task<String> getAlbumArt(string albumId)
+        public async Task<String> getAlbumArt(string mbAlbumId)
         {
-            var result = await helper.getAlbumArtAsync(albumId);
+            var result = await helper.getAlbumArtAsync(mbAlbumId);
             return result;
         }
 
-        [HttpGet("albums")]
-        public async Task<MusicBrainzReleases> getAlbums(string artistId)
+        [HttpGet("setalbumid")]
+        public async Task<MusicBrainzReleases> getAlbums(string artistId, string albumName)
         {
-            var result = await helper.getAlbumIdAsync(artistId);
-           // result.releases.Where(x => x.)
-            return result;
+
+            var result = await helper.getAlbumIdAsync(artistId, albumName);
+           // var albumUrl = await helper.getAlbumArtAsync(mbAlbumId);
+            // result.releases.Where(x => x.)
+            return null;
+        }
+
+
+
+        [HttpGet("setalbumpicture")]
+        public async Task setAlbums(string artistName, string albumName)
+        {
+             helper.setAlbum(artistName, albumName);
+          
         }
     }
 }

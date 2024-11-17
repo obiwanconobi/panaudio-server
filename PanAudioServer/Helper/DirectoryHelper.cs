@@ -56,6 +56,9 @@ namespace PanAudioServer.Helper
             {
                 Console.WriteLine();
             }
+
+            input.Replace('‐', '-');
+            
             char HyphenMinus = '\u002D';        // Regular hyphen-minus: -
              char HyphenFigureDash = '\u2012';   // Figure dash: ‒
              char HyphenEnDash = '\u2013';       // En dash: –
@@ -289,15 +292,15 @@ namespace PanAudioServer.Helper
                             artistName = file.Artist;
                         }
                         var artist = dbArtists.Where(x => x.Name.ToLower() == artistName.ToLower()).FirstOrDefault() ?? artists.Where(x => x.Name.ToLower() == artistName.ToLower()).FirstOrDefault();
-                       // var musicBrainzArtistId = await musicBrainzHelper.getArtistIdAsync(artistName);
 
                         if (artist == null)
                         {
                             artistId = Guid.NewGuid().ToString();
                             var artistDir = Directory.GetParent(directory);
+                            var musicBrainzArtistId = await musicBrainzHelper.getArtistIdAsync(artistName);
                             //set artistId,
                             // sqliteHelper.UploadArtist(new Artists(id: artistId, name: artistName, picture: ""));
-                            artists.Add(new Artists(id: artistId, name: removeShittyCharacters(artistName),artistPath: artistDir!.FullName, picture: Path.GetFileName(returnLikelyArtistImage(artistDir!.FullName, artistName)), favourite: false, musicBrainzId: ""));
+                            artists.Add(new Artists(id: artistId, name: removeShittyCharacters(artistName),artistPath: artistDir!.FullName, picture: Path.GetFileName(returnLikelyArtistImage(artistDir!.FullName, artistName)), favourite: false, musicBrainzId: musicBrainzArtistId));
                             Console.WriteLine("Info: Inserted Artist: " + artistName);
                         }
                         else

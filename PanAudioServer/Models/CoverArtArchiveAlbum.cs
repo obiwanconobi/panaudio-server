@@ -15,7 +15,7 @@
             public string comment { get; set; }
             public int edit { get; set; }
             public bool front { get; set; }
-            public long id { get; set; }
+            public string id { get; set; }
             public string image { get; set; }
             public Thumbnails thumbnails { get; set; }
             public string[] types { get; set; }
