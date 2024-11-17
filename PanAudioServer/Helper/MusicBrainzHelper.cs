@@ -65,7 +65,7 @@ namespace PanAudioServer.Helper
 
         }
 
-        public async void setAlbum(string artist, string album)
+        public async Task setAlbum(string artist, string album)
         {
             var albumId = await sqliteHelper.GetMusicBrainzUrl(artist, album);
             if (albumId == "") { 
