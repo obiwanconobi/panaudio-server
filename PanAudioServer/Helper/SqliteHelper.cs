@@ -118,6 +118,10 @@ namespace PanAudioServer.Helper
                         Length = song.Length ?? "",
                         Path = song.Path ?? "",
                         MusicBrainzId = song.MusicBrainzId ?? "",
+                        BitDepth = song.BitDepth ?? "",
+                        BitRate = song.BitRate ?? "",
+                        SampleRate = song.SampleRate ?? "",
+                        Codec = song.Codec ?? "",
                         PlayCount = playbacks.Count()
                     })
                 .OrderBy(x => x.Title)
