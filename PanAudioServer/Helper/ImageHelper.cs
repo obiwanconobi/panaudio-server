@@ -28,7 +28,7 @@ namespace PanAudioServer.Helper
                 fullPath = Path.Combine(artist.ArtistPath ?? "", artist.Picture ?? "");
             }catch(Exception ex)
             {
-                Console.WriteLine("Error Getting Image for " + artist.Name);
+               // Console.WriteLine("Error Getting Image for " + artist.Name);
             }
 
 
