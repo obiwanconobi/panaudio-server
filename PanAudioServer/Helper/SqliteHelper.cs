@@ -24,6 +24,9 @@ namespace PanAudioServer.Helper
         public async void Clear()
         {
             _context = new SqliteContext();
+            _context.PlaybackHistory.ExecuteDelete();
+            _context.Playlists.ExecuteDelete();
+            _context.PlaylistItems.ExecuteDelete();
             _context.Album.ExecuteDelete();
             _context.Artists.ExecuteDelete();
             _context.Songs.ExecuteDelete();

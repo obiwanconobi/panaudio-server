@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PanAudioServer.Helper;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
 
 namespace PanAudioServer.Controllers
 {
@@ -54,6 +55,52 @@ namespace PanAudioServer.Controllers
             // Return the file with proper content type
             return File(imageBytes, contentType);
         }
+
+
+        [HttpPost("upload-album")]
+        public async Task<IActionResult> UploadAlbumImage(IFormFile file, string albumId)
+        {
+
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(fileExtension))
+                return BadRequest("Invalid file type. Allowed types: jpg, jpeg, png, gif, bmp");
+
+            try
+            {
+                // Generate unique filename
+                var fileName = $"{"cover"}{fileExtension}";
+                var filePath = Path.Combine(imageHelper.ImagePath(albumId), fileName);
+
+                // Save original file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                imageHelper.SetImage(albumId, fileName);
+
+
+                return Ok(new
+                {
+                    message = "File uploaded successfully",
+                    fileName = fileName,
+                    thumbnailName = $"thumb_{fileName}"
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception in a real-world scenario
+                return StatusCode(500, "An error occurred while processing the file.");
+            }
+
+        }
+
+
+
 
 
         private IActionResult extractImageFromFile(string path)

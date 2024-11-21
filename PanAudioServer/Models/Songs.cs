@@ -12,6 +12,10 @@
         public string AlbumPicture { get; set;}
         public bool? Favourite { get; set;}
         public string Length { get; set;}
+        public string Codec { get; set; }
+        public string BitRate { get; set;}
+        public string BitDepth { get; set; }
+        public string SampleRate { get; set; }
         public string Path { get; set; }
         public string? MusicBrainzId { get; set;}
         public int PlayCount { get; set;}

@@ -1,4 +1,6 @@
-﻿namespace PanAudioServer.Helper
+﻿using PanAudioServer.Models;
+
+namespace PanAudioServer.Helper
 {
     public class ImageHelper
     {
@@ -8,6 +10,13 @@
         {
             var album = sqliteHelper.GetAlbumById(albumId);
             return Path.Combine(album.AlbumPath, album.Picture ?? "");
+        }
+
+        public void SetImage(string albumId, string imageName)
+        {
+            var album = sqliteHelper.GetAlbumById(albumId);
+            album.Picture = imageName;
+            sqliteHelper.UpdateAlbum(album);
         }
 
         public string ArtistImagePath(string artistId)

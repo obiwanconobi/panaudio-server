@@ -1,8 +1,5 @@
-﻿using System.Formats.Asn1;
-using System.Net.Http;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using PanAudioServer.Models;
 
 
@@ -25,26 +22,26 @@ namespace PanAudioServer.Helper
 
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
-            var albums = JsonSerializer.Deserialize<CoverArtArchiveAlbum>(responseBody);
+            var albums = JsonConvert.DeserializeObject<CoverArtArchiveAlbum>(responseBody);
             return albums.images.FirstOrDefault().image;
         }
 
         public async Task<string> getAlbumIdAsync(string musicBrainzArtistId, string albumName)
         {
             //http://musicbrainz.org/ws/2/release/?query=arid:"0743b15a-3c32-48c8-ad58-cb325350befa"&primarytype:"album"&fmt=json
-            using HttpResponseMessage response = await _httpClient.GetAsync("https://musicbrainz.org/ws/2/release/?query=arid:" + musicBrainzArtistId + " AND release:" + albumName + " AND status:Official&fmt=json&inc=artist-credits&limit=1");
+          //  var artist = sqliteHelper.GetArtist(musicBrainzArtistId);
+            using HttpResponseMessage response = await _httpClient.GetAsync("https://musicbrainz.org/ws/2/release-group/?query=arid:" + musicBrainzArtistId + " AND release:" + albumName + " AND status:Official&fmt=json&inc=artist-credits&limit=1");
 
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
-            responseBody.Replace("artist-credit", "artistcredit");
-            var albums = JsonSerializer.Deserialize<MusicBrainzReleases>(responseBody);
-            return albums.releases[0].id;
+            var albums = JsonConvert.DeserializeObject<MusicBrainzReleaseGroups>(responseBody);
+            return albums.releasegroups[0].id;
         }
 
 
         public async Task setArtistId(string artistName)
         {
-            var id = await getAlbumArtAsync(artistName);
+            var id = await getArtistIdAsync(artistName);
             var artist = sqliteHelper.GetArtist(artistName);
             artist.MusicBrainzId = id;
             sqliteHelper.UpdateArtist(artist);
@@ -59,7 +56,7 @@ namespace PanAudioServer.Helper
             
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
-            var artist = JsonSerializer.Deserialize<MusicBrainzArtist>(responseBody);
+            var artist = JsonConvert.DeserializeObject<MusicBrainzArtist>(responseBody);
             return artist.artists[0].id ?? "";
         }
 

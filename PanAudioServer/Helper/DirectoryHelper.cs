@@ -350,11 +350,15 @@ namespace PanAudioServer.Helper
                                 TrackNumber = Convert.ToInt32(file.TrackNumber),
                                 Album = file.Album,
                                 AlbumId = albumId,
-                                Artist = artistName,
+                                Artist = artistName,    
                                 ArtistId = artistId,
                                 AlbumPicture = "",
                                 Favourite = false,
                                 Length = file.Duration.ToString(),
+                                Codec = file.AudioFormat.ShortName,
+                                BitRate = file.Bitrate.ToString(),
+                                BitDepth = file.BitDepth.ToString(),
+                                SampleRate = file.SampleRate.ToString(),
                                 Path = f.ToString()
 
 
