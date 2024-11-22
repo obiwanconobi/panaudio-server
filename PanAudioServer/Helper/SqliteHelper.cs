@@ -9,21 +9,26 @@ namespace PanAudioServer.Helper
     {
         private SqliteContext? _context;
 
-        public async Task<Album> GetAlbum(string artist, string album)
+        public SqliteHelper()
         {
             _context = new SqliteContext();
+        }
+
+        public async Task<Album> GetAlbum(string artist, string album)
+        {
+            
             return _context.Album.FirstOrDefault(x => x.Title == album && x.Artist == artist);
         }
 
         public Album GetAlbumById(string albumId)
         {
-            _context = new SqliteContext();
+            
             return _context.Album.First(x => x.Id == albumId);
         }
 
         public async void Clear()
         {
-            _context = new SqliteContext();
+            
             _context.PlaybackHistory.ExecuteDelete();
             _context.Playlists.ExecuteDelete();
             _context.PlaylistItems.ExecuteDelete();
@@ -35,9 +40,8 @@ namespace PanAudioServer.Helper
 
         public async Task UploadAlbums(List<Album> album)
         {
-            _context = new SqliteContext();
-            using (var context = new SqliteContext())
-            {
+            
+          
                 try
                 {
                     _context.Album.AddRange(album);
@@ -47,14 +51,13 @@ namespace PanAudioServer.Helper
                 {
 
                 }
-            }
+            
         }
 
         public async void UploadAlbum(Album album)
         {
-            _context = new SqliteContext();
-            using(var context  = new SqliteContext())
-            {
+            
+         
                 try
                 {
                     _context.Album.Add(album);
@@ -62,43 +65,43 @@ namespace PanAudioServer.Helper
                 }catch(Exception ex)
                 {
 
-                }
-            }
+               }
+            
         }
 
         public List<Album> GetAllAblumsForArtist(string artistName)
         {
-            _context = new SqliteContext();
+            
             return _context.Album.Where(x => x.Artist == artistName).ToList();
         }
 
         public List<Album> GetAllAblums()
         {
-            _context = new SqliteContext();
+            
             return _context.Album.OrderBy(x => x.Title).ToList();
         }
 
         public List<Album> GetFavouriteAblums()
         {
-            _context = new SqliteContext();
+            
             return _context.Album.Where(x => x.Favourite == true).ToList();
         }
 
         public List<Album> GetRecentAblums()
         {
-            _context = new SqliteContext();
+            
             return _context.Album.OrderBy(x => x.DateAdded).Take(20).ToList();
         }
 
         public List<Album> GetRecentReleasedAlbums()
         {
-            _context = new SqliteContext();
+            
             return _context.Album.Where(x => x.Year != 0).OrderByDescending(x => x.Year).Take(40).ToList();
         }
 
         public List<Songs> GetAllSongs()
         {
-            _context = new SqliteContext();
+            
             return _context.Songs
                 .GroupJoin(
                     _context.PlaybackHistory,
@@ -130,39 +133,39 @@ namespace PanAudioServer.Helper
 
         public List<Songs> GetFavouriteSongs()
         {
-            _context = new SqliteContext();
+            
             return _context.Songs.Where(x => x.Favourite == true).ToList();
         }
 
         public List<Artists> GetAllArtists()
         {
-            _context =  new SqliteContext();
+            
             return _context.Artists.OrderBy(x => x.Name).ToList();
         }
 
 
         public Artists GetArtist(string artist)
         {
-            _context = new SqliteContext();
+            
             return _context.Artists.First(x => x.Name == artist);
         }
 
         public Artists? GetArtistById(string artistId)
         {
-            _context = new SqliteContext();
+            
             return _context.Artists.FirstOrDefault(x => x.Id == artistId);
         }
 
 
         public List<Artists> GetFavouriteArtists()
         {
-            _context = new SqliteContext();
+            
             return _context.Artists.Where(x => x.Favourite == true).ToList();
         }
 
         public Songs GetSongById(string songId)
         {
-            _context = new SqliteContext();
+            
             var song = _context.Songs.First(x => x.Id == songId);
             song.PlayCount = _context.PlaybackHistory.Count(x => x.SongId == songId);
             return song;
@@ -170,54 +173,50 @@ namespace PanAudioServer.Helper
 
         public Songs GetSong(string artist, string album, string title)
         {
-            _context = new SqliteContext();
+            
             return _context.Songs.First(x => x.Artist == artist && x.Album == album  && x.Title == title);
         }
 
         public async Task UploadArtists(List<Artists> artists)
         {
-            _context = new SqliteContext();
-            using (var context = new SqliteContext())
-            {
+            
+     
                 try
                 {
-                    context.Artists.AddRange(artists);
-                    await context.SaveChangesAsync();
+                    _context.Artists.AddRange(artists);
+                    await _context.SaveChangesAsync();
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.ToString());
                 }
-            }
+            
         }
 
 
         public async void UploadArtist(Artists artists)
         {
-            _context = new SqliteContext();
-            using(var context = new SqliteContext())
-            {
+            
+        
                 try
                 {
-                    context.Artists.Add(artists);
-                    await context.SaveChangesAsync();
+                    _context.Artists.Add(artists);
+                    await _context.SaveChangesAsync();
                 }catch(Exception ex)
                 {
                     Console.WriteLine(ex.ToString());
                 }
-            }
+            
         }
 
         public void UpdateArtist(Artists artist)
         {
-            _context ??= new SqliteContext();
-            using (var context = new SqliteContext())
-            {
-
+            
+        
                 try
                 {
-                    context.Artists.Update(artist);
-                    context.SaveChangesAsync();
+                    _context.Artists.Update(artist);
+                    _context.SaveChangesAsync();
 
                 }
                 catch (Exception ex)
@@ -226,20 +225,19 @@ namespace PanAudioServer.Helper
                     Console.WriteLine(ex.ToString());
                 }
 
-            }
+            
 
         }
 
         public void UpdateAlbum(Album album)
         {
-            _context ??= new SqliteContext();
-            using (var context = new SqliteContext())
-            {
+            
+         
 
                 try
                 {
-                    context.Album.Update(album);
-                    context.SaveChangesAsync();
+                   _context.Album.Update(album);
+                    _context.SaveChangesAsync();
 
                 }
                 catch (Exception ex)
@@ -248,20 +246,18 @@ namespace PanAudioServer.Helper
                     Console.WriteLine(ex.ToString());
                 }
 
-            }
+            
 
         }
 
         public void UpdateSong(Songs song)
         {
-            _context ??= new SqliteContext();
-            using (var context = new SqliteContext())
-            {
-
+            
+         
                 try
                 {
-                    context.Songs.Update(song);
-                    context.SaveChangesAsync();
+                    _context.Songs.Update(song);
+                    _context.SaveChangesAsync();
 
                 }
                 catch (Exception ex)
@@ -270,21 +266,19 @@ namespace PanAudioServer.Helper
                     Console.WriteLine(ex.ToString());
                 }
 
-            }
+            
 
         }
 
 
         public async Task UploadSongs(List<Songs> song)
         {
-            _context ??= new SqliteContext();
-            using (var context = new SqliteContext())
-            {
+
 
                 try
                 {
-                    context.Songs.AddRange(song);
-                    await context.SaveChangesAsync();
+                    _context.Songs.AddRange(song);
+                    await _context.SaveChangesAsync();
 
                 }
                 catch (Exception ex)
@@ -293,20 +287,19 @@ namespace PanAudioServer.Helper
                     Console.WriteLine(ex.ToString());
                 }
 
-            }
+            
 
         }
 
         public async void UploadSong(Songs song)
         {
-            _context ??= new SqliteContext();
-            using (var context = new SqliteContext())
-            {
+            
+       
 
                 try
                 {
-                    context.Songs.Add(song);
-                    await context.SaveChangesAsync();
+                    _context.Songs.Add(song);
+                    await _context.SaveChangesAsync();
 
                 }
                 catch (Exception ex)
@@ -315,20 +308,17 @@ namespace PanAudioServer.Helper
                     Console.WriteLine(ex.ToString());
                 }
 
-            }
+            
 
         }
 
         public async Task CreateNewPlaylist(string playlistTitle)
         {
-            _context ??= new SqliteContext();
-            using (var context = new SqliteContext())
-            {
-
+           
                 try
                 {
-                    context.Playlists.Add(new Playlists() { PlaylistId = Guid.NewGuid().ToString(), PlaylistName = playlistTitle });
-                    await context.SaveChangesAsync();
+                    _context.Playlists.Add(new Playlists() { PlaylistId = Guid.NewGuid().ToString(), PlaylistName = playlistTitle });
+                    await _context.SaveChangesAsync();
 
                 }
                 catch (Exception ex)
@@ -336,24 +326,23 @@ namespace PanAudioServer.Helper
 
                     Console.WriteLine(ex.ToString());
                 }
-
-            }
+            
         }
 
         public Playlists GetPlaylist(string playlistId)
         {
-            _context ??= new SqliteContext();
+            
             return _context.Playlists.Where(x => x.PlaylistId == playlistId).Include(x => x.PlaylistItems).ThenInclude(p => p.Song).FirstOrDefault();
         }
 
         public List<Playlists> GetPlaylists()
         {
-            _context ??= new SqliteContext();
+            
             return _context.Playlists.ToList();
         }
         public async Task DeletePlaylist(string playlistId)
         {
-            _context ??= new SqliteContext();
+            
             try
             {
                 _context.Playlists.Where(x => x.PlaylistId == playlistId).ExecuteDelete();
@@ -366,7 +355,7 @@ namespace PanAudioServer.Helper
 
         public async Task AddSongToPlaylist(string playlistId, string songId)
         {
-            _context ??= new SqliteContext();
+            
             try
             {
                 _context.PlaylistItems.Add(new PlaylistItems() { PlaylistId = playlistId, PlaylistItemId = Guid.NewGuid().ToString(), SongId = songId });
@@ -380,7 +369,7 @@ namespace PanAudioServer.Helper
 
         public async Task DeleteSongFromPlaylist(string playlistId, string songId)
         {
-            _context ??= new SqliteContext();
+            
             try
             {
                 _context.PlaylistItems.Where(x => x.PlaylistId == playlistId).Where(y => y.SongId == songId).ExecuteDelete();
@@ -396,7 +385,7 @@ namespace PanAudioServer.Helper
         //Playback
         public async Task StartRecordPlayback(string songId)
         {
-            _context ??= new SqliteContext();
+            
             DateTime playbackStartTime = DateTime.Now;
             try
             {
@@ -405,18 +394,20 @@ namespace PanAudioServer.Helper
                 if (dateDiff.Seconds > 20){
                     await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
                     await _context.SaveChangesAsync();
+                    Console.WriteLine("Playback logged for song: " + songId);
                 }
 
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Error Logging Song: " + songId);
                 Console.WriteLine(ex.ToString());
             }
         }
 
         public async Task<DateTime> GetLastPlayDate(string songId)
         {
-            _context ??= new SqliteContext();
+            
             var value = await _context.PlaybackHistory.Where(x => x.SongId == songId).OrderByDescending(y => y.PlaybackStart).FirstOrDefaultAsync();
             if(value == null)return DateTime.Now.AddDays(-1);
             return value.PlaybackStart;
@@ -424,7 +415,7 @@ namespace PanAudioServer.Helper
 
         public async Task<List<PlaybackCounts>> GetPlaybackHistory()
         {
-            _context ??= new SqliteContext();
+            
             var songPlaybackCounts = _context.PlaybackHistory
                  .GroupBy(x => x.SongId)
                  .Select(g => new PlaybackCounts{ SongId = g.Key, PlaybackCount = g.Count() })
@@ -435,7 +426,7 @@ namespace PanAudioServer.Helper
 
         public async Task<string> GetMusicBrainzUrl(string artist, string ablum)
         {
-            _context ??= new SqliteContext();
+            
             var mbid = _context.Album.Where(x => x.Artist == artist).Where(y =>y.Title == ablum).FirstOrDefault();
             if (mbid == null) return null;
             return mbid.MusicBrainzId ?? "";

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MetaBrainz.MusicBrainz;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using PanAudioServer.Models;
 
@@ -29,7 +30,17 @@ namespace PanAudioServer.Helper
         public async Task<string> getAlbumIdAsync(string musicBrainzArtistId, string albumName)
         {
             //http://musicbrainz.org/ws/2/release/?query=arid:"0743b15a-3c32-48c8-ad58-cb325350befa"&primarytype:"album"&fmt=json
-          //  var artist = sqliteHelper.GetArtist(musicBrainzArtistId);
+            //  var artist = sqliteHelper.GetArtist(musicBrainzArtistId);
+
+            var q = new Query("PanAudio-Beta", "0.1", "mailto:panaudio-support@panaro.co.uk");
+            var artist = await q.LookupArtistAsync(new Guid(musicBrainzArtistId) ,Include.ReleaseGroups);
+
+            var album = artist.ReleaseGroups.Where(x => x.Title == albumName).ToList();
+            var releases = await q.LookupReleaseGroupAsync(album[0].Id, Include.Releases);
+            var rel = releases.Releases.OrderBy(x => x.Date).ToList();
+
+            return rel[0].Id.ToString();
+
             using HttpResponseMessage response = await _httpClient.GetAsync("https://musicbrainz.org/ws/2/release-group/?query=arid:" + musicBrainzArtistId + " AND release:" + albumName + " AND status:Official&fmt=json&inc=artist-credits&limit=1");
 
             response.EnsureSuccessStatusCode();
