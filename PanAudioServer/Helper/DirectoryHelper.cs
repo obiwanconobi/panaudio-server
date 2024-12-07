@@ -370,11 +370,6 @@ namespace PanAudioServer.Helper
                         }
                         else
                         {
-                            //update song
-                            if(file.DiscNumber > 0)
-                            {
-                                Console.WriteLine("EEE");
-                            }
                             song.DiscNumber = file.DiscNumber ?? 1;
                             await sqliteHelper.UpdateSong(song);
                         }
