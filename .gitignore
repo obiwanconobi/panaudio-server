@@ -30,3 +30,7 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+.idea/.idea.PanAudioServer/.idea/.name
+.idea/.idea.PanAudioServer/.idea/encodings.xml
+.idea/.idea.PanAudioServer/.idea/indexLayout.xml
+.idea/.idea.PanAudioServer/.idea/vcs.xml

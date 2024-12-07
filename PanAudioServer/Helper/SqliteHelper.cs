@@ -118,6 +118,7 @@ namespace PanAudioServer.Helper
                         ArtistId = song.ArtistId ?? "",
                         AlbumPicture = song.AlbumPicture ?? "",
                         Favourite = song.Favourite,
+                        DiscNumber = song.DiscNumber,
                         Length = song.Length ?? "",
                         Path = song.Path ?? "",
                         MusicBrainzId = song.MusicBrainzId ?? "",
@@ -250,14 +251,14 @@ namespace PanAudioServer.Helper
 
         }
 
-        public void UpdateSong(Songs song)
+        public async Task UpdateSong(Songs song)
         {
             
          
                 try
                 {
                     _context.Songs.Update(song);
-                    _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
 
                 }
                 catch (Exception ex)

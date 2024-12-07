@@ -62,7 +62,8 @@ namespace PanAudioServer.Helper
 
         public async Task<string> getArtistIdAsync(string artistName)
         {
-            
+          //  var q = new Query("PanAudio-Beta", "0.1", "mailto:panaudio-support@panaro.co.uk");
+          //  var artist = await q.FindArtists("artistName")
             using HttpResponseMessage response = await _httpClient.GetAsync("http://musicbrainz.org/ws/2/artist/?query=artist:" + artistName + "&fmt=json&limit=1");
             
             response.EnsureSuccessStatusCode();

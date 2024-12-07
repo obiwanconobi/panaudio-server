@@ -353,6 +353,7 @@ namespace PanAudioServer.Helper
                                 Artist = artistName,    
                                 ArtistId = artistId,
                                 AlbumPicture = "",
+                                DiscNumber =  file.DiscNumber ?? 1,
                                 Favourite = false,
                                 Length = file.Duration.ToString(),
                                 Codec = file.AudioFormat.ShortName,
@@ -366,6 +367,16 @@ namespace PanAudioServer.Helper
                             songs.Add(songAdd);
                             //sqliteHelper.UploadSong(songAdd);
                             Console.WriteLine("Info: Inserted Song:" + songAdd.Title + " : " + songAdd.Artist );
+                        }
+                        else
+                        {
+                            //update song
+                            if(file.DiscNumber > 0)
+                            {
+                                Console.WriteLine("EEE");
+                            }
+                            song.DiscNumber = file.DiscNumber ?? 1;
+                            await sqliteHelper.UpdateSong(song);
                         }
                     }
 

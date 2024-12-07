@@ -10,6 +10,7 @@
         public string Artist { get; set;}
         public string ArtistId { get; set;}
         public string AlbumPicture { get; set;}
+        public int DiscNumber { get; set;}
         public bool? Favourite { get; set;}
         public string Length { get; set;}
         public string Codec { get; set; }
