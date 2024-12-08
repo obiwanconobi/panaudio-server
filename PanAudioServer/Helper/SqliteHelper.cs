@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Validations;
 using PanAudioServer.Data;
 using PanAudioServer.Models;
 using System.Diagnostics.Contracts;
@@ -383,6 +384,24 @@ namespace PanAudioServer.Helper
         }
 
 
+        public async Task UpdateLastPlayback(PlaybackHistory playback, int Seconds)
+        {
+
+            try
+            {
+                playback.Seconds = Seconds;
+                _context.PlaybackHistory.Update(playback);
+                await _context.SaveChangesAsync();
+
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.ToString());
+            }
+
+        }
+
         //Playback
         public async Task StartRecordPlayback(string songId)
         {
@@ -390,13 +409,47 @@ namespace PanAudioServer.Helper
             DateTime playbackStartTime = DateTime.Now;
             try
             {
-                var playbackDate = await GetLastPlayDate(songId);
-                var dateDiff = playbackStartTime - playbackDate;
-                if (dateDiff.Seconds > 20){
-                    await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
-                    await _context.SaveChangesAsync();
-                    Console.WriteLine("Playback logged for song: " + songId);
+
+                var lastSong = await GetLastPlaySong();
+                var song = GetSongById(songId);
+                int songLength = int.Parse(song.Length);
+                if (lastSong != null)
+                {
+                    var fullSong = GetSongById(lastSong.SongId);
+                    if (DateTime.Now < lastSong.PlaybackStart.AddSeconds(int.Parse(fullSong.Length)))
+                    {
+
+                        //update last song with seconds
+                        var secondsLength = DateTime.Now - playbackStartTime;
+                        await UpdateLastPlayback(lastSong, secondsLength.Seconds);
+
+                        //add new song
+                        await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
+                        
+
+                    }
+                    else
+                    {
+                        //Update the playback seconds for the last song
+                        
+                       await  UpdateLastPlayback(lastSong, int.Parse(fullSong.Length));
+
+
+                        //add new song
+                        await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
+                    }
                 }
+                else
+                {
+                    await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime});
+                }
+
+               
+               
+                   
+                 await _context.SaveChangesAsync();
+                 Console.WriteLine("Playback logged for song: " + songId);
+               
 
             }
             catch (Exception ex)
@@ -412,6 +465,13 @@ namespace PanAudioServer.Helper
             var value = await _context.PlaybackHistory.Where(x => x.SongId == songId).OrderByDescending(y => y.PlaybackStart).FirstOrDefaultAsync();
             if(value == null)return DateTime.Now.AddDays(-1);
             return value.PlaybackStart;
+        }
+        public async Task<PlaybackHistory> GetLastPlaySong()
+        {
+
+            var value = await _context.PlaybackHistory.OrderByDescending(y => y.PlaybackStart).FirstOrDefaultAsync();
+            
+            return value;
         }
 
         public async Task<List<PlaybackCounts>> GetPlaybackHistory()
