@@ -406,7 +406,7 @@ namespace PanAudioServer.Helper
         public async Task StartRecordPlayback(string songId)
         {
             
-            DateTime playbackStartTime = DateTime.Now;
+            DateTime playbackStartTime = DateTime.UtcNow;
             try
             {
 
@@ -416,11 +416,11 @@ namespace PanAudioServer.Helper
                 if (lastSong != null)
                 {
                     var fullSong = GetSongById(lastSong.SongId);
-                    if (DateTime.Now < lastSong.PlaybackStart.AddSeconds(int.Parse(fullSong.Length)))
+                    if (DateTime.UtcNow < lastSong.PlaybackStart.AddSeconds(int.Parse(fullSong.Length)))
                     {
 
                         //update last song with seconds
-                        var secondsLength = DateTime.Now - playbackStartTime;
+                        var secondsLength = DateTime.UtcNow - playbackStartTime;
                         await UpdateLastPlayback(lastSong, secondsLength.Seconds);
                         Console.WriteLine("Updated last Playback for: " + fullSong.Title + " With Seconds: " + secondsLength);
                         //add new song
