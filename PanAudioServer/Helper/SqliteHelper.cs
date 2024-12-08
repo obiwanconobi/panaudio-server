@@ -503,10 +503,28 @@ namespace PanAudioServer.Helper
             return songPlaybackCounts;
         }
 
-        public async Task<List<PlaybackArtists>> GetPlaybackHistoryArtists()
+        public async Task<List<PlaybackDays>> GetPlaybackByDays(DateOnly startDate, DateOnly endDate)
+        {
+            var playbackDays = _context.PlaybackHistory
+                .Where(x => x.PlaybackStart.Date >= DateTime.Parse(startDate.ToString()) &&
+                            x.PlaybackStart.Date <= DateTime.Parse(endDate.ToString()))
+                .GroupBy(x => x.PlaybackStart.Date)
+                .Select(g => new PlaybackDays
+                {
+                    Day = DateOnly.FromDateTime(g.Key),
+                    TotalSeconds = g.Sum(x => x.Seconds)
+                })
+                .ToList();
+
+            return playbackDays;
+        }
+
+        public async Task<List<PlaybackArtists>> GetPlaybackHistoryArtists(DateTime startDate, DateTime endDate)
         {
 
             var playbackArtists = _context.PlaybackHistory
+                .Where(x => x.PlaybackStart >= startDate &&
+                    x.PlaybackStart <= endDate)
                     .Join(
                         _context.Songs,
                         ph => ph.SongId,
