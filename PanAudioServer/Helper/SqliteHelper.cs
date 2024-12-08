@@ -407,6 +407,7 @@ namespace PanAudioServer.Helper
         {
             
             DateTime playbackStartTime = DateTime.UtcNow;
+            
             try
             {
 
@@ -420,7 +421,7 @@ namespace PanAudioServer.Helper
                     {
 
                         //update last song with seconds
-                        var secondsLength = DateTime.UtcNow - playbackStartTime;
+                        var secondsLength = DateTime.UtcNow - lastSong.PlaybackStart;
                         await UpdateLastPlayback(lastSong, secondsLength.Seconds);
                         Console.WriteLine("Updated last Playback for: " + fullSong.Title + " With Seconds: " + secondsLength);
                         //add new song
