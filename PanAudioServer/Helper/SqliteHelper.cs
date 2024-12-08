@@ -384,6 +384,8 @@ namespace PanAudioServer.Helper
         }
 
 
+
+
         public async Task UpdateLastPlayback(PlaybackHistory playback, int Seconds)
         {
 
@@ -500,6 +502,32 @@ namespace PanAudioServer.Helper
                  .ToList();
             return songPlaybackCounts;
         }
+
+        public async Task<List<PlaybackArtists>> GetPlaybackHistoryArtists()
+        {
+
+            var playbackArtists = _context.PlaybackHistory
+                    .Join(
+                        _context.Songs,
+                        ph => ph.SongId,
+                        s => s.Id,
+                        (ph, s) => new {
+                            ArtistId = s.ArtistId,
+                            ArtistName = s.Artist,
+                            Seconds = ph.Seconds
+                        })
+                    .GroupBy(x => new { x.ArtistId, x.ArtistName })
+                    .Select(g => new PlaybackArtists
+                    {
+                        ArtistId = g.Key.ArtistId,
+                        ArtistName = g.Key.ArtistName,
+                        PlayCount = g.Count(),
+                        TotalSeconds = g.Sum(x => x.Seconds)
+                    })
+                    .ToList();
+            return playbackArtists;
+        }
+
 
         public async Task<string> GetMusicBrainzUrl(string artist, string ablum)
         {
