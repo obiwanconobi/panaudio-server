@@ -422,10 +422,10 @@ namespace PanAudioServer.Helper
                         //update last song with seconds
                         var secondsLength = DateTime.Now - playbackStartTime;
                         await UpdateLastPlayback(lastSong, secondsLength.Seconds);
-
+                        Console.WriteLine("Updated last Playback for: " + fullSong.Title + " With Seconds: " + secondsLength);
                         //add new song
                         await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
-                        
+                        Console.WriteLine("Playback logged for song: " + songId);
 
                     }
                     else
@@ -433,22 +433,24 @@ namespace PanAudioServer.Helper
                         //Update the playback seconds for the last song
                         
                        await  UpdateLastPlayback(lastSong, int.Parse(fullSong.Length));
-
+                        Console.WriteLine("Updated last Playback for: " + fullSong.Title + " With full song Length");
 
                         //add new song
                         await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
+                        Console.WriteLine("Playback logged for song: " + songId);
                     }
                 }
                 else
                 {
                     await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime});
+                    Console.WriteLine("Playback logged for song: " + songId);
                 }
 
                
                
                    
                  await _context.SaveChangesAsync();
-                 Console.WriteLine("Playback logged for song: " + songId);
+                 
                
 
             }
