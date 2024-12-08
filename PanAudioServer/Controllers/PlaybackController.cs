@@ -22,5 +22,11 @@ namespace PanAudioServer.Controllers
            return await sqliteHelper.GetPlaybackHistory();
         }
 
+        [HttpGet("historyByDate")]
+        public async Task<List<PlaybackCounts>> GetPlaybackByDate(DateTime startDate, DateTime endDate)
+        {
+            return await sqliteHelper.GetPlaybackHistoryByDate(startDate, endDate);
+        }
+
     }
 }

@@ -463,7 +463,7 @@ namespace PanAudioServer.Helper
         {
             
             var value = await _context.PlaybackHistory.Where(x => x.SongId == songId).OrderByDescending(y => y.PlaybackStart).FirstOrDefaultAsync();
-            if(value == null)return DateTime.Now.AddDays(-1);
+            if(value == null)return DateTime.UtcNow.AddDays(-1);
             return value.PlaybackStart;
         }
         public async Task<PlaybackHistory> GetLastPlaySong()
@@ -479,7 +479,20 @@ namespace PanAudioServer.Helper
             
             var songPlaybackCounts = _context.PlaybackHistory
                  .GroupBy(x => x.SongId)
-                 .Select(g => new PlaybackCounts{ SongId = g.Key, PlaybackCount = g.Count() })
+                 .Select(g => new PlaybackCounts{ SongId = g.Key, PlaybackCount = g.Count(), TotalSeconds = g.Sum(x => x.Seconds) })
+                 .OrderByDescending(x => x.PlaybackCount)
+                 .ToList();
+            return songPlaybackCounts;
+        }
+
+        public async Task<List<PlaybackCounts>> GetPlaybackHistoryByDate(DateTime startDate, DateTime endDate)
+        {
+
+            var songPlaybackCounts = _context.PlaybackHistory
+                 .Where(x => x.PlaybackStart >= startDate &&
+                    x.PlaybackStart <= endDate)
+                 .GroupBy(x => x.SongId)
+                 .Select(g => new PlaybackCounts { SongId = g.Key, PlaybackCount = g.Count(), TotalSeconds = g.Sum(x => x.Seconds) })
                  .OrderByDescending(x => x.PlaybackCount)
                  .ToList();
             return songPlaybackCounts;
