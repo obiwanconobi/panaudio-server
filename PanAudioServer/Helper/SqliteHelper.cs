@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Validations;
 using PanAudioServer.Data;
 using PanAudioServer.Models;
 using System.Diagnostics.Contracts;
+using System.Security.Cryptography;
 
 namespace PanAudioServer.Helper
 {
@@ -515,6 +516,19 @@ namespace PanAudioServer.Helper
                     TotalSeconds = g.Sum(x => x.Seconds)
                 })
                 .ToList();
+
+
+            var totalDays = endDate.DayNumber - startDate.DayNumber;
+            
+            for (var idd = 0; idd < totalDays; idd++)
+            {
+                var result = playbackDays.Where(x => x.Day == startDate.AddDays(idd)).FirstOrDefault();
+                if(result == null)
+                {
+                    playbackDays.Insert(idd, new PlaybackDays{Day = startDate.AddDays(idd), TotalSeconds = 0 });
+                }
+            }
+
 
             return playbackDays;
         }
