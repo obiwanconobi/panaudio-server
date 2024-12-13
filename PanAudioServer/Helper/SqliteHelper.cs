@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Validations;
 using PanAudioServer.Data;
 using PanAudioServer.Models;
-using System.Diagnostics.Contracts;
-using System.Security.Cryptography;
 
 namespace PanAudioServer.Helper
 {
@@ -487,6 +484,18 @@ namespace PanAudioServer.Helper
                  .GroupBy(x => x.SongId)
                  .Select(g => new PlaybackCounts{ SongId = g.Key, PlaybackCount = g.Count(), TotalSeconds = g.Sum(x => x.Seconds) })
                  .OrderByDescending(x => x.PlaybackCount)
+                 .ToList();
+            return songPlaybackCounts;
+        }
+
+        public async Task<List<PlaybackHistory>> GetPlaybackHistoryForDay(DateOnly day)
+        {
+            var startDate = day.ToDateTime(new TimeOnly(hour: 0, minute: 0));
+            var endDate = day.ToDateTime(new TimeOnly(hour: 23, minute: 59));
+            var songPlaybackCounts = _context.PlaybackHistory
+                 .Where(x => x.PlaybackStart >= startDate &&
+                    x.PlaybackStart <= endDate)
+                 .OrderByDescending(x => x.PlaybackStart)
                  .ToList();
             return songPlaybackCounts;
         }
