@@ -527,7 +527,7 @@ namespace PanAudioServer.Helper
                 .ToList();
 
 
-            var totalDays = endDate.DayNumber - startDate.DayNumber;
+            var totalDays = (endDate.DayNumber - startDate.DayNumber)+1;
             
             for (var idd = 0; idd < totalDays; idd++)
             {
