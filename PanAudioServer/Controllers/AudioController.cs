@@ -106,6 +106,8 @@ namespace PanAudioServer.Controllers
                     return "audio/wav";
                 case ".flac":
                     return "audio/flac";
+                case ".m4a":
+                    return "audio/mp4";
                 default:
                     return "application.octet-stream";
             }
