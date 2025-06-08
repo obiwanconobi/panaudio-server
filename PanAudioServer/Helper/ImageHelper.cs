@@ -4,7 +4,12 @@ namespace PanAudioServer.Helper
 {
     public class ImageHelper
     {
-        SqliteHelper sqliteHelper = new SqliteHelper();
+        private SqliteHelper sqliteHelper;
+
+        public ImageHelper(SqliteHelper sqliteHelper)
+        {
+            this.sqliteHelper = sqliteHelper;
+        }
 
         public string ImagePath(string albumId)
         {

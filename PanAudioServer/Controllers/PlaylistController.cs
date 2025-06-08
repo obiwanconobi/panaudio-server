@@ -8,7 +8,13 @@ namespace PanAudioServer.Controllers
     [Route("api")]
     public class PlaylistController : Controller
     {
-        SqliteHelper sqliteHelper = new SqliteHelper();
+        private SqliteHelper sqliteHelper;
+
+        public PlaylistController(SqliteHelper sqliteHelper)
+        {
+            this.sqliteHelper = sqliteHelper;
+        }
+        
         [HttpGet("playlists")]
         public List<Playlists> GetPlaylists()
         {

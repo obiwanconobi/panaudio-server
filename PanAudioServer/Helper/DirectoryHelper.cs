@@ -19,11 +19,12 @@ namespace PanAudioServer.Helper
         List<Songs> dbSongs = new List<Songs>();
         List<Album> dbAlbums = new List<Album>();
         List<Artists> dbArtists = new List<Artists>();
-        MusicBrainzHelper musicBrainzHelper = new MusicBrainzHelper();
+        private MusicBrainzHelper musicBrainzHelper;
 
-        public DirectoryHelper(SqliteHelper sqliteHelper)
+        public DirectoryHelper(SqliteHelper sqliteHelper, MusicBrainzHelper musicBrainzHelper)
         {
             this.sqliteHelper = sqliteHelper;
+            this.musicBrainzHelper = musicBrainzHelper;
             dbSongs = sqliteHelper.GetAllSongs();
             dbArtists = sqliteHelper.GetAllArtists();
             dbAlbums = sqliteHelper.GetAllAblums();

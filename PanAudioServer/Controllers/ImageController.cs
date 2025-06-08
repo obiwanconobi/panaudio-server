@@ -11,7 +11,12 @@ namespace PanAudioServer.Controllers
     [Route("api")]
     public class ImageController : Controller
     {
-        ImageHelper imageHelper = new ImageHelper();
+        private ImageHelper imageHelper;
+
+        public ImageController(ImageHelper imageHelper)
+        {
+            this.imageHelper = imageHelper;
+        }
 
         [HttpGet("albumArt")]
         public IActionResult GetAlbumArt(string albumId)

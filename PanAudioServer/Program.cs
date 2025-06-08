@@ -31,6 +31,8 @@ builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
 builder.Services.AddSingleton<SqliteHelper>();
 builder.Services.AddSingleton<DirectoryHelper>();
 builder.Services.AddSingleton<DatabaseHelper>();
+builder.Services.AddSingleton<MusicBrainzHelper>();
+builder.Services.AddSingleton<ImageHelper>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

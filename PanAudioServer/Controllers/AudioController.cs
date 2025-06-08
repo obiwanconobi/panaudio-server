@@ -5,6 +5,7 @@ using System.Reflection;
 using static System.Net.Mime.MediaTypeNames;
 using PanAudioServer.Helper;
 using System.Net.Mime;
+using PanAudioServer.Data;
 
 
 namespace PanAudioServer.Controllers
@@ -15,7 +16,12 @@ namespace PanAudioServer.Controllers
     {
         private readonly string _basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         private readonly String _filePath = "\\Media\\Test\\2 - Neurotic.flac";
-        SqliteHelper sqliteHelper = new SqliteHelper();
+        private SqliteHelper sqliteHelper;
+
+        public AudioController(SqliteHelper sqliteHelper)
+        {
+            this.sqliteHelper = sqliteHelper;
+        }
 
         [HttpGet("audio-dl")]
         public IActionResult DownloadAudio()

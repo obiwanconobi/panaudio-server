@@ -8,7 +8,12 @@ namespace PanAudioServer.Controllers
     [Route("api/playback")]
     public class PlaybackController : Controller
     {
-        SqliteHelper sqliteHelper = new SqliteHelper();
+        private SqliteHelper sqliteHelper;
+
+        public PlaybackController(SqliteHelper sqliteHelper)
+        {
+            this.sqliteHelper = sqliteHelper;
+        }
 
         [HttpPut("start")]
         public async Task StartPlayback(string songId)
