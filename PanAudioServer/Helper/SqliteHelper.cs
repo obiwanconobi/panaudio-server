@@ -4,7 +4,7 @@ using PanAudioServer.Models;
 
 namespace PanAudioServer.Helper
 {
-    public class SqliteHelper
+    public class SqliteHelper 
     {
         private SqliteContext? _context;
 
@@ -261,7 +261,6 @@ namespace PanAudioServer.Helper
                 {
                     _context.Songs.Update(song);
                     await _context.SaveChangesAsync();
-
                 }
                 catch (Exception ex)
                 {

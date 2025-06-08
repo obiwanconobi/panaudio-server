@@ -11,7 +11,7 @@ namespace PanAudioServer.Helper
     public class DirectoryHelper
     {
        // private readonly string _basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-       SqliteHelper sqliteHelper  = new SqliteHelper();
+        private SqliteHelper sqliteHelper;
         List<Songs> songs = new List<Songs>();
         List<Album> albums = new List<Album>();
         List<Artists> artists = new List<Artists>();
@@ -21,8 +21,9 @@ namespace PanAudioServer.Helper
         List<Artists> dbArtists = new List<Artists>();
         MusicBrainzHelper musicBrainzHelper = new MusicBrainzHelper();
 
-        public DirectoryHelper()
+        public DirectoryHelper(SqliteHelper sqliteHelper)
         {
+            this.sqliteHelper = sqliteHelper;
             dbSongs = sqliteHelper.GetAllSongs();
             dbArtists = sqliteHelper.GetAllArtists();
             dbAlbums = sqliteHelper.GetAllAblums();

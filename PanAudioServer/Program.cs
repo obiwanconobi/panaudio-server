@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PanAudioServer.Data;
 using System.Text.Json.Serialization;
+using PanAudioServer.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,10 @@ builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
            .AllowAnyMethod()
            .AllowAnyHeader();
 }));
+
+builder.Services.AddSingleton<SqliteHelper>();
+builder.Services.AddSingleton<DirectoryHelper>();
+builder.Services.AddSingleton<DatabaseHelper>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
