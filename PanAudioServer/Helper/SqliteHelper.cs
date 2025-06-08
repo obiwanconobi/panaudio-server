@@ -8,9 +8,9 @@ namespace PanAudioServer.Helper
     {
         private SqliteContext? _context;
 
-        public SqliteHelper()
+        public SqliteHelper(SqliteContext context)
         {
-            _context = new SqliteContext();
+            _context = context;
         }
 
         public async Task<Album> GetAlbum(string artist, string album)
