@@ -6,7 +6,8 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "SqliteDB": "Data Source=Data\\panaudio.db"
+        "SqliteDB": "Data Source=Data\\panaudio.db",
+        "SentryDsn": ""
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7053;http://localhost:5027"
@@ -17,7 +18,8 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "SqliteDB": "Data Source=Data\\panaudio.db"
+        "SqliteDB": "Data Source=Data\\panaudio.db",
+        "SentryDsn": ""
       }
     },
     "Docker": {
@@ -26,7 +28,8 @@
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
         "ASPNETCORE_URLS": "https://+:443;http://+:80",
-        "SqliteDB": "Data Source=Data\\panaudio.dbb"
+        "SqliteDB": "Data Source=Data\\panaudio.dbb",
+        "SentryDsn": ""
       },
       "publishAllPorts": true,
       "useSSL": true

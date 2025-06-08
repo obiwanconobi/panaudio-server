@@ -5,7 +5,17 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.WebHost.UseSentry(options =>
+{
+    options.Dsn = Environment.GetEnvironmentVariable("SentryDsn");
+    options.SendDefaultPii = true; // Adds request URL and headers, IP and name for users, etc.
+    options.SetBeforeSend((@event, hint) =>
+    {
+        // Never report server names
+        @event.ServerName = null;
+        return @event;
+    });
+});
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
