@@ -22,7 +22,7 @@ namespace PanAudioServer.Helper
 
         public Album GetAlbumById(string albumId)
         {
-            return _context.Album.First(x => x.Id == albumId);
+            return  _context.Album.First(x => x.Id == albumId);
         }
 
         public async void Clear()
@@ -415,7 +415,6 @@ namespace PanAudioServer.Helper
             
             try
             {
-
                 var lastSong = await GetLastPlaySong();
                 var song = GetSongById(songId);
                 int songLength = int.Parse(song.Length);
@@ -424,13 +423,13 @@ namespace PanAudioServer.Helper
                     var fullSong = GetSongById(lastSong.SongId);
                     if (DateTime.UtcNow < lastSong.PlaybackStart.AddSeconds(int.Parse(fullSong.Length)))
                     {
-
                         //update last song with seconds
                         var secondsLength = DateTime.UtcNow - lastSong.PlaybackStart;
                         await UpdateLastPlayback(lastSong, secondsLength.Seconds);
                         Console.WriteLine("Updated last Playback for: " + fullSong.Title + " With Seconds: " + secondsLength);
                         //add new song
                         await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
+                        await _context.SaveChangesAsync();
                         Console.WriteLine("Playback logged for song: " + songId);
 
                     }
@@ -443,21 +442,16 @@ namespace PanAudioServer.Helper
 
                         //add new song
                         await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
+                        await _context.SaveChangesAsync();
                         Console.WriteLine("Playback logged for song: " + songId);
                     }
                 }
                 else
                 {
                     await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime});
+                    await _context.SaveChangesAsync();
                     Console.WriteLine("Playback logged for song: " + songId);
                 }
-
-               
-               
-                   
-                 await _context.SaveChangesAsync();
-                 
-               
 
             }
             catch (Exception ex)
