@@ -4,13 +4,13 @@ using PanAudioServer.Models;
 
 namespace PanAudioServer.Helper
 {
-    public class SqliteHelper 
+    public class SqliteHelper
     {
         private SqliteContext? _context;
 
-        public SqliteHelper(SqliteContext context)
+        public SqliteHelper()
         {
-            _context = context;
+            _context = new SqliteContext();
         }
 
         public async Task<Album> GetAlbum(string artist, string album)
@@ -20,9 +20,10 @@ namespace PanAudioServer.Helper
             return _context.Album.FirstOrDefault(x => x.Title == album && x.Artist == artist);
         }
 
-        public async Task<Album> GetAlbumById(string albumId)
+        public Album GetAlbumById(string albumId)
         {
-            return await _context.Album.FirstAsync(x => x.Id == albumId);
+            
+            return _context.Album.First(x => x.Id == albumId);
         }
 
         public async void Clear()
@@ -74,10 +75,10 @@ namespace PanAudioServer.Helper
             return _context.Album.Where(x => x.Artist == artistName).ToList();
         }
 
-        public async Task<List<Album>> GetAllAblums()
+        public List<Album> GetAllAblums()
         {
             
-            return await _context.Album.OrderBy(x => x.Title).ToListAsync();
+            return _context.Album.OrderBy(x => x.Title).ToList();
         }
 
         public List<Album> GetFavouriteAblums()
@@ -98,10 +99,10 @@ namespace PanAudioServer.Helper
             return _context.Album.Where(x => x.Year != 0).OrderByDescending(x => x.Year).Take(40).ToList();
         }
 
-        public async Task<List<Songs>> GetAllSongs()
+        public List<Songs> GetAllSongs()
         {
             
-            return await _context.Songs
+            return _context.Songs
                 .GroupJoin(
                     _context.PlaybackHistory,
                     song => song.Id,
@@ -128,7 +129,7 @@ namespace PanAudioServer.Helper
                         PlayCount = playbacks.Count()
                     })
                 .OrderBy(x => x.Title)
-                .ToListAsync();
+                .ToList();
         }
 
         public List<Songs> GetFavouriteSongs()
@@ -137,10 +138,10 @@ namespace PanAudioServer.Helper
             return _context.Songs.Where(x => x.Favourite == true).ToList();
         }
 
-        public async Task<List<Artists>> GetAllArtists()
+        public List<Artists> GetAllArtists()
         {
             
-            return await _context.Artists.OrderBy(x => x.Name).ToListAsync();
+            return _context.Artists.OrderBy(x => x.Name).ToList();
         }
 
 
@@ -150,10 +151,10 @@ namespace PanAudioServer.Helper
             return _context.Artists.First(x => x.Name == artist);
         }
 
-        public async Task<Artists>? GetArtistById(string artistId)
+        public Artists? GetArtistById(string artistId)
         {
             
-            return await _context.Artists.FirstOrDefaultAsync(x => x.Id == artistId);
+            return _context.Artists.FirstOrDefault(x => x.Id == artistId);
         }
 
 
@@ -260,6 +261,7 @@ namespace PanAudioServer.Helper
                 {
                     _context.Songs.Update(song);
                     await _context.SaveChangesAsync();
+
                 }
                 catch (Exception ex)
                 {
@@ -415,6 +417,7 @@ namespace PanAudioServer.Helper
             
             try
             {
+
                 var lastSong = await GetLastPlaySong();
                 var song = GetSongById(songId);
                 int songLength = int.Parse(song.Length);
@@ -423,13 +426,13 @@ namespace PanAudioServer.Helper
                     var fullSong = GetSongById(lastSong.SongId);
                     if (DateTime.UtcNow < lastSong.PlaybackStart.AddSeconds(int.Parse(fullSong.Length)))
                     {
+
                         //update last song with seconds
                         var secondsLength = DateTime.UtcNow - lastSong.PlaybackStart;
                         await UpdateLastPlayback(lastSong, secondsLength.Seconds);
                         Console.WriteLine("Updated last Playback for: " + fullSong.Title + " With Seconds: " + secondsLength);
                         //add new song
                         await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
-                        await _context.SaveChangesAsync();
                         Console.WriteLine("Playback logged for song: " + songId);
 
                     }
@@ -442,16 +445,21 @@ namespace PanAudioServer.Helper
 
                         //add new song
                         await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
-                        await _context.SaveChangesAsync();
                         Console.WriteLine("Playback logged for song: " + songId);
                     }
                 }
                 else
                 {
                     await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime});
-                    await _context.SaveChangesAsync();
                     Console.WriteLine("Playback logged for song: " + songId);
                 }
+
+               
+               
+                   
+                 await _context.SaveChangesAsync();
+                 
+               
 
             }
             catch (Exception ex)

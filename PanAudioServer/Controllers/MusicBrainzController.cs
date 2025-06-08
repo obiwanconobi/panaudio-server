@@ -7,12 +7,7 @@ namespace PanAudioServer.Controllers
 {
     public class MusicBrainzController : Controller
     {
-        private MusicBrainzHelper helper;
-
-        public MusicBrainzController(MusicBrainzHelper helper)
-        {
-            this.helper = helper;
-        }
+        MusicBrainzHelper helper = new MusicBrainzHelper();
 
         [HttpGet("album-art")]
         public async Task<String> getAlbumArt(string mbAlbumId)

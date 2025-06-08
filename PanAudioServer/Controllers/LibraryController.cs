@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PanAudioServer.Data;
 using PanAudioServer.Helper;
 using PanAudioServer.Models;
 
@@ -9,29 +8,24 @@ namespace PanAudioServer.Controllers
     [Route("api")]
     public class LibraryController : Controller
     {
-        private SqliteHelper sqliteHelper;
-
-        public LibraryController(SqliteHelper sqliteHelper)
-        {
-            this.sqliteHelper = sqliteHelper;
-        }
+        SqliteHelper sqliteHelper = new SqliteHelper();
 
         [HttpGet("artists")]
-        public async Task<List<Artists>> GetArtists()
+        public List<Artists> GetArtists()
         {
-            return await sqliteHelper.GetAllArtists();
+            return sqliteHelper.GetAllArtists();
         }
 
         [HttpGet("albums-by-id")]
-        public async Task<Album> GetAlbumById(string albumId)
+        public Album GetAlbumById(string albumId)
         {
-            return await sqliteHelper.GetAlbumById(albumId);
+            return sqliteHelper.GetAlbumById(albumId);
         }
 
         [HttpGet("albums")]
-        public async Task<List<Album>> GetAlbums()
+        public List<Album> GetAlbums()
         {
-            return await sqliteHelper.GetAllAblums();
+            return sqliteHelper.GetAllAblums();
         }
 
         [HttpGet("recent-albums")]
@@ -47,9 +41,9 @@ namespace PanAudioServer.Controllers
         }
         
         [HttpGet("songs")]
-        public async Task<List<Songs>> GetSongs() 
+        public List<Songs> GetSongs() 
         {
-            return await sqliteHelper.GetAllSongs();
+            return sqliteHelper.GetAllSongs();
         }
 
         [HttpGet("song")]
@@ -74,17 +68,17 @@ namespace PanAudioServer.Controllers
         }
 
         [HttpPost("favourite-album")]
-        public async Task SetAlbumFavourite(string albumId, bool favourite)
+        public void SetAlbumFavourite(string albumId, bool favourite)
         {
-            var album = await sqliteHelper.GetAlbumById(albumId);
+            var album = sqliteHelper.GetAlbumById(albumId);
             album.Favourite = favourite;
             sqliteHelper.UpdateAlbum(album);
         }
 
         [HttpPost("favourite-artist")]
-        public async Task SetArtistFavourite(string artistId, bool favourite)
+        public void SetArtistFavourite(string artistId, bool favourite)
         {
-            var artist =await sqliteHelper.GetArtistById(artistId);
+            var artist = sqliteHelper.GetArtistById(artistId);
             artist.Favourite = favourite;
             sqliteHelper.UpdateArtist(artist);
         }

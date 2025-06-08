@@ -11,17 +11,12 @@ namespace PanAudioServer.Controllers
     [Route("api")]
     public class ImageController : Controller
     {
-        private ImageHelper imageHelper;
-
-        public ImageController(ImageHelper imageHelper)
-        {
-            this.imageHelper = imageHelper;
-        }
+        ImageHelper imageHelper = new ImageHelper();
 
         [HttpGet("albumArt")]
-        public async Task<IActionResult> GetAlbumArt(string albumId)
+        public IActionResult GetAlbumArt(string albumId)
         {
-            string albumArtPath =  await imageHelper.ImagePath(albumId);
+            string albumArtPath = imageHelper.ImagePath(albumId);
             // Check if file exists
             if (!System.IO.File.Exists(albumArtPath))
             {
@@ -41,9 +36,9 @@ namespace PanAudioServer.Controllers
 
 
         [HttpGet("artistArt")]
-        public async Task<IActionResult> GetArtistArt(string artistId)
+        public IActionResult GetArtistArt(string artistId)
         {
-            string albumArtPath = await imageHelper.ArtistImagePath(artistId);
+            string albumArtPath = imageHelper.ArtistImagePath(artistId);
             // Check if file exists
             if (!System.IO.File.Exists(albumArtPath))
             {
@@ -78,7 +73,7 @@ namespace PanAudioServer.Controllers
             {
                 // Generate unique filename
                 var fileName = $"{"cover"}{fileExtension}";
-                var filePath = Path.Combine( await imageHelper.ImagePath(albumId), fileName);
+                var filePath = Path.Combine(imageHelper.ImagePath(albumId), fileName);
 
                 // Save original file
                 using (var stream = new FileStream(filePath, FileMode.Create))

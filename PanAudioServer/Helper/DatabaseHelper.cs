@@ -3,13 +3,8 @@
     public class DatabaseHelper
     {
 
-        //SqliteHelper sqliteHelper = new SqliteHelper();
-        private SqliteHelper sqliteHelper;
+        SqliteHelper sqliteHelper = new SqliteHelper();
 
-        public DatabaseHelper(SqliteHelper sqliteHelper)
-        {
-            this.sqliteHelper = sqliteHelper;
-        }
 
         public void clearAll()
         {

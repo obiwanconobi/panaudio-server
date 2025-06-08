@@ -11,7 +11,7 @@ namespace PanAudioServer.Helper
     public class DirectoryHelper
     {
        // private readonly string _basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-        private SqliteHelper sqliteHelper;
+       SqliteHelper sqliteHelper  = new SqliteHelper();
         List<Songs> songs = new List<Songs>();
         List<Album> albums = new List<Album>();
         List<Artists> artists = new List<Artists>();
@@ -19,12 +19,13 @@ namespace PanAudioServer.Helper
         List<Songs> dbSongs = new List<Songs>();
         List<Album> dbAlbums = new List<Album>();
         List<Artists> dbArtists = new List<Artists>();
-        private MusicBrainzHelper musicBrainzHelper;
+        MusicBrainzHelper musicBrainzHelper = new MusicBrainzHelper();
 
-        public DirectoryHelper(SqliteHelper sqliteHelper, MusicBrainzHelper musicBrainzHelper)
+        public DirectoryHelper()
         {
-            this.sqliteHelper = sqliteHelper;
-            this.musicBrainzHelper = musicBrainzHelper;
+            dbSongs = sqliteHelper.GetAllSongs();
+            dbArtists = sqliteHelper.GetAllArtists();
+            dbAlbums = sqliteHelper.GetAllAblums();
         }
 
         public string[]? getDirectories(String path)
@@ -249,10 +250,6 @@ namespace PanAudioServer.Helper
 
         public async Task getSongs(String directory)
         {
-            
-            dbSongs = await sqliteHelper.GetAllSongs();
-            dbArtists = await sqliteHelper.GetAllArtists();
-            dbAlbums = await sqliteHelper.GetAllAblums();
             var files = Directory.GetFiles(directory).OrderBy(f => GetExtensionPriority(Path.GetExtension(f))).ToList();
             // files.OrderBy(f => GetExtensionPriority(Path.GetExtension(f)));
             String albumId = "";

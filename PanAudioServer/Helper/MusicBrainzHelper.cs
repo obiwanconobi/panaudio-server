@@ -11,14 +11,10 @@ namespace PanAudioServer.Helper
         // http://musicbrainz.org/ws/2/artist/?query=artist:blink-182&fmt=json
 
         HttpClient _httpClient = new HttpClient();
-        private SqliteHelper sqliteHelper;
-        private ImageHelper imageHelper;
-        
-        
-        public MusicBrainzHelper(SqliteHelper sqliteHelper, ImageHelper imageHelper) {
+        SqliteHelper sqliteHelper = new SqliteHelper();
+        ImageHelper imageHelper = new ImageHelper();
+        public MusicBrainzHelper() {
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "panaudio-server-beta/0.0.5 (panaudio-support@panaro.co.uk)");
-            this.sqliteHelper = sqliteHelper;
-            this.imageHelper = imageHelper;
         }
 
         public async Task<String> getAlbumArtAsync(string id)
@@ -99,7 +95,7 @@ namespace PanAudioServer.Helper
 
             var albumSave = await sqliteHelper.GetAlbum(artist, album);
             var albumUrl = await getAlbumArtAsync(albumSave.MusicBrainzId);
-            var savePlace = await imageHelper.ImagePath(albumSave.Id);
+            var savePlace = imageHelper.ImagePath(albumSave.Id);
             byte[] imageBytes = await _httpClient.GetByteArrayAsync(albumUrl);
             try
             {
