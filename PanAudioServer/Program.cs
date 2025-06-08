@@ -27,7 +27,7 @@ builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
            .AllowAnyMethod()
            .AllowAnyHeader();
 }));
-builder.Services.AddDbContext<SqliteContext>(ServiceLifetime.Transient);
+builder.Services.AddDbContext<SqliteContext>(ServiceLifetime.Singleton);
 builder.Services.AddSingleton<SqliteHelper>();
 builder.Services.AddSingleton<DirectoryHelper>();
 builder.Services.AddSingleton<DatabaseHelper>();

@@ -22,7 +22,6 @@ namespace PanAudioServer.Helper
 
         public Album GetAlbumById(string albumId)
         {
-            
             return _context.Album.First(x => x.Id == albumId);
         }
 
