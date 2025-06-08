@@ -240,7 +240,7 @@ namespace PanAudioServer.Helper
                 try
                 {
                    _context.Album.Update(album);
-                    _context.SaveChangesAsync();
+                   _context.SaveChangesAsync();
 
                 }
                 catch (Exception ex)
@@ -266,6 +266,7 @@ namespace PanAudioServer.Helper
                 catch (Exception ex)
                 {
                     SentrySdk.CaptureException(ex);
+                    SentrySdk.CaptureMessage(song.Title + " - " + song.Artist);
                     Console.WriteLine(ex.ToString());
                 }
 
