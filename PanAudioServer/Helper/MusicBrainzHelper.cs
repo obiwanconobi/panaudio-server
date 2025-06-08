@@ -99,7 +99,7 @@ namespace PanAudioServer.Helper
 
             var albumSave = await sqliteHelper.GetAlbum(artist, album);
             var albumUrl = await getAlbumArtAsync(albumSave.MusicBrainzId);
-            var savePlace = imageHelper.ImagePath(albumSave.Id);
+            var savePlace = await imageHelper.ImagePath(albumSave.Id);
             byte[] imageBytes = await _httpClient.GetByteArrayAsync(albumUrl);
             try
             {

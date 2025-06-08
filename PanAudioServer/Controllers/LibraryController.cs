@@ -23,9 +23,9 @@ namespace PanAudioServer.Controllers
         }
 
         [HttpGet("albums-by-id")]
-        public Album GetAlbumById(string albumId)
+        public async Task<Album> GetAlbumById(string albumId)
         {
-            return sqliteHelper.GetAlbumById(albumId);
+            return await sqliteHelper.GetAlbumById(albumId);
         }
 
         [HttpGet("albums")]
@@ -74,17 +74,17 @@ namespace PanAudioServer.Controllers
         }
 
         [HttpPost("favourite-album")]
-        public void SetAlbumFavourite(string albumId, bool favourite)
+        public async Task SetAlbumFavourite(string albumId, bool favourite)
         {
-            var album = sqliteHelper.GetAlbumById(albumId);
+            var album = await sqliteHelper.GetAlbumById(albumId);
             album.Favourite = favourite;
             sqliteHelper.UpdateAlbum(album);
         }
 
         [HttpPost("favourite-artist")]
-        public void SetArtistFavourite(string artistId, bool favourite)
+        public async Task SetArtistFavourite(string artistId, bool favourite)
         {
-            var artist = sqliteHelper.GetArtistById(artistId);
+            var artist =await sqliteHelper.GetArtistById(artistId);
             artist.Favourite = favourite;
             sqliteHelper.UpdateArtist(artist);
         }

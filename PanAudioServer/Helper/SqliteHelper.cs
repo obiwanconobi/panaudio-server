@@ -20,9 +20,9 @@ namespace PanAudioServer.Helper
             return _context.Album.FirstOrDefault(x => x.Title == album && x.Artist == artist);
         }
 
-        public Album GetAlbumById(string albumId)
+        public async Task<Album> GetAlbumById(string albumId)
         {
-            return  _context.Album.First(x => x.Id == albumId);
+            return await _context.Album.FirstAsync(x => x.Id == albumId);
         }
 
         public async void Clear()
@@ -150,10 +150,10 @@ namespace PanAudioServer.Helper
             return _context.Artists.First(x => x.Name == artist);
         }
 
-        public Artists? GetArtistById(string artistId)
+        public async Task<Artists>? GetArtistById(string artistId)
         {
             
-            return _context.Artists.FirstOrDefault(x => x.Id == artistId);
+            return await _context.Artists.FirstOrDefaultAsync(x => x.Id == artistId);
         }
 
 
