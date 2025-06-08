@@ -74,10 +74,10 @@ namespace PanAudioServer.Helper
             return _context.Album.Where(x => x.Artist == artistName).ToList();
         }
 
-        public List<Album> GetAllAblums()
+        public async Task<List<Album>> GetAllAblums()
         {
             
-            return _context.Album.OrderBy(x => x.Title).ToList();
+            return await _context.Album.OrderBy(x => x.Title).ToListAsync();
         }
 
         public List<Album> GetFavouriteAblums()
@@ -98,10 +98,10 @@ namespace PanAudioServer.Helper
             return _context.Album.Where(x => x.Year != 0).OrderByDescending(x => x.Year).Take(40).ToList();
         }
 
-        public List<Songs> GetAllSongs()
+        public async Task<List<Songs>> GetAllSongs()
         {
             
-            return _context.Songs
+            return await _context.Songs
                 .GroupJoin(
                     _context.PlaybackHistory,
                     song => song.Id,
@@ -128,7 +128,7 @@ namespace PanAudioServer.Helper
                         PlayCount = playbacks.Count()
                     })
                 .OrderBy(x => x.Title)
-                .ToList();
+                .ToListAsync();
         }
 
         public List<Songs> GetFavouriteSongs()
@@ -137,10 +137,10 @@ namespace PanAudioServer.Helper
             return _context.Songs.Where(x => x.Favourite == true).ToList();
         }
 
-        public List<Artists> GetAllArtists()
+        public async Task<List<Artists>> GetAllArtists()
         {
             
-            return _context.Artists.OrderBy(x => x.Name).ToList();
+            return await _context.Artists.OrderBy(x => x.Name).ToListAsync();
         }
 
 

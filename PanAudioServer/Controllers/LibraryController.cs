@@ -17,9 +17,9 @@ namespace PanAudioServer.Controllers
         }
 
         [HttpGet("artists")]
-        public List<Artists> GetArtists()
+        public async Task<List<Artists>> GetArtists()
         {
-            return sqliteHelper.GetAllArtists();
+            return await sqliteHelper.GetAllArtists();
         }
 
         [HttpGet("albums-by-id")]
@@ -29,9 +29,9 @@ namespace PanAudioServer.Controllers
         }
 
         [HttpGet("albums")]
-        public List<Album> GetAlbums()
+        public async Task<List<Album>> GetAlbums()
         {
-            return sqliteHelper.GetAllAblums();
+            return await sqliteHelper.GetAllAblums();
         }
 
         [HttpGet("recent-albums")]
@@ -47,9 +47,9 @@ namespace PanAudioServer.Controllers
         }
         
         [HttpGet("songs")]
-        public List<Songs> GetSongs() 
+        public async Task<List<Songs>> GetSongs() 
         {
-            return sqliteHelper.GetAllSongs();
+            return await sqliteHelper.GetAllSongs();
         }
 
         [HttpGet("song")]

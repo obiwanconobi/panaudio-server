@@ -25,9 +25,6 @@ namespace PanAudioServer.Helper
         {
             this.sqliteHelper = sqliteHelper;
             this.musicBrainzHelper = musicBrainzHelper;
-            dbSongs = sqliteHelper.GetAllSongs();
-            dbArtists = sqliteHelper.GetAllArtists();
-            dbAlbums = sqliteHelper.GetAllAblums();
         }
 
         public string[]? getDirectories(String path)
@@ -252,6 +249,10 @@ namespace PanAudioServer.Helper
 
         public async Task getSongs(String directory)
         {
+            
+            dbSongs = await sqliteHelper.GetAllSongs();
+            dbArtists = await sqliteHelper.GetAllArtists();
+            dbAlbums = await sqliteHelper.GetAllAblums();
             var files = Directory.GetFiles(directory).OrderBy(f => GetExtensionPriority(Path.GetExtension(f))).ToList();
             // files.OrderBy(f => GetExtensionPriority(Path.GetExtension(f)));
             String albumId = "";
