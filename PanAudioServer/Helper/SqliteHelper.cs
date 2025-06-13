@@ -623,6 +623,7 @@ namespace PanAudioServer.Helper
             {
                 oldValue.ConfigValue = value;
                 _context.Config.Update(oldValue);
+                _context.SaveChanges();
             }
             
         }
