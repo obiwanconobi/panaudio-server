@@ -591,13 +591,22 @@ namespace PanAudioServer.Helper
         //CONFIG
         public string? GetConfigValue(string configName)
         {
-            var value =  _context.Config.Where(x => x.ConfigName == configName).FirstOrDefault();
-            if (value == null)
+            try
             {
+                var value = _context.Config.Where(x => x.ConfigName == configName).FirstOrDefault();
+                if (value == null)
+                {
+                    return null;
+                }
+
+                return value.ConfigValue;
+            }
+            catch (Exception e)
+            {
+                SentrySdk.CaptureException(e);
                 return null;
             }
-            
-            return value.ConfigValue;
+
             
         }
 
