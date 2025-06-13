@@ -7,7 +7,7 @@ namespace PanAudioServer.Helper
     public class SqliteHelper
     {
         private SqliteContext? _context;
-
+        ConfigHelper configHelper = new ConfigHelper();
         public SqliteHelper()
         {
             _context = new SqliteContext();
@@ -510,10 +510,11 @@ namespace PanAudioServer.Helper
 
         public async Task<List<PlaybackCounts>> GetPlaybackHistoryByDate(DateTime startDate, DateTime endDate)
         {
-
+            var playbackTime = configHelper.GetPlaybackReportingTime();
             var songPlaybackCounts = _context.PlaybackHistory
                  .Where(x => x.PlaybackStart >= startDate &&
                     x.PlaybackStart <= endDate)
+                 .Where(y => y.Seconds >= playbackTime)
                  .GroupBy(x => x.SongId)
                  .Select(g => new PlaybackCounts { SongId = g.Key, PlaybackCount = g.Count(), TotalSeconds = g.Sum(x => x.Seconds) })
                  .OrderByDescending(x => x.PlaybackCount)
@@ -584,6 +585,43 @@ namespace PanAudioServer.Helper
             var mbid = _context.Album.Where(x => x.Artist == artist).Where(y =>y.Title == ablum).FirstOrDefault();
             if (mbid == null) return null;
             return mbid.MusicBrainzId ?? "";
+        }
+        
+        
+        //CONFIG
+        public string? GetConfigValue(string configName)
+        {
+            var value =  _context.Config.Where(x => x.ConfigName == configName).FirstOrDefault();
+            if (value == null)
+            {
+                return null;
+            }
+            
+            return value.ConfigValue;
+            
+        }
+
+        public void SetConfigValue(String configName, String value)
+        {
+            var oldValue = _context.Config.Where(x => x.ConfigName == configName).FirstOrDefault();
+            if (oldValue == null)
+            {
+                try
+                {
+                  _context.Config.Add(new Config {ConfigId = Guid.NewGuid() ,ConfigName = configName, ConfigValue = value });
+                  _context.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    
+                }
+                   }
+            else
+            {
+                oldValue.ConfigValue = value;
+                _context.Config.Update(oldValue);
+            }
+            
         }
     }
 }
