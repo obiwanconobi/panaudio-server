@@ -2,10 +2,13 @@ namespace PanAudioServer.Helper;
 
 public class ConfigHelper
 {
+    private SqliteHelper sqliteHelper;
+
+    public ConfigHelper()
+    {
+        sqliteHelper = new SqliteHelper();
+    }
     
-    SqliteHelper sqliteHelper = new SqliteHelper();
-
-
     public int GetPlaybackReportingTime()
     {
         var value = sqliteHelper.GetConfigValue("PlaybackReportingTime");

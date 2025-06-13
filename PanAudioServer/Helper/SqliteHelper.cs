@@ -6,12 +6,7 @@ namespace PanAudioServer.Helper
 {
     public class SqliteHelper
     {
-        private SqliteContext? _context;
-        ConfigHelper configHelper = new ConfigHelper();
-        public SqliteHelper()
-        {
-            _context = new SqliteContext();
-        }
+        private SqliteContext? _context = new SqliteContext();
 
         public async Task<Album> GetAlbum(string artist, string album)
         {
@@ -508,9 +503,8 @@ namespace PanAudioServer.Helper
             return songPlaybackCounts;
         }
 
-        public async Task<List<PlaybackCounts>> GetPlaybackHistoryByDate(DateTime startDate, DateTime endDate)
+        public async Task<List<PlaybackCounts>> GetPlaybackHistoryByDate(DateTime startDate, DateTime endDate, int playbackTime)
         {
-            var playbackTime = configHelper.GetPlaybackReportingTime();
             var songPlaybackCounts = _context.PlaybackHistory
                  .Where(x => x.PlaybackStart >= startDate &&
                     x.PlaybackStart <= endDate)

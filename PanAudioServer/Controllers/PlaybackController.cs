@@ -9,6 +9,7 @@ namespace PanAudioServer.Controllers
     public class PlaybackController : Controller
     {
         SqliteHelper sqliteHelper = new SqliteHelper();
+        ConfigHelper configHelper = new ConfigHelper();
 
         [HttpPut("start")]
         public async Task StartPlayback(string songId)
@@ -31,7 +32,8 @@ namespace PanAudioServer.Controllers
         [HttpGet("historyByDate")]
         public async Task<List<PlaybackCounts>> GetPlaybackByDate(DateTime startDate, DateTime endDate)
         {
-            return await sqliteHelper.GetPlaybackHistoryByDate(startDate, endDate);
+            var playbackTime = configHelper.GetPlaybackReportingTime();
+            return await sqliteHelper.GetPlaybackHistoryByDate(startDate, endDate, playbackTime);
         }
 
         [HttpGet("historyartists")]

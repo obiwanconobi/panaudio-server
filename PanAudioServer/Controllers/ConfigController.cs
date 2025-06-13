@@ -7,7 +7,12 @@ namespace PanAudioServer.Controllers;
 [Route("api")]
 public class ConfigController : Controller
 {
-    ConfigHelper _configHelper =  new ConfigHelper();
+    private ConfigHelper _configHelper;
+
+    public ConfigController()
+    {
+        _configHelper = new ConfigHelper();
+    }
     
     [HttpGet("getPlaybackTimeConfig")]
     public int GetPlaybackTime()
