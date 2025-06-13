@@ -593,7 +593,7 @@ namespace PanAudioServer.Helper
         {
             try
             {
-                var value = _context.Config.Where(x => x.ConfigName == configName).FirstOrDefault();
+                var value = _context?.Config.FirstOrDefault(x => x.ConfigName == configName);
                 if (value == null)
                 {
                     return null;
