@@ -102,12 +102,13 @@ namespace PanAudioServer.Controllers
         }
 
         [HttpPost("update-song")]
-        public void SetArtistFavourite(string songId, string songTitle, string songPath)
+        public void UpdateSong(string songId, string songTitle, string songPath, int songNumber)
         {
             var song = sqliteHelper.GetSongById(songId);
             song.Id = songId;
             song.Title = songTitle;
             song.Path = songPath;
+            song.TrackNumber = songNumber;
             sqliteHelper.UpdateSong(song);
         }
         
