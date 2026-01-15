@@ -112,6 +112,25 @@ namespace PanAudioServer.Controllers
             sqliteHelper.UpdateSong(song);
         }
         
+        [HttpPost("delete-song")]
+        public void DeleteSong(string songId)
+        {
+          sqliteHelper.DeleteSong(songId);
+        }
+
+        [HttpPost("delete-artist")]
+        public void DeleteArtist(string artistId)
+        {
+            sqliteHelper.DeleteArtist(artistId);
+        }
+
+        [HttpPost("delete-album")]
+        public void DeleteArtist(string albumId)
+        {
+           sqliteHelper.DeleteAlbum(albumId);
+        }
+
+
     }
 
 }

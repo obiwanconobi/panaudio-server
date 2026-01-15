@@ -8,6 +8,23 @@ namespace PanAudioServer.Helper
     {
         private SqliteContext? _context = new SqliteContext();
 
+
+        public async void DeleteArtist(string artistId){
+            _context.Artists.Where(x => x.Id == artistId).ExecuteDelete();
+            await _context.SaveChangesAsync();
+        }
+
+        public async void DeleteAlbum(string albumId){
+            _context.Albums.Where(x => x.Id == albumId).ExecuteDelete();
+            await _context.SaveChangesAsync();
+        }
+
+        public async void DeleteSong(string songId){
+            _context.Songs.Where(x => x.Id == songId).ExecuteDelete();
+            await _context.SaveChangesAsync();
+        }
+
+
         public async Task<Album> GetAlbum(string artist, string album)
         {
             var ff = "Get Album for " + artist;
