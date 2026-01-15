@@ -125,7 +125,7 @@ namespace PanAudioServer.Controllers
         }
 
         [HttpPost("delete-album")]
-        public void DeleteArtist(string albumId)
+        public void DeleteAlbum(string albumId)
         {
            sqliteHelper.DeleteAlbum(albumId);
         }

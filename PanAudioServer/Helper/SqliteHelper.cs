@@ -15,7 +15,7 @@ namespace PanAudioServer.Helper
         }
 
         public async void DeleteAlbum(string albumId){
-            _context.Albums.Where(x => x.Id == albumId).ExecuteDelete();
+            _context.Album.Where(x => x.Id == albumId).ExecuteDelete();
             await _context.SaveChangesAsync();
         }
 
