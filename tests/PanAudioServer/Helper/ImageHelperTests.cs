@@ -13,6 +13,7 @@ namespace PanAudioServer.Tests.Helper
     {
         private SqliteConnection _connection;
         private SqliteContext _context;
+        private SqliteHelper _sqliteHelper;
         private ImageHelper _helper;
 
         [SetUp]
@@ -28,8 +29,8 @@ namespace PanAudioServer.Tests.Helper
             _context = new SqliteContext(options);
             _context.Database.EnsureCreated();
 
-            var sqliteHelper = new SqliteHelper(_context);
-            _helper = new ImageHelper(sqliteHelper);
+            _sqliteHelper = new SqliteHelper(_context);
+            _helper = new ImageHelper(_sqliteHelper);
         }
 
         [TearDown]
@@ -135,6 +136,8 @@ namespace PanAudioServer.Tests.Helper
         [Test]
         public void ArtistImagePath_ReturnsCorrectPath_WhenArtistExists()
         {
+            _sqliteHelper.SetConfigValue("ArtistPictures", "True");
+
             var artistId = Guid.NewGuid().ToString();
             var artist = new Artists(
                 id: artistId,
@@ -153,6 +156,8 @@ namespace PanAudioServer.Tests.Helper
         [Test]
         public void ArtistImagePath_ReturnsPathWithoutPicture_WhenPictureIsNull()
         {
+            _sqliteHelper.SetConfigValue("ArtistPictures", "True");
+
             var artistId = Guid.NewGuid().ToString();
             var artist = new Artists(
                 id: artistId,
@@ -171,6 +176,8 @@ namespace PanAudioServer.Tests.Helper
         [Test]
         public void ArtistImagePath_ReturnsPathWithoutPicture_WhenPictureIsEmpty()
         {
+            _sqliteHelper.SetConfigValue("ArtistPictures", "True");
+
             var artistId = Guid.NewGuid().ToString();
             var artist = new Artists(
                 id: artistId,
@@ -189,6 +196,8 @@ namespace PanAudioServer.Tests.Helper
         [Test]
         public void ArtistImagePath_DoesNotThrow_WhenArtistPathIsNull()
         {
+            _sqliteHelper.SetConfigValue("ArtistPictures", "True");
+
             var artistId = Guid.NewGuid().ToString();
             var artist = new Artists(
                 id: artistId,
@@ -200,6 +209,32 @@ namespace PanAudioServer.Tests.Helper
             _context.SaveChanges();
 
             Assert.DoesNotThrow(() => _helper.ArtistImagePath(artistId));
+        }
+
+        [Test]
+        public void ArtistImagePath_ReturnsEmpty_WhenArtistPicturesDisabled()
+        {
+            var artistId = Guid.NewGuid().ToString();
+            var artist = new Artists(
+                id: artistId,
+                name: "Test Artist",
+                artistPath: "/music/artists/test",
+                picture: "artist.jpg"
+            );
+            _context.Artists.Add(artist);
+            _context.SaveChanges();
+
+            var result = _helper.ArtistImagePath(artistId);
+
+            Assert.AreEqual("", result);
+        }
+
+        [Test]
+        public void ArtistImagePath_ReturnsEmpty_WhenArtistPicturesDisabledAndNoArtist()
+        {
+            var result = _helper.ArtistImagePath("nonexistent");
+
+            Assert.AreEqual("", result);
         }
     }
 }

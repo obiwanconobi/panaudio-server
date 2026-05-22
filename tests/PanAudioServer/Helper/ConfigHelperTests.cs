@@ -62,5 +62,40 @@ namespace PanAudioServer.Tests.Helper
         {
             Assert.DoesNotThrow(() => _configHelper.SetPlaybackReportingTime("10"));
         }
+
+        [Test]
+        public void GetArtistPictures_ReturnsFalse_WhenNoConfigValue()
+        {
+            bool result = _configHelper.GetArtistPictures();
+
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void GetArtistPictures_ReturnsTrue_WhenConfigValueIsTrue()
+        {
+            _configHelper.SetArtistPictures(true);
+
+            bool result = _configHelper.GetArtistPictures();
+
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void GetArtistPictures_ReturnsFalse_WhenConfigValueIsFalse()
+        {
+            _configHelper.SetArtistPictures(false);
+
+            bool result = _configHelper.GetArtistPictures();
+
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void SetArtistPictures_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _configHelper.SetArtistPictures(true));
+            Assert.DoesNotThrow(() => _configHelper.SetArtistPictures(false));
+        }
     }
 }

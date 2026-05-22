@@ -25,5 +25,17 @@ public class ConfigController : Controller
     {
         _configHelper.SetPlaybackReportingTime(time.ToString());
     }
+    
+    [HttpGet("getArtistPictureConfig")]
+    public bool GetArtistPictureConfig()
+    {
+        return _configHelper.GetArtistPictures();
+    }
+    
+    [HttpPost("setArtistPictureConfig")]
+    public void SetPlaybackTime(bool value)
+    {
+        _configHelper.SetArtistPictures(value);
+    }
 
 }

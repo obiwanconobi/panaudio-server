@@ -29,4 +29,19 @@ public class ConfigHelper
         sqliteHelper.SetConfigValue("PlaybackReportingTime", time);
     }
     
+    public bool GetArtistPictures()
+    {
+        var value = sqliteHelper.GetConfigValue("ArtistPictures");
+        if(value == null)
+        {
+            return false;
+        }
+        return Convert.ToBoolean(value);
+    }
+    
+    public void SetArtistPictures(bool value)
+    {
+        sqliteHelper.SetConfigValue("ArtistPictures", value.ToString());
+    }
+    
 }

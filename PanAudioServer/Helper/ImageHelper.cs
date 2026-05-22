@@ -5,15 +5,18 @@ namespace PanAudioServer.Helper
     public class ImageHelper
     {
         SqliteHelper sqliteHelper;
+        ConfigHelper configHelper;
 
         public ImageHelper()
         {
             sqliteHelper = new SqliteHelper();
+            configHelper = new ConfigHelper();
         }
 
         public ImageHelper(SqliteHelper sqliteHelper)
         {
             this.sqliteHelper = sqliteHelper;
+            configHelper = new ConfigHelper(sqliteHelper);
         }
 
         public string ImagePath(string albumId)
@@ -31,6 +34,8 @@ namespace PanAudioServer.Helper
 
         public string ArtistImagePath(string artistId)
         {
+            var enableArtistImages = configHelper.GetArtistPictures();
+            if (!enableArtistImages) return "";
             var artist = sqliteHelper.GetArtistById(artistId);
             var fullPath = "";
             try
@@ -40,8 +45,6 @@ namespace PanAudioServer.Helper
             {
                // Console.WriteLine("Error Getting Image for " + artist.Name);
             }
-
-
             return fullPath;
         }
     }
