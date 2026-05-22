@@ -14,7 +14,6 @@ namespace PanAudioServer.Data
 
         public SqliteContext(DbContextOptions<SqliteContext> options) : base(options)
         {
-            Database.ExecuteSqlRaw("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

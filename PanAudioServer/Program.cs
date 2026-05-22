@@ -35,7 +35,8 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddDbContext<SqliteContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("SqliteDB")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("SqliteDB"))
+           .AddInterceptors(new SqliteConnectionInterceptor()));
 
 builder.Services.AddSingleton<HttpClient>();
 builder.Services.AddScoped<SqliteHelper>();
