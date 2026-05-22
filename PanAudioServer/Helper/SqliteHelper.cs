@@ -6,7 +6,17 @@ namespace PanAudioServer.Helper
 {
     public class SqliteHelper
     {
-        private SqliteContext? _context = new SqliteContext();
+        private SqliteContext? _context;
+
+        public SqliteHelper()
+        {
+            _context = new SqliteContext();
+        }
+
+        public SqliteHelper(SqliteContext context)
+        {
+            _context = context;
+        }
 
 
         public async void DeleteArtist(string artistId){

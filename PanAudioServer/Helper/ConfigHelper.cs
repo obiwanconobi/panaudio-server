@@ -8,6 +8,11 @@ public class ConfigHelper
     {
         sqliteHelper = new SqliteHelper();
     }
+
+    public ConfigHelper(SqliteHelper sqliteHelper)
+    {
+        this.sqliteHelper = sqliteHelper;
+    }
     
     public int GetPlaybackReportingTime()
     {

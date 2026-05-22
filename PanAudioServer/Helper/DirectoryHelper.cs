@@ -11,7 +11,7 @@ namespace PanAudioServer.Helper
     public class DirectoryHelper
     {
        // private readonly string _basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-       SqliteHelper sqliteHelper  = new SqliteHelper();
+       SqliteHelper sqliteHelper;
         List<Songs> songs = new List<Songs>();
         List<Album> albums = new List<Album>();
         List<Artists> artists = new List<Artists>();
@@ -23,6 +23,15 @@ namespace PanAudioServer.Helper
 
         public DirectoryHelper()
         {
+            sqliteHelper = new SqliteHelper();
+            dbSongs = sqliteHelper.GetAllSongs();
+            dbArtists = sqliteHelper.GetAllArtists();
+            dbAlbums = sqliteHelper.GetAllAblums();
+        }
+
+        public DirectoryHelper(SqliteHelper sqliteHelper)
+        {
+            this.sqliteHelper = sqliteHelper;
             dbSongs = sqliteHelper.GetAllSongs();
             dbArtists = sqliteHelper.GetAllArtists();
             dbAlbums = sqliteHelper.GetAllAblums();
@@ -52,36 +61,19 @@ namespace PanAudioServer.Helper
 
         public string removeShittyCharacters(string input)
         {
-            if (input.Contains("blink"))
-            {
-                Console.WriteLine();
-            }
+             char HyphenMinus = '\u002D';        // Regular hyphen-minus: -
+             char HyphenFigureDash = '\u2012';   // Figure dash: -
+             char HyphenEnDash = '\u2013';       // En dash: -
+             char HyphenEmDash = '\u2014';       // Em dash: -
+             char HyphenNonBreakingHyphen = '\u2011'; // Non-breaking hyphen: -
 
-            input.Replace('‐', '-');
-            
-            char HyphenMinus = '\u002D';        // Regular hyphen-minus: -
-             char HyphenFigureDash = '\u2012';   // Figure dash: ‒
-             char HyphenEnDash = '\u2013';       // En dash: –
-             char HyphenEmDash = '\u2014';       // Em dash: —
-             char HyphenNonBreakingHyphen = '\u2011'; // Non-breaking hyphen: ‑
-
-            if (input.Contains(HyphenNonBreakingHyphen))
-            {
-                Console.WriteLine();
-            }
-
-            input.Replace("’", "'");
-
-            input.Replace(HyphenFigureDash, HyphenMinus);
-            input.Replace(HyphenEnDash, HyphenMinus);
-            input.Replace(HyphenEmDash, HyphenMinus);
-            input.Replace(HyphenNonBreakingHyphen, HyphenMinus);
-
-            input.Replace("-", "-");
-
-           
-           // input.Replace('‐', '-');
-            input.Replace("`", "'");
+            input = input.Replace('\u2010', '-');
+            input = input.Replace("\u2019", "'");
+            input = input.Replace(HyphenFigureDash, HyphenMinus);
+            input = input.Replace(HyphenEnDash, HyphenMinus);
+            input = input.Replace(HyphenEmDash, HyphenMinus);
+            input = input.Replace(HyphenNonBreakingHyphen, HyphenMinus);
+            input = input.Replace("`", "'");
             return input;
         }
 
@@ -163,7 +155,7 @@ namespace PanAudioServer.Helper
            
         }
 
-        private bool IsImage(string fileExtension)
+        public bool IsImage(string fileExtension)
         {
             switch (fileExtension.ToLower())
             {
