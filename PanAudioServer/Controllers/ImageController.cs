@@ -105,7 +105,7 @@ namespace PanAudioServer.Controllers
 
         private IActionResult extractImageFromFile(string path)
         {
-            var directory = Path.GetDirectoryName(path);
+            var directory = Directory.Exists(path) ? path : Path.GetDirectoryName(path);
             if (directory == null || !Directory.Exists(directory))
                 return NotFound();
 
