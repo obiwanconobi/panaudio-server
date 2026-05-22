@@ -105,15 +105,23 @@ namespace PanAudioServer.Controllers
 
         private IActionResult extractImageFromFile(string path)
         {
-            var files = Directory.GetFiles(path);
-            Track file = new Track(files.Where(x => x.EndsWith(".flac")).FirstOrDefault());
+            var directory = Path.GetDirectoryName(path);
+            if (directory == null || !Directory.Exists(directory))
+                return NotFound();
+
+            var files = Directory.GetFiles(directory);
+            var flacFile = files.Where(x => x.EndsWith(".flac")).FirstOrDefault();
+            if (flacFile == null)
+                return NotFound();
+
+            Track file = new Track(flacFile);
             var embeddedPictures = file.EmbeddedPictures;
             if (embeddedPictures != null && embeddedPictures.Count > 0)
             {
                 PictureInfo firstPicture = embeddedPictures[0];
                 return File(firstPicture.PictureData, firstPicture.MimeType.ToString());
             }
-            return null;
+            return NotFound();
         }
 
 
