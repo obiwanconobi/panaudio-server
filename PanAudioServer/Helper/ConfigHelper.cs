@@ -24,9 +24,9 @@ public class ConfigHelper
         return Convert.ToInt16(value);
     }
 
-    public void SetPlaybackReportingTime(string time)
+    public async Task SetPlaybackReportingTime(string time)
     {
-        sqliteHelper.SetConfigValue("PlaybackReportingTime", time);
+        await sqliteHelper.SetConfigValue("PlaybackReportingTime", time);
     }
     
     public bool GetArtistPictures()
@@ -39,9 +39,9 @@ public class ConfigHelper
         return Convert.ToBoolean(value);
     }
     
-    public void SetArtistPictures(bool value)
+    public async Task SetArtistPictures(bool value)
     {
-        sqliteHelper.SetConfigValue("ArtistPictures", value.ToString());
+        await sqliteHelper.SetConfigValue("ArtistPictures", value.ToString());
     }
     
 }

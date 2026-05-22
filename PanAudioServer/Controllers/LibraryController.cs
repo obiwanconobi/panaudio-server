@@ -65,27 +65,30 @@ namespace PanAudioServer.Controllers
         }
 
         [HttpPost("favourite")]
-        public void SetFavourite(string songId, bool favourite)
+        public async Task<IActionResult> SetFavourite(string songId, bool favourite)
         {
             var song = sqliteHelper.GetSongById(songId);
             song.Favourite = favourite;
-            sqliteHelper.UpdateSong(song);
+            await sqliteHelper.UpdateSong(song);
+            return Ok();
         }
 
         [HttpPost("favourite-album")]
-        public void SetAlbumFavourite(string albumId, bool favourite)
+        public async Task<IActionResult> SetAlbumFavourite(string albumId, bool favourite)
         {
             var album = sqliteHelper.GetAlbumById(albumId);
             album.Favourite = favourite;
-            sqliteHelper.UpdateAlbum(album);
+            await sqliteHelper.UpdateAlbum(album);
+            return Ok();
         }
 
         [HttpPost("favourite-artist")]
-        public void SetArtistFavourite(string artistId, bool favourite)
+        public async Task<IActionResult> SetArtistFavourite(string artistId, bool favourite)
         {
             var artist = sqliteHelper.GetArtistById(artistId);
             artist.Favourite = favourite;
-            sqliteHelper.UpdateArtist(artist);
+            await sqliteHelper.UpdateArtist(artist);
+            return Ok();
         }
 
         [HttpGet("favourite-albums")]
@@ -107,32 +110,36 @@ namespace PanAudioServer.Controllers
         }
 
         [HttpPost("update-song")]
-        public void UpdateSong(string songId, string songTitle, string songPath, int songNumber)
+        public async Task<IActionResult> UpdateSong(string songId, string songTitle, string songPath, int songNumber)
         {
             var song = sqliteHelper.GetSongById(songId);
             song.Id = songId;
             song.Title = songTitle;
             song.Path = songPath;
             song.TrackNumber = songNumber;
-            sqliteHelper.UpdateSong(song);
+            await sqliteHelper.UpdateSong(song);
+            return Ok();
         }
         
         [HttpPost("delete-song")]
-        public void DeleteSong(string songId)
+        public async Task<IActionResult> DeleteSong(string songId)
         {
-          sqliteHelper.DeleteSong(songId);
+          await sqliteHelper.DeleteSong(songId);
+          return Ok();
         }
 
         [HttpPost("delete-artist")]
-        public void DeleteArtist(string artistId)
+        public async Task<IActionResult> DeleteArtist(string artistId)
         {
-            sqliteHelper.DeleteArtist(artistId);
+            await sqliteHelper.DeleteArtist(artistId);
+            return Ok();
         }
 
         [HttpPost("delete-album")]
-        public void DeleteAlbum(string albumId)
+        public async Task<IActionResult> DeleteAlbum(string albumId)
         {
-           sqliteHelper.DeleteAlbum(albumId);
+           await sqliteHelper.DeleteAlbum(albumId);
+           return Ok();
         }
 
 

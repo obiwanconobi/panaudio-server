@@ -200,12 +200,12 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void UploadAlbum_PersistsToDatabase()
+        public async Task UploadAlbum_PersistsToDatabase()
         {
             var album = new Album("alb-1", "New Album", "New Artist", albumPath: "/music/new");
             _context.SaveChanges();
 
-            _helper.UploadAlbum(album);
+            await _helper.UploadAlbum(album);
 
             var saved = _context.Album.Find("alb-1");
             Assert.IsNotNull(saved);
@@ -213,7 +213,7 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void UpdateAlbum_PersistsChanges()
+        public async Task UpdateAlbum_PersistsChanges()
         {
             var album = SeedAlbum("alb-1", "Original", "Artist");
             _context.SaveChanges();
@@ -222,7 +222,7 @@ namespace PanAudioServer.Tests.Helper
             var updated = _context.Album.Find("alb-1");
             updated.Title = "Changed";
             updated.Picture = "cover.jpg";
-            _helper.UpdateAlbum(updated);
+            await _helper.UpdateAlbum(updated);
 
             _context.ChangeTracker.Clear();
             var result = _context.Album.Find("alb-1");
@@ -311,7 +311,7 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void UploadSong_PersistsToDatabase()
+        public async Task UploadSong_PersistsToDatabase()
         {
             var song = new Songs
             {
@@ -332,7 +332,7 @@ namespace PanAudioServer.Tests.Helper
             };
             _context.SaveChanges();
 
-            _helper.UploadSong(song);
+            await _helper.UploadSong(song);
 
             var saved = _context.Songs.Find("song-1");
             Assert.IsNotNull(saved);
@@ -435,11 +435,11 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void UploadArtist_PersistsToDatabase()
+        public async Task UploadArtist_PersistsToDatabase()
         {
             var artist = new Artists("art-1", "New Artist", "/music/new");
 
-            _helper.UploadArtist(artist);
+            await _helper.UploadArtist(artist);
 
             var saved = _context.Artists.Find("art-1");
             Assert.IsNotNull(saved);
@@ -447,7 +447,7 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void UpdateArtist_PersistsChanges()
+        public async Task UpdateArtist_PersistsChanges()
         {
             var artist = SeedArtist("art-1", "Original Name");
             _context.SaveChanges();
@@ -456,7 +456,7 @@ namespace PanAudioServer.Tests.Helper
             var updated = _context.Artists.Find("art-1");
             updated.Name = "Updated Name";
             updated.Favourite = true;
-            _helper.UpdateArtist(updated);
+            await _helper.UpdateArtist(updated);
 
             _context.ChangeTracker.Clear();
             var result = _context.Artists.Find("art-1");
@@ -585,9 +585,9 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void GetConfigValue_ReturnsValue_WhenSet()
+        public async Task GetConfigValue_ReturnsValue_WhenSet()
         {
-            _helper.SetConfigValue("MyKey", "MyValue");
+            await _helper.SetConfigValue("MyKey", "MyValue");
 
             var result = _helper.GetConfigValue("MyKey");
 
@@ -595,10 +595,10 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void SetConfigValue_UpdatesExistingEntry()
+        public async Task SetConfigValue_UpdatesExistingEntry()
         {
-            _helper.SetConfigValue("MyKey", "Original");
-            _helper.SetConfigValue("MyKey", "Updated");
+            await _helper.SetConfigValue("MyKey", "Original");
+            await _helper.SetConfigValue("MyKey", "Updated");
 
             var result = _helper.GetConfigValue("MyKey");
 

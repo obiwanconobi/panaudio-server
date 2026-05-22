@@ -16,9 +16,9 @@
         }
 
 
-        public void clearAll()
+        public async Task clearAll()
         {
-            sqliteHelper.Clear();
+            await sqliteHelper.Clear();
         }
     }
 }

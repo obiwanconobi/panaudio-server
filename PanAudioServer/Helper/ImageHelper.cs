@@ -25,11 +25,11 @@ namespace PanAudioServer.Helper
             return Path.Combine(album.AlbumPath, album.Picture ?? "");
         }
 
-        public void SetImage(string albumId, string imageName)
+        public async Task SetImage(string albumId, string imageName)
         {
             var album = sqliteHelper.GetAlbumById(albumId);
             album.Picture = imageName;
-            sqliteHelper.UpdateAlbum(album);
+            await sqliteHelper.UpdateAlbum(album);
         }
 
         public string ArtistImagePath(string artistId)

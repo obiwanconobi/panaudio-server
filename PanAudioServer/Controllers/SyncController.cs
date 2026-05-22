@@ -20,19 +20,20 @@ namespace PanAudioServer.Controllers
         }
       
         [HttpGet("all")]
-        public async void Sync()
+        public async Task<IActionResult> Sync()
         {
             string _totalPath = _basePath + @"/Music/";
 
             await dirHelper.directoryGetter(_totalPath);
             await dirHelper.saveData();
-         
+            return Ok();
         }
 
         [HttpGet("clear")]
-        public async void Clear()
+        public async Task<IActionResult> Clear()
         {
-            dbHelper.clearAll();
+            await dbHelper.clearAll();
+            return Ok();
         }
 
        

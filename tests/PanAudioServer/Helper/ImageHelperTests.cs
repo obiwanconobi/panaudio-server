@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -98,7 +99,7 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void SetImage_UpdatesAlbumPicture()
+        public async Task SetImage_UpdatesAlbumPicture()
         {
             var albumId = Guid.NewGuid().ToString();
             var album = new Album(
@@ -111,32 +112,33 @@ namespace PanAudioServer.Tests.Helper
             _context.Album.Add(album);
             _context.SaveChanges();
 
-            _helper.SetImage(albumId, "new-image.png");
+            await _helper.SetImage(albumId, "new-image.png");
 
             var updated = _context.Album.Find(albumId);
             Assert.AreEqual("new-image.png", updated.Picture);
         }
 
         [Test]
-        public void SetImage_DoesNotThrow_WhenAlbumExists()
+        public async Task SetImage_DoesNotThrow_WhenAlbumExists()
         {
             var albumId = Guid.NewGuid().ToString();
             var album = new Album(
                 id: albumId,
                 title: "Test Album",
                 artist: "Test Artist",
-                albumPath: "/music/albums/test"
+                albumPath: "/music/albums/test",
+                picture: "image.png"
             );
             _context.Album.Add(album);
             _context.SaveChanges();
 
-            Assert.DoesNotThrow(() => _helper.SetImage(albumId, "cover.jpg"));
+            Assert.DoesNotThrowAsync(async () => await _helper.SetImage(albumId, "cover.jpg"));
         }
 
         [Test]
-        public void ArtistImagePath_ReturnsCorrectPath_WhenArtistExists()
+        public async Task ArtistImagePath_ReturnsCorrectPath_WhenArtistExists()
         {
-            _sqliteHelper.SetConfigValue("ArtistPictures", "True");
+            await _sqliteHelper.SetConfigValue("ArtistPictures", "True");
 
             var artistId = Guid.NewGuid().ToString();
             var artist = new Artists(
@@ -154,9 +156,9 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void ArtistImagePath_ReturnsPathWithoutPicture_WhenPictureIsNull()
+        public async Task ArtistImagePath_ReturnsPathWithoutPicture_WhenPictureIsNull()
         {
-            _sqliteHelper.SetConfigValue("ArtistPictures", "True");
+            await _sqliteHelper.SetConfigValue("ArtistPictures", "True");
 
             var artistId = Guid.NewGuid().ToString();
             var artist = new Artists(
@@ -174,9 +176,9 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void ArtistImagePath_ReturnsPathWithoutPicture_WhenPictureIsEmpty()
+        public async Task ArtistImagePath_ReturnsPathWithoutPicture_WhenPictureIsEmpty()
         {
-            _sqliteHelper.SetConfigValue("ArtistPictures", "True");
+            await _sqliteHelper.SetConfigValue("ArtistPictures", "True");
 
             var artistId = Guid.NewGuid().ToString();
             var artist = new Artists(
@@ -194,9 +196,9 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void ArtistImagePath_DoesNotThrow_WhenArtistPathIsNull()
+        public async Task ArtistImagePath_DoesNotThrow_WhenArtistPathIsNull()
         {
-            _sqliteHelper.SetConfigValue("ArtistPictures", "True");
+            await _sqliteHelper.SetConfigValue("ArtistPictures", "True");
 
             var artistId = Guid.NewGuid().ToString();
             var artist = new Artists(

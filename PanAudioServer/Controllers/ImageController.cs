@@ -86,7 +86,7 @@ namespace PanAudioServer.Controllers
                     await file.CopyToAsync(stream);
                 }
 
-                imageHelper.SetImage(albumId, fileName);
+                await imageHelper.SetImage(albumId, fileName);
 
 
                 return Ok(new

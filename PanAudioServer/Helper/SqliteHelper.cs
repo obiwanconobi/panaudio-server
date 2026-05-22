@@ -19,17 +19,17 @@ namespace PanAudioServer.Helper
         }
 
 
-        public async void DeleteArtist(string artistId){
+        public async Task DeleteArtist(string artistId){
             _context.Artists.Where(x => x.Id == artistId).ExecuteDelete();
             await _context.SaveChangesAsync();
         }
 
-        public async void DeleteAlbum(string albumId){
+        public async Task DeleteAlbum(string albumId){
             _context.Album.Where(x => x.Id == albumId).ExecuteDelete();
             await _context.SaveChangesAsync();
         }
 
-        public async void DeleteSong(string songId){
+        public async Task DeleteSong(string songId){
             _context.Songs.Where(x => x.Id == songId).ExecuteDelete();
             await _context.SaveChangesAsync();
         }
@@ -48,7 +48,7 @@ namespace PanAudioServer.Helper
             return _context.Album.First(x => x.Id == albumId);
         }
 
-        public async void Clear()
+        public async Task Clear()
         {
             
             _context.PlaybackHistory.ExecuteDelete();
@@ -76,7 +76,7 @@ namespace PanAudioServer.Helper
             
         }
 
-        public async void UploadAlbum(Album album)
+        public async Task UploadAlbum(Album album)
         {
             
          
@@ -218,7 +218,7 @@ namespace PanAudioServer.Helper
         }
 
 
-        public async void UploadArtist(Artists artists)
+        public async Task UploadArtist(Artists artists)
         {
             
         
@@ -234,14 +234,14 @@ namespace PanAudioServer.Helper
             
         }
 
-        public void UpdateArtist(Artists artist)
+        public async Task UpdateArtist(Artists artist)
         {
             
         
                 try
                 {
                     _context.Artists.Update(artist);
-                    _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
 
                 }
                 catch (Exception ex)
@@ -254,7 +254,7 @@ namespace PanAudioServer.Helper
 
         }
 
-        public void UpdateAlbum(Album album)
+        public async Task UpdateAlbum(Album album)
         {
             
          
@@ -262,7 +262,7 @@ namespace PanAudioServer.Helper
                 try
                 {
                    _context.Album.Update(album);
-                   _context.SaveChangesAsync();
+                   await _context.SaveChangesAsync();
 
                 }
                 catch (Exception ex)
@@ -317,7 +317,7 @@ namespace PanAudioServer.Helper
 
         }
 
-        public async void UploadSong(Songs song)
+        public async Task UploadSong(Songs song)
         {
             
        
@@ -631,7 +631,7 @@ namespace PanAudioServer.Helper
             
         }
 
-        public void SetConfigValue(String configName, String value)
+        public async Task SetConfigValue(String configName, String value)
         {
             var oldValue = _context.Config.Where(x => x.ConfigName == configName).FirstOrDefault();
             if (oldValue == null)
@@ -639,7 +639,7 @@ namespace PanAudioServer.Helper
                 try
                 {
                   _context.Config.Add(new Config {ConfigId = Guid.NewGuid() ,ConfigName = configName, ConfigValue = value });
-                  _context.SaveChanges();
+                  await _context.SaveChangesAsync();
                 }
                 catch (Exception e)
                 {
@@ -650,7 +650,7 @@ namespace PanAudioServer.Helper
             {
                 oldValue.ConfigValue = value;
                 _context.Config.Update(oldValue);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
             
         }

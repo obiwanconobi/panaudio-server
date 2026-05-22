@@ -59,7 +59,7 @@ namespace PanAudioServer.Helper
             var id = await getArtistIdAsync(artistName);
             var artist = sqliteHelper.GetArtist(artistName);
             artist.MusicBrainzId = id;
-            sqliteHelper.UpdateArtist(artist);
+            await sqliteHelper.UpdateArtist(artist);
 
 
         }
@@ -84,7 +84,7 @@ namespace PanAudioServer.Helper
             var albumf = await sqliteHelper.GetAlbum(artist, album);
             albumf.MusicBrainzId = albumId;
 
-            sqliteHelper.UpdateAlbum(albumf);
+            await sqliteHelper.UpdateAlbum(albumf);
 
 
 
@@ -105,7 +105,7 @@ namespace PanAudioServer.Helper
             {
                 await File.WriteAllBytesAsync(Path.Combine(savePlace, "cover.jpg"), imageBytes);
                 albumSave.Picture = "cover.jpg";
-                sqliteHelper.UpdateAlbum(albumSave);
+                await sqliteHelper.UpdateAlbum(albumSave);
             }catch (Exception ex) {
                 
             }

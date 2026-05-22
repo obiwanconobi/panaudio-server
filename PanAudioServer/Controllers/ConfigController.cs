@@ -21,9 +21,10 @@ public class ConfigController : Controller
     }
     
     [HttpPost("setPlaybackTimeConfig")]
-    public void SetPlaybackTime(int time)
+    public async Task<IActionResult> SetPlaybackTime(int time)
     {
-        _configHelper.SetPlaybackReportingTime(time.ToString());
+        await _configHelper.SetPlaybackReportingTime(time.ToString());
+        return Ok();
     }
     
     [HttpGet("getArtistPictureConfig")]
@@ -33,9 +34,10 @@ public class ConfigController : Controller
     }
     
     [HttpPost("setArtistPictureConfig")]
-    public void SetPlaybackTime(bool value)
+    public async Task<IActionResult> SetArtistPictureConfig(bool value)
     {
-        _configHelper.SetArtistPictures(value);
+        await _configHelper.SetArtistPictures(value);
+        return Ok();
     }
 
 }
