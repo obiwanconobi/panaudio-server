@@ -8,12 +8,23 @@ namespace PanAudioServer.Helper
 {
     public class MusicBrainzHelper
     {
-        // http://musicbrainz.org/ws/2/artist/?query=artist:blink-182&fmt=json
+        HttpClient _httpClient;
+        SqliteHelper sqliteHelper;
+        ImageHelper imageHelper;
 
-        HttpClient _httpClient = new HttpClient();
-        SqliteHelper sqliteHelper = new SqliteHelper();
-        ImageHelper imageHelper = new ImageHelper();
-        public MusicBrainzHelper() {
+        public MusicBrainzHelper()
+        {
+            _httpClient = new HttpClient();
+            sqliteHelper = new SqliteHelper();
+            imageHelper = new ImageHelper();
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "panaudio-server-beta/0.0.5 (panaudio-support@panaro.co.uk)");
+        }
+
+        public MusicBrainzHelper(HttpClient httpClient, SqliteHelper sqliteHelper, ImageHelper imageHelper)
+        {
+            _httpClient = httpClient;
+            this.sqliteHelper = sqliteHelper;
+            this.imageHelper = imageHelper;
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "panaudio-server-beta/0.0.5 (panaudio-support@panaro.co.uk)");
         }
 
@@ -40,13 +51,6 @@ namespace PanAudioServer.Helper
             var rel = releases.Releases.OrderBy(x => x.Date).ToList();
 
             return rel[0].Id.ToString();
-
-            using HttpResponseMessage response = await _httpClient.GetAsync("https://musicbrainz.org/ws/2/release-group/?query=arid:" + musicBrainzArtistId + " AND release:" + albumName + " AND status:Official&fmt=json&inc=artist-credits&limit=1");
-
-            response.EnsureSuccessStatusCode();
-            var responseBody = await response.Content.ReadAsStringAsync();
-            var albums = JsonConvert.DeserializeObject<MusicBrainzReleaseGroups>(responseBody);
-            return albums.releasegroups[0].id;
         }
 
 
