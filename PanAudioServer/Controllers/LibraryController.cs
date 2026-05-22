@@ -142,6 +142,124 @@ namespace PanAudioServer.Controllers
            return Ok();
         }
 
+        [HttpGet("album/{albumId}/songs")]
+        public async Task<List<Songs>> GetAlbumSongs(string albumId)
+        {
+            return await sqliteHelper.GetSongsByAlbumId(albumId);
+        }
+
+        [HttpGet("artist/{artistId}/albums")]
+        public async Task<List<Album>> GetArtistAlbums(string artistId)
+        {
+            return await sqliteHelper.GetAlbumsByArtistId(artistId);
+        }
+
+        [HttpPut("song/{songId}")]
+        public async Task<IActionResult> EditSong(string songId, [FromBody] UpdateSongRequest request)
+        {
+            var song = await sqliteHelper.GetSongById(songId);
+            var changedFields = new Dictionary<string, object>();
+
+            if (request.Artist != null)
+            {
+                var artist = await sqliteHelper.GetArtistByName(request.Artist);
+                if (artist == null)
+                {
+                    artist = new Artists(Guid.NewGuid().ToString(), request.Artist);
+                    await sqliteHelper.UploadArtist(artist);
+                }
+                song.Artist = artist.Name;
+                song.ArtistId = artist.Id;
+                changedFields["artist"] = request.Artist;
+            }
+
+            if (request.Album != null)
+            {
+                var album = await sqliteHelper.GetAlbum(song.Artist, request.Album);
+                if (album == null)
+                {
+                    album = new Album(Guid.NewGuid().ToString(), request.Album, song.Artist);
+                    await sqliteHelper.UploadAlbum(album);
+                }
+                song.Album = album.Title;
+                song.AlbumId = album.Id;
+                changedFields["album"] = request.Album;
+            }
+
+            if (request.Title != null) { song.Title = request.Title; changedFields["title"] = request.Title; }
+            if (request.TrackNumber.HasValue) { song.TrackNumber = request.TrackNumber; changedFields["trackNumber"] = request.TrackNumber.Value; }
+            if (request.DiscNumber.HasValue) { song.DiscNumber = request.DiscNumber.Value; changedFields["discNumber"] = request.DiscNumber.Value; }
+            if (request.Favourite.HasValue) { song.Favourite = request.Favourite; }
+
+            await sqliteHelper.UpdateSong(song);
+
+            return Ok(song);
+        }
+
+        [HttpPut("album/{albumId}")]
+        public async Task<IActionResult> EditAlbum(string albumId, [FromBody] UpdateAlbumRequest request)
+        {
+            var album = await sqliteHelper.GetAlbumById(albumId);
+            var originalTitle = album.Title;
+            var originalArtist = album.Artist;
+
+            if (request.Title != null)
+            {
+                album.Title = request.Title;
+            }
+            if (request.Artist != null)
+            {
+                album.Artist = request.Artist;
+            }
+            if (request.Year.HasValue)
+            {
+                album.Year = request.Year;
+            }
+
+            await sqliteHelper.UpdateAlbum(album);
+
+            if (request.Title != null && request.Title != originalTitle)
+            {
+                await sqliteHelper.UpdateAlbumTitleOnSongs(albumId, request.Title);
+            }
+            if (request.Artist != null && request.Artist != originalArtist)
+            {
+                await sqliteHelper.UpdateArtistNameOnSongsByAlbumId(albumId, request.Artist);
+                var artist = await sqliteHelper.GetArtistByName(request.Artist);
+                if (artist == null)
+                {
+                    artist = new Artists(Guid.NewGuid().ToString(), request.Artist);
+                    await sqliteHelper.UploadArtist(artist);
+                }
+            }
+
+            return Ok(album);
+        }
+
+        [HttpPut("artist/{artistId}")]
+        public async Task<IActionResult> EditArtist(string artistId, [FromBody] UpdateArtistRequest request)
+        {
+            var artist = await sqliteHelper.GetArtistById(artistId);
+            if (artist == null)
+                return NotFound();
+
+            var originalName = artist.Name;
+
+            if (request.Name != null)
+            {
+                artist.Name = request.Name;
+            }
+
+            await sqliteHelper.UpdateArtist(artist);
+
+            if (request.Name != null && request.Name != originalName)
+            {
+                await sqliteHelper.UpdateArtistNameOnSongsByArtistId(artistId, request.Name);
+                await sqliteHelper.UpdateArtistNameOnAlbums(originalName, request.Name);
+            }
+
+            return Ok(artist);
+        }
 
     }
 

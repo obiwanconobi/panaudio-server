@@ -652,5 +652,117 @@ namespace PanAudioServer.Helper
             }
             
         }
+
+        public async Task<List<Songs>> GetSongsByAlbumId(string albumId)
+        {
+            return await _context.Songs
+                .Where(x => x.AlbumId == albumId)
+                .Select(s => new Songs
+                {
+                    Id = s.Id,
+                    TrackNumber = s.TrackNumber ?? null,
+                    Title = s.Title ?? "",
+                    Album = s.Album ?? "",
+                    AlbumId = s.AlbumId ?? "",
+                    Artist = s.Artist ?? "",
+                    ArtistId = s.ArtistId ?? "",
+                    AlbumPicture = s.AlbumPicture ?? "",
+                    Favourite = s.Favourite,
+                    DiscNumber = s.DiscNumber,
+                    Length = s.Length ?? "",
+                    Path = s.Path ?? "",
+                    MusicBrainzId = s.MusicBrainzId ?? "",
+                    BitDepth = s.BitDepth ?? "",
+                    BitRate = s.BitRate ?? "",
+                    SampleRate = s.SampleRate ?? "",
+                    Codec = s.Codec ?? "",
+                    PlayCount = _context.PlaybackHistory.Count(p => p.SongId == s.Id)
+                })
+                .OrderBy(x => x.DiscNumber)
+                .ThenBy(x => x.TrackNumber)
+                .ToListAsync();
+        }
+
+        public async Task<List<Album>> GetAlbumsByArtistId(string artistId)
+        {
+            var artist = await _context.Artists.FirstOrDefaultAsync(x => x.Id == artistId);
+            if (artist == null)
+                return new List<Album>();
+            return await _context.Album.Where(x => x.Artist == artist.Name).ToListAsync();
+        }
+
+        public async Task<List<Songs>> SearchSongs(string query)
+        {
+            return await _context.Songs
+                .Where(x => x.Title.Contains(query))
+                .Select(s => new Songs
+                {
+                    Id = s.Id,
+                    TrackNumber = s.TrackNumber ?? null,
+                    Title = s.Title ?? "",
+                    Album = s.Album ?? "",
+                    AlbumId = s.AlbumId ?? "",
+                    Artist = s.Artist ?? "",
+                    ArtistId = s.ArtistId ?? "",
+                    AlbumPicture = s.AlbumPicture ?? "",
+                    Favourite = s.Favourite,
+                    DiscNumber = s.DiscNumber,
+                    Length = s.Length ?? "",
+                    Path = s.Path ?? "",
+                    MusicBrainzId = s.MusicBrainzId ?? "",
+                    BitDepth = s.BitDepth ?? "",
+                    BitRate = s.BitRate ?? "",
+                    SampleRate = s.SampleRate ?? "",
+                    Codec = s.Codec ?? "",
+                    PlayCount = _context.PlaybackHistory.Count(p => p.SongId == s.Id)
+                })
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<List<Album>> SearchAlbums(string query)
+        {
+            return await _context.Album
+                .Where(x => x.Title.Contains(query) || x.Artist.Contains(query))
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<List<Artists>> SearchArtists(string query)
+        {
+            return await _context.Artists
+                .Where(x => x.Name.Contains(query))
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<Artists?> GetArtistByName(string artistName)
+        {
+            return await _context.Artists.FirstOrDefaultAsync(x => x.Name == artistName);
+        }
+
+        public async Task UpdateAlbumTitleOnSongs(string albumId, string newAlbumTitle)
+        {
+            await _context.Songs.Where(s => s.AlbumId == albumId)
+                .ExecuteUpdateAsync(s => s.SetProperty(x => x.Album, newAlbumTitle));
+        }
+
+        public async Task UpdateArtistNameOnSongsByAlbumId(string albumId, string newArtistName)
+        {
+            await _context.Songs.Where(s => s.AlbumId == albumId)
+                .ExecuteUpdateAsync(s => s.SetProperty(x => x.Artist, newArtistName));
+        }
+
+        public async Task UpdateArtistNameOnSongsByArtistId(string artistId, string newArtistName)
+        {
+            await _context.Songs.Where(s => s.ArtistId == artistId)
+                .ExecuteUpdateAsync(s => s.SetProperty(x => x.Artist, newArtistName));
+        }
+
+        public async Task UpdateArtistNameOnAlbums(string originalArtistName, string newArtistName)
+        {
+            await _context.Album.Where(a => a.Artist == originalArtistName)
+                .ExecuteUpdateAsync(a => a.SetProperty(x => x.Artist, newArtistName));
+        }
     }
 }

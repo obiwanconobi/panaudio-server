@@ -636,5 +636,257 @@ namespace PanAudioServer.Tests.Helper
 
             Assert.AreEqual("", result);
         }
+
+        // ─── GetSongsByAlbumId Tests ────────────────────────────────────
+
+        [Test]
+        public async Task GetSongsByAlbumId_ReturnsSongsOrderedByDiscAndTrack()
+        {
+            var albumId = "alb-1";
+            var song1 = SeedSong("song-1", "Track 2", "Artist A", "Album A", albumId: albumId, trackNumber: 2);
+            song1.DiscNumber = 1;
+            var song2 = SeedSong("song-2", "Track 1", "Artist A", "Album A", albumId: albumId, trackNumber: 1);
+            song2.DiscNumber = 1;
+            var song3 = SeedSong("song-3", "Track 1", "Artist A", "Album A", albumId: albumId, trackNumber: 1);
+            song3.DiscNumber = 2;
+            _context.SaveChanges();
+
+            var result = await _helper.GetSongsByAlbumId(albumId);
+
+            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual("song-2", result[0].Id);
+            Assert.AreEqual("song-1", result[1].Id);
+            Assert.AreEqual("song-3", result[2].Id);
+        }
+
+        [Test]
+        public async Task GetSongsByAlbumId_ReturnsEmptyList_WhenNoSongsMatch()
+        {
+            var result = await _helper.GetSongsByAlbumId("nonexistent");
+
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task GetSongsByAlbumId_ReturnsOnlyMatchingAlbumSongs()
+        {
+            var albumId1 = "alb-1";
+            var albumId2 = "alb-2";
+            SeedSong("song-1", "Track 1", "Artist", "Album", albumId: albumId1);
+            SeedSong("song-2", "Track 2", "Artist", "Album 2", albumId: albumId2);
+            _context.SaveChanges();
+
+            var result = await _helper.GetSongsByAlbumId(albumId1);
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("song-1", result[0].Id);
+        }
+
+        [Test]
+        public async Task GetSongsByAlbumId_IncludesPlayCount()
+        {
+            var albumId = "alb-1";
+            SeedSong("song-1", "Track 1", "Artist", "Album", albumId: albumId);
+            _context.PlaybackHistory.Add(new PlaybackHistory { SongId = "song-1", PlaybackStart = DateTime.UtcNow, Seconds = 120 });
+            _context.PlaybackHistory.Add(new PlaybackHistory { SongId = "song-1", PlaybackStart = DateTime.UtcNow.AddDays(-1), Seconds = 180 });
+            _context.SaveChanges();
+
+            var result = await _helper.GetSongsByAlbumId(albumId);
+
+            Assert.AreEqual(2, result[0].PlayCount);
+        }
+
+        // ─── GetAlbumsByArtistId Tests ──────────────────────────────────
+
+        [Test]
+        public async Task GetAlbumsByArtistId_ReturnsAlbumsForArtist()
+        {
+            var artistId = "art-1";
+            SeedArtist(artistId, "My Artist");
+            SeedAlbum("alb-1", "Album One", "My Artist");
+            SeedAlbum("alb-2", "Album Two", "My Artist");
+            _context.SaveChanges();
+
+            var result = await _helper.GetAlbumsByArtistId(artistId);
+
+            Assert.AreEqual(2, result.Count);
+            Assert.IsTrue(result.Any(a => a.Title == "Album One"));
+            Assert.IsTrue(result.Any(a => a.Title == "Album Two"));
+        }
+
+        [Test]
+        public async Task GetAlbumsByArtistId_ReturnsEmptyList_WhenArtistNotFound()
+        {
+            var result = await _helper.GetAlbumsByArtistId("nonexistent");
+
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task GetAlbumsByArtistId_ReturnsEmptyList_WhenNoAlbumsForArtist()
+        {
+            var artistId = "art-1";
+            SeedArtist(artistId, "Lonely Artist");
+            _context.SaveChanges();
+
+            var result = await _helper.GetAlbumsByArtistId(artistId);
+
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task GetAlbumsByArtistId_ExcludesOtherArtistAlbums()
+        {
+            var artistId = "art-1";
+            SeedArtist(artistId, "My Artist");
+            SeedArtist("art-2", "Other Artist");
+            SeedAlbum("alb-1", "My Album", "My Artist");
+            SeedAlbum("alb-2", "Other Album", "Other Artist");
+            _context.SaveChanges();
+
+            var result = await _helper.GetAlbumsByArtistId(artistId);
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("My Album", result[0].Title);
+        }
+
+        // ─── SearchSongs Tests ──────────────────────────────────────────
+
+        [Test]
+        public async Task SearchSongs_ReturnsMatchingSongs()
+        {
+            SeedSong("song-1", "Hello World", "Artist", "Album");
+            SeedSong("song-2", "Goodbye Moon", "Artist", "Album");
+            SeedSong("song-3", "Hello Sunshine", "Artist", "Album");
+            _context.SaveChanges();
+
+            var result = await _helper.SearchSongs("Hello");
+
+            Assert.AreEqual(2, result.Count);
+            Assert.IsTrue(result.Any(s => s.Id == "song-1"));
+            Assert.IsTrue(result.Any(s => s.Id == "song-3"));
+        }
+
+        [Test]
+        public async Task SearchSongs_ReturnsEmptyList_WhenNoMatch()
+        {
+            SeedSong("song-1", "Hello World", "Artist", "Album");
+            _context.SaveChanges();
+
+            var result = await _helper.SearchSongs("zzzzz");
+
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task SearchSongs_IsCaseSensitive()
+        {
+            SeedSong("song-1", "Hello World", "Artist", "Album");
+            _context.SaveChanges();
+
+            var result = await _helper.SearchSongs("hello");
+
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task SearchSongs_IncludesPlayCount()
+        {
+            SeedSong("song-1", "Hello World", "Artist", "Album");
+            _context.PlaybackHistory.Add(new PlaybackHistory { SongId = "song-1", PlaybackStart = DateTime.UtcNow, Seconds = 60 });
+            _context.SaveChanges();
+
+            var result = await _helper.SearchSongs("Hello");
+
+            Assert.AreEqual(1, result[0].PlayCount);
+        }
+
+        // ─── SearchAlbums Tests ─────────────────────────────────────────
+
+        [Test]
+        public async Task SearchAlbums_ReturnsMatchingByTitle()
+        {
+            SeedAlbum("alb-1", "Dark Side", "Pink Floyd");
+            SeedAlbum("alb-2", "The Wall", "Pink Floyd");
+            SeedAlbum("alb-3", "Random", "Other Artist");
+            _context.SaveChanges();
+
+            var result = await _helper.SearchAlbums("Dark");
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Dark Side", result[0].Title);
+        }
+
+        [Test]
+        public async Task SearchAlbums_ReturnsMatchingByArtist()
+        {
+            SeedAlbum("alb-1", "Dark Side", "Pink Floyd");
+            SeedAlbum("alb-2", "The Wall", "Pink Floyd");
+            SeedAlbum("alb-3", "Random", "Other Artist");
+            _context.SaveChanges();
+
+            var result = await _helper.SearchAlbums("Pink");
+
+            Assert.AreEqual(2, result.Count);
+        }
+
+        [Test]
+        public async Task SearchAlbums_ReturnsEmptyList_WhenNoMatch()
+        {
+            SeedAlbum("alb-1", "Dark Side", "Pink Floyd");
+            _context.SaveChanges();
+
+            var result = await _helper.SearchAlbums("zzzzz");
+
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task SearchAlbums_IsCaseSensitive()
+        {
+            SeedAlbum("alb-1", "Dark Side", "Pink Floyd");
+            _context.SaveChanges();
+
+            var result = await _helper.SearchAlbums("dark");
+
+            Assert.IsEmpty(result);
+        }
+
+        // ─── SearchArtists Tests ────────────────────────────────────────
+
+        [Test]
+        public async Task SearchArtists_ReturnsMatchingArtists()
+        {
+            SeedArtist("art-1", "Pink Floyd");
+            SeedArtist("art-2", "Pink");
+            SeedArtist("art-3", "Red Hot Chili Peppers");
+            _context.SaveChanges();
+
+            var result = await _helper.SearchArtists("Pink");
+
+            Assert.AreEqual(2, result.Count);
+        }
+
+        [Test]
+        public async Task SearchArtists_ReturnsEmptyList_WhenNoMatch()
+        {
+            SeedArtist("art-1", "Pink Floyd");
+            _context.SaveChanges();
+
+            var result = await _helper.SearchArtists("zzzzz");
+
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task SearchArtists_IsCaseSensitive()
+        {
+            SeedArtist("art-1", "Pink Floyd");
+            _context.SaveChanges();
+
+            var result = await _helper.SearchArtists("pink");
+
+            Assert.IsEmpty(result);
+        }
     }
 }
