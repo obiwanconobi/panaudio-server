@@ -20,32 +20,33 @@ namespace PanAudioServer.Helper
         List<Album> dbAlbums = new List<Album>();
         List<Artists> dbArtists = new List<Artists>();
         MusicBrainzHelper musicBrainzHelper;
+        private bool _dataLoaded = false;
 
         public DirectoryHelper()
         {
             sqliteHelper = new SqliteHelper();
             musicBrainzHelper = new MusicBrainzHelper();
-            dbSongs = sqliteHelper.GetAllSongs();
-            dbArtists = sqliteHelper.GetAllArtists();
-            dbAlbums = sqliteHelper.GetAllAblums();
         }
 
         public DirectoryHelper(SqliteHelper sqliteHelper)
         {
             this.sqliteHelper = sqliteHelper;
             musicBrainzHelper = new MusicBrainzHelper();
-            dbSongs = sqliteHelper.GetAllSongs();
-            dbArtists = sqliteHelper.GetAllArtists();
-            dbAlbums = sqliteHelper.GetAllAblums();
         }
 
         public DirectoryHelper(SqliteHelper sqliteHelper, MusicBrainzHelper musicBrainzHelper)
         {
             this.sqliteHelper = sqliteHelper;
             this.musicBrainzHelper = musicBrainzHelper;
-            dbSongs = sqliteHelper.GetAllSongs();
-            dbArtists = sqliteHelper.GetAllArtists();
-            dbAlbums = sqliteHelper.GetAllAblums();
+        }
+
+        private async Task EnsureDataLoadedAsync()
+        {
+            if (_dataLoaded) return;
+            dbSongs = await sqliteHelper.GetAllSongs();
+            dbArtists = await sqliteHelper.GetAllArtists();
+            dbAlbums = await sqliteHelper.GetAllAblums();
+            _dataLoaded = true;
         }
 
         public string[]? getDirectories(String path)
@@ -145,7 +146,7 @@ namespace PanAudioServer.Helper
         //remove
         public async Task<Artists> getArtist(string artist) 
         {
-            return sqliteHelper.GetArtist(artist);
+            return await sqliteHelper.GetArtist(artist);
         }
 
         public async Task saveData()
@@ -253,6 +254,7 @@ namespace PanAudioServer.Helper
 
         public async Task getSongs(String directory)
         {
+            await EnsureDataLoadedAsync();
             var files = Directory.GetFiles(directory).OrderBy(f => GetExtensionPriority(Path.GetExtension(f))).ToList();
             // files.OrderBy(f => GetExtensionPriority(Path.GetExtension(f)));
             String albumId = "";

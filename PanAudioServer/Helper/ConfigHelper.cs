@@ -14,9 +14,9 @@ public class ConfigHelper
         this.sqliteHelper = sqliteHelper;
     }
     
-    public int GetPlaybackReportingTime()
+    public async Task<int> GetPlaybackReportingTime()
     {
-        var value = sqliteHelper.GetConfigValue("PlaybackReportingTime");
+        var value = await sqliteHelper.GetConfigValue("PlaybackReportingTime");
         if (value == null)
         {
             return 5;
@@ -29,9 +29,9 @@ public class ConfigHelper
         await sqliteHelper.SetConfigValue("PlaybackReportingTime", time);
     }
     
-    public bool GetArtistPictures()
+    public async Task<bool> GetArtistPictures()
     {
-        var value = sqliteHelper.GetConfigValue("ArtistPictures");
+        var value = await sqliteHelper.GetConfigValue("ArtistPictures");
         if(value == null)
         {
             return false;

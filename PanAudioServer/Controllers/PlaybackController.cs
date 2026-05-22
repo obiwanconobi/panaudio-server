@@ -38,7 +38,7 @@ namespace PanAudioServer.Controllers
         [HttpGet("historyByDate")]
         public async Task<List<PlaybackCounts>> GetPlaybackByDate(DateTime startDate, DateTime endDate)
         {
-            var playbackTime = configHelper.GetPlaybackReportingTime();
+            var playbackTime = await configHelper.GetPlaybackReportingTime();
             return await sqliteHelper.GetPlaybackHistoryByDate(startDate, endDate, playbackTime);
         }
 

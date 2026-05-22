@@ -42,10 +42,10 @@ namespace PanAudioServer.Helper
             return _context.Album.FirstOrDefault(x => x.Title == album && x.Artist == artist);
         }
 
-        public Album GetAlbumById(string albumId)
+        public async Task<Album> GetAlbumById(string albumId)
         {
             
-            return _context.Album.First(x => x.Id == albumId);
+            return await _context.Album.FirstAsync(x => x.Id == albumId);
         }
 
         public async Task Clear()
@@ -91,113 +91,109 @@ namespace PanAudioServer.Helper
             
         }
 
-        public List<Album> GetAllAblumsForArtist(string artistName)
+        public async Task<List<Album>> GetAllAblumsForArtist(string artistName)
         {
             
-            return _context.Album.Where(x => x.Artist == artistName).ToList();
+            return await _context.Album.Where(x => x.Artist == artistName).ToListAsync();
         }
 
-        public List<Album> GetAllAblums()
+        public async Task<List<Album>> GetAllAblums()
         {
             
-            return _context.Album.OrderBy(x => x.Title).ToList();
+            return await _context.Album.OrderBy(x => x.Title).ToListAsync();
         }
 
-        public List<Album> GetFavouriteAblums()
+        public async Task<List<Album>> GetFavouriteAblums()
         {
             
-            return _context.Album.Where(x => x.Favourite == true).ToList();
+            return await _context.Album.Where(x => x.Favourite == true).ToListAsync();
         }
 
-        public List<Album> GetRecentAblums()
+        public async Task<List<Album>> GetRecentAblums()
         {
             
-            return _context.Album.OrderBy(x => x.DateAdded).Take(20).ToList();
+            return await _context.Album.OrderBy(x => x.DateAdded).Take(20).ToListAsync();
         }
 
-        public List<Album> GetRecentReleasedAlbums()
+        public async Task<List<Album>> GetRecentReleasedAlbums()
         {
             
-            return _context.Album.Where(x => x.Year != 0).OrderByDescending(x => x.Year).Take(40).ToList();
+            return await _context.Album.Where(x => x.Year != 0).OrderByDescending(x => x.Year).Take(40).ToListAsync();
         }
 
-        public List<Songs> GetAllSongs()
+        public async Task<List<Songs>> GetAllSongs()
         {
             
-            return _context.Songs
-                .GroupJoin(
-                    _context.PlaybackHistory,
-                    song => song.Id,
-                    playback => playback.SongId,
-                    (song, playbacks) => new Songs
+            return await _context.Songs
+                .Select(s => new Songs
                     {
-                        Id = song.Id,
-                        TrackNumber = song.TrackNumber ?? null,  // Handle nullable int explicitly
-                        Title = song.Title ?? "",                // Handle nullable strings explicitly
-                        Album = song.Album ?? "",
-                        AlbumId = song.AlbumId ?? "",
-                        Artist = song.Artist ?? "",
-                        ArtistId = song.ArtistId ?? "",
-                        AlbumPicture = song.AlbumPicture ?? "",
-                        Favourite = song.Favourite,
-                        DiscNumber = song.DiscNumber,
-                        Length = song.Length ?? "",
-                        Path = song.Path ?? "",
-                        MusicBrainzId = song.MusicBrainzId ?? "",
-                        BitDepth = song.BitDepth ?? "",
-                        BitRate = song.BitRate ?? "",
-                        SampleRate = song.SampleRate ?? "",
-                        Codec = song.Codec ?? "",
-                        PlayCount = playbacks.Count()
+                        Id = s.Id,
+                        TrackNumber = s.TrackNumber ?? null,
+                        Title = s.Title ?? "",
+                        Album = s.Album ?? "",
+                        AlbumId = s.AlbumId ?? "",
+                        Artist = s.Artist ?? "",
+                        ArtistId = s.ArtistId ?? "",
+                        AlbumPicture = s.AlbumPicture ?? "",
+                        Favourite = s.Favourite,
+                        DiscNumber = s.DiscNumber,
+                        Length = s.Length ?? "",
+                        Path = s.Path ?? "",
+                        MusicBrainzId = s.MusicBrainzId ?? "",
+                        BitDepth = s.BitDepth ?? "",
+                        BitRate = s.BitRate ?? "",
+                        SampleRate = s.SampleRate ?? "",
+                        Codec = s.Codec ?? "",
+                        PlayCount = _context.PlaybackHistory.Count(p => p.SongId == s.Id)
                     })
                 .OrderBy(x => x.Title)
-                .ToList();
+                .ToListAsync();
         }
 
-        public List<Songs> GetFavouriteSongs()
+        public async Task<List<Songs>> GetFavouriteSongs()
         {
             
-            return _context.Songs.Where(x => x.Favourite == true).ToList();
+            return await _context.Songs.Where(x => x.Favourite == true).ToListAsync();
         }
 
-        public List<Artists> GetAllArtists()
+        public async Task<List<Artists>> GetAllArtists()
         {
             
-            return _context.Artists.OrderBy(x => x.Name).ToList();
-        }
-
-
-        public Artists GetArtist(string artist)
-        {
-            
-            return _context.Artists.First(x => x.Name == artist);
-        }
-
-        public Artists? GetArtistById(string artistId)
-        {
-            
-            return _context.Artists.FirstOrDefault(x => x.Id == artistId);
+            return await _context.Artists.OrderBy(x => x.Name).ToListAsync();
         }
 
 
-        public List<Artists> GetFavouriteArtists()
+        public async Task<Artists> GetArtist(string artist)
         {
             
-            return _context.Artists.Where(x => x.Favourite == true).ToList();
+            return await _context.Artists.FirstAsync(x => x.Name == artist);
         }
 
-        public Songs GetSongById(string songId)
+        public async Task<Artists?> GetArtistById(string artistId)
         {
             
-            var song = _context.Songs.First(x => x.Id == songId);
-            song.PlayCount = _context.PlaybackHistory.Count(x => x.SongId == songId);
+            return await _context.Artists.FirstOrDefaultAsync(x => x.Id == artistId);
+        }
+
+
+        public async Task<List<Artists>> GetFavouriteArtists()
+        {
+            
+            return await _context.Artists.Where(x => x.Favourite == true).ToListAsync();
+        }
+
+        public async Task<Songs> GetSongById(string songId)
+        {
+            
+            var song = await _context.Songs.FirstAsync(x => x.Id == songId);
+            song.PlayCount = await _context.PlaybackHistory.CountAsync(x => x.SongId == songId);
             return song;
         }
 
-        public Songs GetSong(string artist, string album, string title)
+        public async Task<Songs> GetSong(string artist, string album, string title)
         {
             
-            return _context.Songs.First(x => x.Artist == artist && x.Album == album  && x.Title == title);
+            return await _context.Songs.FirstAsync(x => x.Artist == artist && x.Album == album  && x.Title == title);
         }
 
         public async Task UploadArtists(List<Artists> artists)
@@ -355,16 +351,16 @@ namespace PanAudioServer.Helper
             
         }
 
-        public Playlists GetPlaylist(string playlistId)
+        public async Task<Playlists> GetPlaylist(string playlistId)
         {
             
-            return _context.Playlists.Where(x => x.PlaylistId == playlistId).Include(x => x.PlaylistItems).ThenInclude(p => p.Song).FirstOrDefault();
+            return await _context.Playlists.Where(x => x.PlaylistId == playlistId).Include(x => x.PlaylistItems).ThenInclude(p => p.Song).FirstOrDefaultAsync();
         }
 
-        public List<Playlists> GetPlaylists()
+        public async Task<List<Playlists>> GetPlaylists()
         {
             
-            return _context.Playlists.ToList();
+            return await _context.Playlists.ToListAsync();
         }
         public async Task DeletePlaylist(string playlistId)
         {
@@ -440,12 +436,13 @@ namespace PanAudioServer.Helper
             try
             {
 
+                await _context.Database.BeginTransactionAsync();
                 var lastSong = await GetLastPlaySong();
-                var song = GetSongById(songId);
+                var song = await GetSongById(songId);
                 int songLength = int.Parse(song.Length);
                 if (lastSong != null)
                 {
-                    var fullSong = GetSongById(lastSong.SongId);
+                    var fullSong = await GetSongById(lastSong.SongId);
                     if (DateTime.UtcNow < lastSong.PlaybackStart.AddSeconds(int.Parse(fullSong.Length)))
                     {
 
@@ -476,10 +473,11 @@ namespace PanAudioServer.Helper
                     Console.WriteLine("Playback logged for song: " + songId);
                 }
 
+                
                
-               
-                   
+                    
                  await _context.SaveChangesAsync();
+                 await _context.Database.CommitTransactionAsync();
                  
                
 
@@ -610,11 +608,11 @@ namespace PanAudioServer.Helper
         
         
         //CONFIG
-        public string? GetConfigValue(string configName)
+        public async Task<string?> GetConfigValue(string configName)
         {
             try
             {
-                var value = _context?.Config.FirstOrDefault(x => x.ConfigName == configName);
+                var value = await _context.Config.FirstOrDefaultAsync(x => x.ConfigName == configName);
                 if (value == null)
                 {
                     return null;

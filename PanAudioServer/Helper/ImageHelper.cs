@@ -19,24 +19,24 @@ namespace PanAudioServer.Helper
             configHelper = new ConfigHelper(sqliteHelper);
         }
 
-        public string ImagePath(string albumId)
+        public async Task<string> ImagePath(string albumId)
         {
-            var album = sqliteHelper.GetAlbumById(albumId);
+            var album = await sqliteHelper.GetAlbumById(albumId);
             return Path.Combine(album.AlbumPath, album.Picture ?? "");
         }
 
         public async Task SetImage(string albumId, string imageName)
         {
-            var album = sqliteHelper.GetAlbumById(albumId);
+            var album = await sqliteHelper.GetAlbumById(albumId);
             album.Picture = imageName;
             await sqliteHelper.UpdateAlbum(album);
         }
 
-        public string ArtistImagePath(string artistId)
+        public async Task<string> ArtistImagePath(string artistId)
         {
-            var enableArtistImages = configHelper.GetArtistPictures();
+            var enableArtistImages = await configHelper.GetArtistPictures();
             if (!enableArtistImages) return "";
-            var artist = sqliteHelper.GetArtistById(artistId);
+            var artist = await sqliteHelper.GetArtistById(artistId);
             var fullPath = "";
             try
             {

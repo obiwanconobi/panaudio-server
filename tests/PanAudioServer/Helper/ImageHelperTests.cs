@@ -18,7 +18,7 @@ namespace PanAudioServer.Tests.Helper
         private ImageHelper _helper;
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _connection = new SqliteConnection("DataSource=:memory:");
             _connection.Open();
@@ -35,14 +35,14 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDown()
         {
             _connection?.Dispose();
             _context?.Dispose();
         }
 
         [Test]
-        public void ImagePath_ReturnsCorrectPath_WhenAlbumExists()
+        public async Task ImagePath_ReturnsCorrectPath_WhenAlbumExists()
         {
             var albumId = Guid.NewGuid().ToString();
             var album = new Album(
@@ -55,13 +55,13 @@ namespace PanAudioServer.Tests.Helper
             _context.Album.Add(album);
             _context.SaveChanges();
 
-            var result = _helper.ImagePath(albumId);
+            var result = await _helper.ImagePath(albumId);
 
             Assert.AreEqual("/music/albums/test/cover.jpg", result);
         }
 
         [Test]
-        public void ImagePath_ReturnsPathWithoutPicture_WhenPictureIsNull()
+        public async Task ImagePath_ReturnsPathWithoutPicture_WhenPictureIsNull()
         {
             var albumId = Guid.NewGuid().ToString();
             var album = new Album(
@@ -74,13 +74,13 @@ namespace PanAudioServer.Tests.Helper
             _context.Album.Add(album);
             _context.SaveChanges();
 
-            var result = _helper.ImagePath(albumId);
+            var result = await _helper.ImagePath(albumId);
 
             Assert.AreEqual("/music/albums/test", result);
         }
 
         [Test]
-        public void ImagePath_ReturnsPathWithoutPicture_WhenPictureIsEmpty()
+        public async Task ImagePath_ReturnsPathWithoutPicture_WhenPictureIsEmpty()
         {
             var albumId = Guid.NewGuid().ToString();
             var album = new Album(
@@ -93,7 +93,7 @@ namespace PanAudioServer.Tests.Helper
             _context.Album.Add(album);
             _context.SaveChanges();
 
-            var result = _helper.ImagePath(albumId);
+            var result = await _helper.ImagePath(albumId);
 
             Assert.AreEqual("/music/albums/test", result);
         }
@@ -150,7 +150,7 @@ namespace PanAudioServer.Tests.Helper
             _context.Artists.Add(artist);
             _context.SaveChanges();
 
-            var result = _helper.ArtistImagePath(artistId);
+            var result = await _helper.ArtistImagePath(artistId);
 
             Assert.AreEqual("/music/artists/test/artist.jpg", result);
         }
@@ -170,7 +170,7 @@ namespace PanAudioServer.Tests.Helper
             _context.Artists.Add(artist);
             _context.SaveChanges();
 
-            var result = _helper.ArtistImagePath(artistId);
+            var result = await _helper.ArtistImagePath(artistId);
 
             Assert.AreEqual("/music/artists/test", result);
         }
@@ -190,7 +190,7 @@ namespace PanAudioServer.Tests.Helper
             _context.Artists.Add(artist);
             _context.SaveChanges();
 
-            var result = _helper.ArtistImagePath(artistId);
+            var result = await _helper.ArtistImagePath(artistId);
 
             Assert.AreEqual("/music/artists/test", result);
         }
@@ -210,11 +210,11 @@ namespace PanAudioServer.Tests.Helper
             _context.Artists.Add(artist);
             _context.SaveChanges();
 
-            Assert.DoesNotThrow(() => _helper.ArtistImagePath(artistId));
+            Assert.DoesNotThrowAsync(async () => await _helper.ArtistImagePath(artistId));
         }
 
         [Test]
-        public void ArtistImagePath_ReturnsEmpty_WhenArtistPicturesDisabled()
+        public async Task ArtistImagePath_ReturnsEmpty_WhenArtistPicturesDisabled()
         {
             var artistId = Guid.NewGuid().ToString();
             var artist = new Artists(
@@ -226,15 +226,15 @@ namespace PanAudioServer.Tests.Helper
             _context.Artists.Add(artist);
             _context.SaveChanges();
 
-            var result = _helper.ArtistImagePath(artistId);
+            var result = await _helper.ArtistImagePath(artistId);
 
             Assert.AreEqual("", result);
         }
 
         [Test]
-        public void ArtistImagePath_ReturnsEmpty_WhenArtistPicturesDisabledAndNoArtist()
+        public async Task ArtistImagePath_ReturnsEmpty_WhenArtistPicturesDisabledAndNoArtist()
         {
-            var result = _helper.ArtistImagePath("nonexistent");
+            var result = await _helper.ArtistImagePath("nonexistent");
 
             Assert.AreEqual("", result);
         }

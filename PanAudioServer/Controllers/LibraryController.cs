@@ -16,58 +16,58 @@ namespace PanAudioServer.Controllers
         }
 
         [HttpGet("artists")]
-        public List<Artists> GetArtists()
+        public async Task<List<Artists>> GetArtists()
         {
-            return sqliteHelper.GetAllArtists();
+            return await sqliteHelper.GetAllArtists();
         }
 
         [HttpGet("albums-by-id")]
-        public Album GetAlbumById(string albumId)
+        public async Task<Album> GetAlbumById(string albumId)
         {
-            return sqliteHelper.GetAlbumById(albumId);
+            return await sqliteHelper.GetAlbumById(albumId);
         }
 
         [HttpGet("albums")]
-        public List<Album> GetAlbums()
+        public async Task<List<Album>> GetAlbums()
         {
-            return sqliteHelper.GetAllAblums();
+            return await sqliteHelper.GetAllAblums();
         }
 
         [HttpGet("recent-albums")]
-        public List<Album> GetRecentAlbums()
+        public async Task<List<Album>> GetRecentAlbums()
         {
-            return sqliteHelper.GetRecentAblums();
+            return await sqliteHelper.GetRecentAblums();
         }
 
         [HttpGet("recent-released-albums")]
-        public List<Album> GetRecentReleasedAlbums()
+        public async Task<List<Album>> GetRecentReleasedAlbums()
         {
-            return sqliteHelper.GetRecentReleasedAlbums();
+            return await sqliteHelper.GetRecentReleasedAlbums();
         }
         
         [HttpGet("songs")]
-        public List<Songs> GetSongs() 
+        public async Task<List<Songs>> GetSongs() 
         {
-            return sqliteHelper.GetAllSongs();
+            return await sqliteHelper.GetAllSongs();
         }
 
         [HttpGet("song")]
-        public Songs GetSong(string songId)
+        public async Task<Songs> GetSong(string songId)
         {
-            return sqliteHelper.GetSongById(songId);
+            return await sqliteHelper.GetSongById(songId);
         }
 
 
         [HttpGet("albums-for-artist")]
-        public List<Album> GetAlbumsForArtist(string artistName)
+        public async Task<List<Album>> GetAlbumsForArtist(string artistName)
         {
-            return sqliteHelper.GetAllAblumsForArtist(artistName);
+            return await sqliteHelper.GetAllAblumsForArtist(artistName);
         }
 
         [HttpPost("favourite")]
         public async Task<IActionResult> SetFavourite(string songId, bool favourite)
         {
-            var song = sqliteHelper.GetSongById(songId);
+            var song = await sqliteHelper.GetSongById(songId);
             song.Favourite = favourite;
             await sqliteHelper.UpdateSong(song);
             return Ok();
@@ -76,7 +76,7 @@ namespace PanAudioServer.Controllers
         [HttpPost("favourite-album")]
         public async Task<IActionResult> SetAlbumFavourite(string albumId, bool favourite)
         {
-            var album = sqliteHelper.GetAlbumById(albumId);
+            var album = await sqliteHelper.GetAlbumById(albumId);
             album.Favourite = favourite;
             await sqliteHelper.UpdateAlbum(album);
             return Ok();
@@ -85,34 +85,34 @@ namespace PanAudioServer.Controllers
         [HttpPost("favourite-artist")]
         public async Task<IActionResult> SetArtistFavourite(string artistId, bool favourite)
         {
-            var artist = sqliteHelper.GetArtistById(artistId);
+            var artist = await sqliteHelper.GetArtistById(artistId);
             artist.Favourite = favourite;
             await sqliteHelper.UpdateArtist(artist);
             return Ok();
         }
 
         [HttpGet("favourite-albums")]
-        public List<Album> GetFavouriteAlbums()
+        public async Task<List<Album>> GetFavouriteAlbums()
         {
-            return sqliteHelper.GetFavouriteAblums();
+            return await sqliteHelper.GetFavouriteAblums();
         }
 
         [HttpGet("favourite-artists")]
-        public List<Artists> GetFavouriteArtists()
+        public async Task<List<Artists>> GetFavouriteArtists()
         {
-            return sqliteHelper.GetFavouriteArtists();
+            return await sqliteHelper.GetFavouriteArtists();
         }
 
         [HttpGet("favourite-songs")]
-        public List<Songs> GetFavouriteSongs()
+        public async Task<List<Songs>> GetFavouriteSongs()
         {
-            return sqliteHelper.GetFavouriteSongs();
+            return await sqliteHelper.GetFavouriteSongs();
         }
 
         [HttpPost("update-song")]
         public async Task<IActionResult> UpdateSong(string songId, string songTitle, string songPath, int songNumber)
         {
-            var song = sqliteHelper.GetSongById(songId);
+            var song = await sqliteHelper.GetSongById(songId);
             song.Id = songId;
             song.Title = songTitle;
             song.Path = songPath;

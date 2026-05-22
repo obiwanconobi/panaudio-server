@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -16,7 +17,7 @@ namespace PanAudioServer.Tests.Helper
         private ConfigHelper _configHelper;
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _connection = new SqliteConnection("DataSource=:memory:");
             _connection.Open();
@@ -33,69 +34,69 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDown()
         {
             _connection?.Dispose();
             _context?.Dispose();
         }
 
         [Test]
-        public void GetPlaybackReportingTime_ReturnsDefaultFive_WhenNoConfigValue()
+        public async Task GetPlaybackReportingTime_ReturnsDefaultFive_WhenNoConfigValue()
         {
-            int result = _configHelper.GetPlaybackReportingTime();
+            int result = await _configHelper.GetPlaybackReportingTime();
 
             Assert.AreEqual(5, result);
         }
 
         [Test]
-        public void GetPlaybackReportingTime_ReturnsSetValue_WhenConfigValueExists()
+        public async Task GetPlaybackReportingTime_ReturnsSetValue_WhenConfigValueExists()
         {
             _configHelper.SetPlaybackReportingTime("10");
 
-            int result = _configHelper.GetPlaybackReportingTime();
+            int result = await _configHelper.GetPlaybackReportingTime();
 
             Assert.AreEqual(10, result);
         }
 
         [Test]
-        public void SetPlaybackReportingTime_DoesNotThrow()
+        public async Task SetPlaybackReportingTime_DoesNotThrow()
         {
-            Assert.DoesNotThrow(() => _configHelper.SetPlaybackReportingTime("10"));
+            Assert.DoesNotThrowAsync(async () => await _configHelper.SetPlaybackReportingTime("10"));
         }
 
         [Test]
-        public void GetArtistPictures_ReturnsFalse_WhenNoConfigValue()
+        public async Task GetArtistPictures_ReturnsFalse_WhenNoConfigValue()
         {
-            bool result = _configHelper.GetArtistPictures();
+            bool result = await _configHelper.GetArtistPictures();
 
             Assert.IsFalse(result);
         }
 
         [Test]
-        public void GetArtistPictures_ReturnsTrue_WhenConfigValueIsTrue()
+        public async Task GetArtistPictures_ReturnsTrue_WhenConfigValueIsTrue()
         {
             _configHelper.SetArtistPictures(true);
 
-            bool result = _configHelper.GetArtistPictures();
+            bool result = await _configHelper.GetArtistPictures();
 
             Assert.IsTrue(result);
         }
 
         [Test]
-        public void GetArtistPictures_ReturnsFalse_WhenConfigValueIsFalse()
+        public async Task GetArtistPictures_ReturnsFalse_WhenConfigValueIsFalse()
         {
             _configHelper.SetArtistPictures(false);
 
-            bool result = _configHelper.GetArtistPictures();
+            bool result = await _configHelper.GetArtistPictures();
 
             Assert.IsFalse(result);
         }
 
         [Test]
-        public void SetArtistPictures_DoesNotThrow()
+        public async Task SetArtistPictures_DoesNotThrow()
         {
-            Assert.DoesNotThrow(() => _configHelper.SetArtistPictures(true));
-            Assert.DoesNotThrow(() => _configHelper.SetArtistPictures(false));
+            Assert.DoesNotThrowAsync(async () => await _configHelper.SetArtistPictures(true));
+            Assert.DoesNotThrowAsync(async () => await _configHelper.SetArtistPictures(false));
         }
     }
 }

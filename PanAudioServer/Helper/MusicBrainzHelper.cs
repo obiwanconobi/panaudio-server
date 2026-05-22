@@ -57,7 +57,7 @@ namespace PanAudioServer.Helper
         public async Task setArtistId(string artistName)
         {
             var id = await getArtistIdAsync(artistName);
-            var artist = sqliteHelper.GetArtist(artistName);
+            var artist = await sqliteHelper.GetArtist(artistName);
             artist.MusicBrainzId = id;
             await sqliteHelper.UpdateArtist(artist);
 
@@ -79,7 +79,7 @@ namespace PanAudioServer.Helper
         public async Task setAlbumId(string artist, string album)
         {
 
-            var artistf =  sqliteHelper.GetArtist(artist);
+            var artistf = await sqliteHelper.GetArtist(artist);
             var albumId = await getAlbumIdAsync(artistf.MusicBrainzId, album);
             var albumf = await sqliteHelper.GetAlbum(artist, album);
             albumf.MusicBrainzId = albumId;
@@ -99,7 +99,7 @@ namespace PanAudioServer.Helper
 
             var albumSave = await sqliteHelper.GetAlbum(artist, album);
             var albumUrl = await getAlbumArtAsync(albumSave.MusicBrainzId);
-            var savePlace = imageHelper.ImagePath(albumSave.Id);
+            var savePlace = await imageHelper.ImagePath(albumSave.Id);
             byte[] imageBytes = await _httpClient.GetByteArrayAsync(albumUrl);
             try
             {

@@ -82,7 +82,7 @@ namespace PanAudioServer.Tests.Helper
         [Test]
         public void clearAll_DoesNotThrow_WhenDbIsEmpty()
         {
-            Assert.DoesNotThrow(() => _helper.clearAll());
+            Assert.DoesNotThrowAsync(async () => await _helper.clearAll());
         }
 
         [Test]

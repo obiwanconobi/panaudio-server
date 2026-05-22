@@ -15,9 +15,9 @@ public class ConfigController : Controller
     }
     
     [HttpGet("getPlaybackTimeConfig")]
-    public int GetPlaybackTime()
+    public async Task<int> GetPlaybackTime()
     {
-        return _configHelper.GetPlaybackReportingTime();
+        return await _configHelper.GetPlaybackReportingTime();
     }
     
     [HttpPost("setPlaybackTimeConfig")]
@@ -28,9 +28,9 @@ public class ConfigController : Controller
     }
     
     [HttpGet("getArtistPictureConfig")]
-    public bool GetArtistPictureConfig()
+    public async Task<bool> GetArtistPictureConfig()
     {
-        return _configHelper.GetArtistPictures();
+        return await _configHelper.GetArtistPictures();
     }
     
     [HttpPost("setArtistPictureConfig")]

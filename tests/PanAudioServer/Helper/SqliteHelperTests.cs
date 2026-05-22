@@ -19,7 +19,7 @@ namespace PanAudioServer.Tests.Helper
         private SqliteHelper _helper;
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _connection = new SqliteConnection("DataSource=:memory:");
             _connection.Open();
@@ -35,7 +35,7 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDown()
         {
             _connection?.Dispose();
             _context?.Dispose();
@@ -93,12 +93,12 @@ namespace PanAudioServer.Tests.Helper
         // ─── Album Tests ───────────────────────────────────────────────
 
         [Test]
-        public void GetAlbumById_ReturnsAlbum_WhenExists()
+        public async Task GetAlbumById_ReturnsAlbum_WhenExists()
         {
             var album = SeedAlbum("alb-1", "My Album", "My Artist");
             _context.SaveChanges();
 
-            var result = _helper.GetAlbumById("alb-1");
+            var result = await _helper.GetAlbumById("alb-1");
 
             Assert.AreEqual("My Album", result.Title);
             Assert.AreEqual("My Artist", result.Artist);
@@ -124,13 +124,13 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void GetAllAblums_ReturnsAllOrderedByTitle()
+        public async Task GetAllAblums_ReturnsAllOrderedByTitle()
         {
             SeedAlbum("a", "Z Album", "Artist");
             SeedAlbum("b", "A Album", "Artist");
             _context.SaveChanges();
 
-            var result = _helper.GetAllAblums();
+            var result = await _helper.GetAllAblums();
 
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual("A Album", result[0].Title);
@@ -138,63 +138,63 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void GetAllAblums_ReturnsEmptyList_WhenNoAlbums()
+        public async Task GetAllAblums_ReturnsEmptyList_WhenNoAlbums()
         {
             _context.SaveChanges();
 
-            var result = _helper.GetAllAblums();
+            var result = await _helper.GetAllAblums();
 
             Assert.AreEqual(0, result.Count);
         }
 
         [Test]
-        public void GetFavouriteAblums_ReturnsOnlyFavourites()
+        public async Task GetFavouriteAblums_ReturnsOnlyFavourites()
         {
             SeedAlbum("a", "Regular", "Artist", favourite: false);
             SeedAlbum("b", "Favourite", "Artist", favourite: true);
             _context.SaveChanges();
 
-            var result = _helper.GetFavouriteAblums();
+            var result = await _helper.GetFavouriteAblums();
 
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("Favourite", result[0].Title);
         }
 
         [Test]
-        public void GetRecentAblums_ReturnsUpToTwentyByDateAdded()
+        public async Task GetRecentAblums_ReturnsUpToTwentyByDateAdded()
         {
             for (int i = 0; i < 25; i++)
                 SeedAlbum(title: $"Album {i:D2}", artist: "Artist", dateAdded: DateTime.UtcNow.AddDays(-i));
             _context.SaveChanges();
 
-            var result = _helper.GetRecentAblums();
+            var result = await _helper.GetRecentAblums();
 
             Assert.AreEqual(20, result.Count);
         }
 
         [Test]
-        public void GetRecentReleasedAlbums_ReturnsAlbumsWithNonZeroYear()
+        public async Task GetRecentReleasedAlbums_ReturnsAlbumsWithNonZeroYear()
         {
             SeedAlbum("a", "Old Album", "Artist", year: 2020);
             SeedAlbum("b", "Recent Album", "Artist", year: 2024);
             SeedAlbum("c", "No Year Album", "Artist", year: 0);
             _context.SaveChanges();
 
-            var result = _helper.GetRecentReleasedAlbums();
+            var result = await _helper.GetRecentReleasedAlbums();
 
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual("Recent Album", result[0].Title);
         }
 
         [Test]
-        public void GetAllAblumsForArtist_ReturnsAlbumsForGivenArtist()
+        public async Task GetAllAblumsForArtist_ReturnsAlbumsForGivenArtist()
         {
             SeedAlbum("a", "Album One", "Artist A");
             SeedAlbum("b", "Album Two", "Artist B");
             SeedAlbum("c", "Album Three", "Artist A");
             _context.SaveChanges();
 
-            var result = _helper.GetAllAblumsForArtist("Artist A");
+            var result = await _helper.GetAllAblumsForArtist("Artist A");
 
             Assert.AreEqual(2, result.Count);
         }
@@ -233,7 +233,7 @@ namespace PanAudioServer.Tests.Helper
         // ─── Song Tests ────────────────────────────────────────────────
 
         [Test]
-        public void GetSongById_ReturnsSongWithPlayCount()
+        public async Task GetSongById_ReturnsSongWithPlayCount()
         {
             var song = SeedSong("song-1", "Track 1", "Artist", "Album");
             _context.PlaybackHistory.Add(new PlaybackHistory
@@ -250,25 +250,25 @@ namespace PanAudioServer.Tests.Helper
             });
             _context.SaveChanges();
 
-            var result = _helper.GetSongById("song-1");
+            var result = await _helper.GetSongById("song-1");
 
             Assert.AreEqual("Track 1", result.Title);
             Assert.AreEqual(2, result.PlayCount);
         }
 
         [Test]
-        public void GetSong_ReturnsSongByArtistAlbumTitle()
+        public async Task GetSong_ReturnsSongByArtistAlbumTitle()
         {
             SeedSong("song-1", "Specific Song", "Specific Artist", "Specific Album");
             _context.SaveChanges();
 
-            var result = _helper.GetSong("Specific Artist", "Specific Album", "Specific Song");
+            var result = await _helper.GetSong("Specific Artist", "Specific Album", "Specific Song");
 
             Assert.AreEqual("song-1", result.Id);
         }
 
         [Test]
-        public void GetAllSongs_ReturnsAllWithPlayCounts()
+        public async Task GetAllSongs_ReturnsAllWithPlayCounts()
         {
             var song1 = SeedSong("song-1", "Song A", "Artist", "Album");
             var song2 = SeedSong("song-2", "Song B", "Artist", "Album");
@@ -280,7 +280,7 @@ namespace PanAudioServer.Tests.Helper
             });
             _context.SaveChanges();
 
-            var result = _helper.GetAllSongs();
+            var result = await _helper.GetAllSongs();
 
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual(1, result.First(s => s.Id == "song-1").PlayCount);
@@ -288,23 +288,23 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void GetAllSongs_ReturnsEmptyList_WhenNoSongs()
+        public async Task GetAllSongs_ReturnsEmptyList_WhenNoSongs()
         {
             _context.SaveChanges();
 
-            var result = _helper.GetAllSongs();
+            var result = await _helper.GetAllSongs();
 
             Assert.AreEqual(0, result.Count);
         }
 
         [Test]
-        public void GetFavouriteSongs_ReturnsOnlyFavourites()
+        public async Task GetFavouriteSongs_ReturnsOnlyFavourites()
         {
             SeedSong("song-1", "Regular", "Artist", "Album", favourite: false);
             SeedSong("song-2", "Fave", "Artist", "Album", favourite: true);
             _context.SaveChanges();
 
-            var result = _helper.GetFavouriteSongs();
+            var result = await _helper.GetFavouriteSongs();
 
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("Fave", result[0].Title);
@@ -376,45 +376,45 @@ namespace PanAudioServer.Tests.Helper
         // ─── Artist Tests ──────────────────────────────────────────────
 
         [Test]
-        public void GetArtist_ReturnsArtistByName()
+        public async Task GetArtist_ReturnsArtistByName()
         {
             var artist = SeedArtist("art-1", "Specific Artist");
             _context.SaveChanges();
 
-            var result = _helper.GetArtist("Specific Artist");
+            var result = await _helper.GetArtist("Specific Artist");
 
             Assert.AreEqual("art-1", result.Id);
         }
 
         [Test]
-        public void GetArtistById_ReturnsArtist_WhenExists()
+        public async Task GetArtistById_ReturnsArtist_WhenExists()
         {
             var artist = SeedArtist("art-1", "An Artist");
             _context.SaveChanges();
 
-            var result = _helper.GetArtistById("art-1");
+            var result = await _helper.GetArtistById("art-1");
 
             Assert.AreEqual("An Artist", result.Name);
         }
 
         [Test]
-        public void GetArtistById_ReturnsNull_WhenNotFound()
+        public async Task GetArtistById_ReturnsNull_WhenNotFound()
         {
             _context.SaveChanges();
 
-            var result = _helper.GetArtistById("nonexistent");
+            var result = await _helper.GetArtistById("nonexistent");
 
             Assert.IsNull(result);
         }
 
         [Test]
-        public void GetAllArtists_ReturnsAllOrderedByName()
+        public async Task GetAllArtists_ReturnsAllOrderedByName()
         {
             SeedArtist("a", "Z Artist");
             SeedArtist("b", "A Artist");
             _context.SaveChanges();
 
-            var result = _helper.GetAllArtists();
+            var result = await _helper.GetAllArtists();
 
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual("A Artist", result[0].Name);
@@ -422,13 +422,13 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void GetFavouriteArtists_ReturnsOnlyFavourites()
+        public async Task GetFavouriteArtists_ReturnsOnlyFavourites()
         {
             SeedArtist("a", "Regular", favourite: false);
             SeedArtist("b", "Fave", favourite: true);
             _context.SaveChanges();
 
-            var result = _helper.GetFavouriteArtists();
+            var result = await _helper.GetFavouriteArtists();
 
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("Fave", result[0].Name);
@@ -491,19 +491,19 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public void GetPlaylists_ReturnsAllPlaylists()
+        public async Task GetPlaylists_ReturnsAllPlaylists()
         {
             _context.Playlists.Add(new Playlists { PlaylistId = "p1", PlaylistName = "List 1" });
             _context.Playlists.Add(new Playlists { PlaylistId = "p2", PlaylistName = "List 2" });
             _context.SaveChanges();
 
-            var result = _helper.GetPlaylists();
+            var result = await _helper.GetPlaylists();
 
             Assert.AreEqual(2, result.Count);
         }
 
         [Test]
-        public void GetPlaylist_ReturnsPlaylistWithItems()
+        public async Task GetPlaylist_ReturnsPlaylistWithItems()
         {
             _context.Playlists.Add(new Playlists { PlaylistId = "p1", PlaylistName = "Test List" });
             SeedSong("s-1", "Song 1", "Artist", "Album", path: "/music/s1.mp3");
@@ -515,7 +515,7 @@ namespace PanAudioServer.Tests.Helper
             });
             _context.SaveChanges();
 
-            var result = _helper.GetPlaylist("p1");
+            var result = await _helper.GetPlaylist("p1");
 
             Assert.AreEqual("Test List", result.PlaylistName);
             Assert.AreEqual(1, result.PlaylistItems.Count);
@@ -577,9 +577,9 @@ namespace PanAudioServer.Tests.Helper
         // ─── Config Tests ──────────────────────────────────────────────
 
         [Test]
-        public void GetConfigValue_ReturnsNull_WhenNotSet()
+        public async Task GetConfigValue_ReturnsNull_WhenNotSet()
         {
-            var result = _helper.GetConfigValue("NonExistentKey");
+            var result = await _helper.GetConfigValue("NonExistentKey");
 
             Assert.IsNull(result);
         }
@@ -589,7 +589,7 @@ namespace PanAudioServer.Tests.Helper
         {
             await _helper.SetConfigValue("MyKey", "MyValue");
 
-            var result = _helper.GetConfigValue("MyKey");
+            var result = await _helper.GetConfigValue("MyKey");
 
             Assert.AreEqual("MyValue", result);
         }
@@ -600,7 +600,7 @@ namespace PanAudioServer.Tests.Helper
             await _helper.SetConfigValue("MyKey", "Original");
             await _helper.SetConfigValue("MyKey", "Updated");
 
-            var result = _helper.GetConfigValue("MyKey");
+            var result = await _helper.GetConfigValue("MyKey");
 
             Assert.AreEqual("Updated", result);
         }

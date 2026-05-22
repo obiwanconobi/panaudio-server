@@ -15,15 +15,15 @@ namespace PanAudioServer.Controllers
             this.sqliteHelper = sqliteHelper;
         }
         [HttpGet("playlists")]
-        public List<Playlists> GetPlaylists()
+        public async Task<List<Playlists>> GetPlaylists()
         {
-            return sqliteHelper.GetPlaylists();
+            return await sqliteHelper.GetPlaylists();
         }
 
         [HttpGet("playlist")]
-        public Playlists GetPlaylist(string playlistId)
+        public async Task<Playlists> GetPlaylist(string playlistId)
         {
-            return sqliteHelper.GetPlaylist(playlistId);
+            return await sqliteHelper.GetPlaylist(playlistId);
         }
 
         [HttpPut("playlist")]

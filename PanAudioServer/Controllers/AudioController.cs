@@ -52,7 +52,7 @@ namespace PanAudioServer.Controllers
         [HttpGet("audio-stream")]
         public async Task<IActionResult> NewStreamAudio(string songId)
         {
-            var song = sqliteHelper.GetSongById(songId);
+            var song = await sqliteHelper.GetSongById(songId);
             string _totalPath = song.Path;
            // string _totalPath = _basePath + _filePath;
             var fileInfo = new FileInfo(song.Path);
