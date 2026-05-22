@@ -14,6 +14,7 @@ namespace PanAudioServer.Data
 
         public SqliteContext(DbContextOptions<SqliteContext> options) : base(options)
         {
+            Database.ExecuteSqlRaw("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -22,13 +23,6 @@ namespace PanAudioServer.Data
                 return;
 
             String test = Environment.GetEnvironmentVariable("SqliteDB");
-            if (test != null)
-            {
-                if (!test.Contains("Journal Mode"))
-                    test += ";Journal Mode=WAL";
-                if (!test.Contains("BusyTimeout"))
-                    test += ";BusyTimeout=5000";
-            }
             optionsBuilder.UseSqlite(test);
         }
 
