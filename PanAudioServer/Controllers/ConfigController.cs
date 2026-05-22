@@ -40,4 +40,17 @@ public class ConfigController : Controller
         return Ok();
     }
 
+    [HttpGet("getTagWritingConfig")]
+    public async Task<bool> GetTagWritingConfig()
+    {
+        return await _configHelper.GetEnableTagWriting();
+    }
+
+    [HttpPost("setTagWritingConfig")]
+    public async Task<IActionResult> SetTagWritingConfig(bool value)
+    {
+        await _configHelper.SetEnableTagWriting(value);
+        return Ok();
+    }
+
 }

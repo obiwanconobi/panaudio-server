@@ -44,4 +44,19 @@ public class ConfigHelper
         await sqliteHelper.SetConfigValue("ArtistPictures", value.ToString());
     }
     
+    public async Task<bool> GetEnableTagWriting()
+    {
+        var value = await sqliteHelper.GetConfigValue("EnableTagWriting");
+        if (value == null)
+        {
+            return false;
+        }
+        return Convert.ToBoolean(value);
+    }
+
+    public async Task SetEnableTagWriting(bool value)
+    {
+        await sqliteHelper.SetConfigValue("EnableTagWriting", value.ToString());
+    }
+    
 }

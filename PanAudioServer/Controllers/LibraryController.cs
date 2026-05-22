@@ -9,10 +9,12 @@ namespace PanAudioServer.Controllers
     public class LibraryController : Controller
     {
         private SqliteHelper sqliteHelper;
+        private TaggingService _taggingService;
 
-        public LibraryController(SqliteHelper sqliteHelper)
+        public LibraryController(SqliteHelper sqliteHelper, TaggingService taggingService)
         {
             this.sqliteHelper = sqliteHelper;
+            _taggingService = taggingService;
         }
 
         [HttpGet("artists")]
@@ -192,6 +194,8 @@ namespace PanAudioServer.Controllers
             if (request.Favourite.HasValue) { song.Favourite = request.Favourite; }
 
             await sqliteHelper.UpdateSong(song);
+
+            await _taggingService.WriteTagsAsync(song.Path, changedFields);
 
             return Ok(song);
         }
