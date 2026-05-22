@@ -8,7 +8,12 @@ namespace PanAudioServer.Controllers
     [Route("api")]
     public class LibraryController : Controller
     {
-        SqliteHelper sqliteHelper = new SqliteHelper();
+        private SqliteHelper sqliteHelper;
+
+        public LibraryController(SqliteHelper sqliteHelper)
+        {
+            this.sqliteHelper = sqliteHelper;
+        }
 
         [HttpGet("artists")]
         public List<Artists> GetArtists()

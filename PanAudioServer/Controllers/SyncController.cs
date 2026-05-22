@@ -10,14 +10,19 @@ namespace PanAudioServer.Controllers
     public class SyncController : Controller
     {
         private readonly string _basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        private DirectoryHelper dirHelper;
+        private DatabaseHelper dbHelper;
+
+        public SyncController(DirectoryHelper dirHelper, DatabaseHelper dbHelper)
+        {
+            this.dirHelper = dirHelper;
+            this.dbHelper = dbHelper;
+        }
       
         [HttpGet("all")]
         public async void Sync()
         {
-            //string _totalPath = @"\\192.168.1.15\ubuntu_media\nextcloud_2\conner\files\Music\";
-          //  string _totalPath = Path.Combine(_basePath, "app", "Music");
             string _totalPath = _basePath + @"/Music/";
-            DirectoryHelper dirHelper = new DirectoryHelper();
 
             await dirHelper.directoryGetter(_totalPath);
             await dirHelper.saveData();
@@ -27,8 +32,7 @@ namespace PanAudioServer.Controllers
         [HttpGet("clear")]
         public async void Clear()
         {
-            DatabaseHelper helper = new DatabaseHelper();
-            helper.clearAll();
+            dbHelper.clearAll();
         }
 
        

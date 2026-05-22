@@ -22,6 +22,13 @@ namespace PanAudioServer.Data
                 return;
 
             String test = Environment.GetEnvironmentVariable("SqliteDB");
+            if (test != null)
+            {
+                if (!test.Contains("Journal Mode"))
+                    test += ";Journal Mode=WAL";
+                if (!test.Contains("BusyTimeout"))
+                    test += ";BusyTimeout=5000";
+            }
             optionsBuilder.UseSqlite(test);
         }
 

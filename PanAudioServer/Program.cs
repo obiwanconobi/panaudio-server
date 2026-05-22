@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PanAudioServer.Data;
+using PanAudioServer.Helper;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,18 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
+builder.Services.AddDbContext<SqliteContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("SqliteDB")));
+
+builder.Services.AddSingleton<HttpClient>();
+builder.Services.AddScoped<SqliteHelper>();
+builder.Services.AddScoped<ConfigHelper>();
+builder.Services.AddScoped<DirectoryHelper>();
+builder.Services.AddScoped<DatabaseHelper>();
+builder.Services.AddScoped<ImageHelper>();
+builder.Services.AddScoped<MusicBrainzHelper>();
+builder.Services.AddScoped<PlaybackHelper>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -50,8 +63,11 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-var db = new SqliteContext();
-db.Database.Migrate();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<SqliteContext>();
+    db.Database.Migrate();
+}
 app.Run();
 
 

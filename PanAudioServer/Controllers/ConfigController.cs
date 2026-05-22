@@ -9,9 +9,9 @@ public class ConfigController : Controller
 {
     private ConfigHelper _configHelper;
 
-    public ConfigController()
+    public ConfigController(ConfigHelper configHelper)
     {
-        _configHelper = new ConfigHelper();
+        _configHelper = configHelper;
     }
     
     [HttpGet("getPlaybackTimeConfig")]
