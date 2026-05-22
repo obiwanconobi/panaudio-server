@@ -354,13 +354,13 @@ namespace PanAudioServer.Helper
         public async Task<Playlists> GetPlaylist(string playlistId)
         {
             
-            return await _context.Playlists.Where(x => x.PlaylistId == playlistId).Include(x => x.PlaylistItems).ThenInclude(p => p.Song).FirstOrDefaultAsync();
+            return await _context.Playlists.Where(x => x.PlaylistId == playlistId).Include(x => x.PlaylistItems).ThenInclude(p => p.Song).AsNoTracking().FirstOrDefaultAsync();
         }
 
         public async Task<List<Playlists>> GetPlaylists()
         {
             
-            return await _context.Playlists.ToListAsync();
+            return await _context.Playlists.AsNoTracking().ToListAsync();
         }
         public async Task DeletePlaylist(string playlistId)
         {
