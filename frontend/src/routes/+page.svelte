@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import AlbumGrid from '$lib/components/music/AlbumGrid.svelte';
+	import AlbumCard from '$lib/components/music/AlbumCard.svelte';
 	import SongRow from '$lib/components/music/SongRow.svelte';
 	import ArtistCard from '$lib/components/music/ArtistCard.svelte';
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
@@ -46,7 +46,7 @@
 			<div class="flex gap-4 overflow-x-auto pb-2 snap-x">
 				{#each recentAlbums.slice(0, 10) as album (album.id)}
 					<div class="w-40 shrink-0 snap-start">
-						<AlbumGrid albums={[album]} />
+						<AlbumCard {album} />
 					</div>
 				{/each}
 			</div>
@@ -61,7 +61,7 @@
 			<div class="flex gap-4 overflow-x-auto pb-2 snap-x">
 				{#each recentReleased.slice(0, 10) as album (album.id)}
 					<div class="w-40 shrink-0 snap-start">
-						<AlbumGrid albums={[album]} />
+						<AlbumCard {album} />
 					</div>
 				{/each}
 			</div>
@@ -89,7 +89,7 @@
 			<div class="flex gap-4 overflow-x-auto pb-2 snap-x">
 				{#each favouriteAlbums.slice(0, 10) as album (album.id)}
 					<div class="w-40 shrink-0 snap-start">
-						<AlbumGrid albums={[album]} />
+						<AlbumCard {album} />
 					</div>
 				{/each}
 			</div>
