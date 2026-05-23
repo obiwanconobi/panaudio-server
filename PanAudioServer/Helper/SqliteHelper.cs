@@ -694,7 +694,7 @@ namespace PanAudioServer.Helper
         public async Task<List<Songs>> SearchSongs(string query)
         {
             return await _context.Songs
-                .Where(x => x.Title.Contains(query))
+                .Where(x => x.Title.ToLower().Contains(query.ToLower()))
                 .Select(s => new Songs
                 {
                     Id = s.Id,
@@ -723,7 +723,7 @@ namespace PanAudioServer.Helper
         public async Task<List<Album>> SearchAlbums(string query)
         {
             return await _context.Album
-                .Where(x => x.Title.Contains(query) || x.Artist.Contains(query))
+                .Where(x => x.Title.ToLower().Contains(query.ToLower()) || x.Artist.ToLower().Contains(query.ToLower()))
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -731,7 +731,7 @@ namespace PanAudioServer.Helper
         public async Task<List<Artists>> SearchArtists(string query)
         {
             return await _context.Artists
-                .Where(x => x.Name.Contains(query))
+                .Where(x => x.Name.ToLower().Contains(query.ToLower()))
                 .AsNoTracking()
                 .ToListAsync();
         }

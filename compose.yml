@@ -1,0 +1,24 @@
+services:
+  panaudio-server:
+    image: ghcr.io/obiwanconobi/panaudio-server:main
+    environment:
+      - SqliteDB=Data Source=/Data/panaudio.db
+    volumes:
+      - ./Data:/Data
+      - /mnt/nextcloud_2/conner/files/Music:/Music
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  frontend:
+    image: ghcr.io/obiwanconobi/panaudio-server:main-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      - GENERATED_ARTIST_AVATARS=${GENERATED_ARTIST_AVATARS:-true}
+      - ENABLE_PLAYBACK_REPORTING=${ENABLE_PLAYBACK_REPORTING:-true}
+    ports:
+      - "6462:80"
+    depends_on:
+      - panaudio-server

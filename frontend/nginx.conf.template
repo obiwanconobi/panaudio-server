@@ -1,0 +1,23 @@
+server {
+    listen 80;
+    root /usr/share/nginx/html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /config {
+        default_type application/json;
+        return 200 '{"generatedArtistAvatars":${GENERATED_ARTIST_AVATARS},"enablePlaybackReporting":${ENABLE_PLAYBACK_REPORTING}}';
+    }
+
+    location /api/ {
+        proxy_pass http://panaudio-server:80;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Range $http_range;
+        proxy_set_header If-Range $http_if_range;
+        proxy_pass_request_headers on;
+    }
+}

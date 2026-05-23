@@ -34,3 +34,6 @@ msbuild.wrn
 .idea/.idea.PanAudioServer/.idea/encodings.xml
 .idea/.idea.PanAudioServer/.idea/indexLayout.xml
 .idea/.idea.PanAudioServer/.idea/vcs.xml
+
+# SQLite data directory
+Data/

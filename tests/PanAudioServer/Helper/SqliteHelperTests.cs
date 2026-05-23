@@ -779,14 +779,15 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public async Task SearchSongs_IsCaseSensitive()
+        public async Task SearchSongs_IsCaseInsensitive()
         {
             SeedSong("song-1", "Hello World", "Artist", "Album");
             _context.SaveChanges();
 
             var result = await _helper.SearchSongs("hello");
 
-            Assert.IsEmpty(result);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Hello World", result[0].Title);
         }
 
         [Test]
@@ -842,14 +843,15 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public async Task SearchAlbums_IsCaseSensitive()
+        public async Task SearchAlbums_IsCaseInsensitive()
         {
             SeedAlbum("alb-1", "Dark Side", "Pink Floyd");
             _context.SaveChanges();
 
             var result = await _helper.SearchAlbums("dark");
 
-            Assert.IsEmpty(result);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Dark Side", result[0].Title);
         }
 
         // ─── SearchArtists Tests ────────────────────────────────────────
@@ -879,14 +881,15 @@ namespace PanAudioServer.Tests.Helper
         }
 
         [Test]
-        public async Task SearchArtists_IsCaseSensitive()
+        public async Task SearchArtists_IsCaseInsensitive()
         {
             SeedArtist("art-1", "Pink Floyd");
             _context.SaveChanges();
 
             var result = await _helper.SearchArtists("pink");
 
-            Assert.IsEmpty(result);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Pink Floyd", result[0].Name);
         }
     }
 }
