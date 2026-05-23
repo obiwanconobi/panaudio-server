@@ -23,6 +23,12 @@ namespace PanAudioServer.Controllers
             return await sqliteHelper.GetAllArtists();
         }
 
+        [HttpGet("artist/{artistId}")]
+        public async Task<Artists> GetArtistById(string artistId)
+        {
+            return await sqliteHelper.GetArtistById(artistId);
+        }
+
         [HttpGet("albums-by-id")]
         public async Task<Album> GetAlbumById(string albumId)
         {

@@ -76,6 +76,10 @@ export function fetchArtists(): Promise<Artist[]> {
 	return fetchJson('/api/artists');
 }
 
+export function fetchArtistById(artistId: string): Promise<Artist> {
+	return fetchJson(`/api/artist/${encodeURIComponent(artistId)}`);
+}
+
 export function fetchFavouriteArtists(): Promise<Artist[]> {
 	return fetchJson('/api/favourite-artists');
 }

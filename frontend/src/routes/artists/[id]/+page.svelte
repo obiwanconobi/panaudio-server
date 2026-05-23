@@ -5,7 +5,7 @@
 	import FavouriteButton from '$lib/components/ui/FavouriteButton.svelte';
 	import EditModal from '$lib/components/ui/EditModal.svelte';
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
-	import { fetchArtistAlbums, setArtistFavourite, updateArtist, deleteArtist, artistArtUrl } from '$lib/api';
+	import { fetchArtistById, fetchArtistAlbums, setArtistFavourite, updateArtist, deleteArtist, artistArtUrl } from '$lib/api';
 	import { library } from '$lib/stores/library.svelte';
 	import { frontendConfig } from '$lib/stores/config.svelte';
 	import { avatarGradient, artistInitials } from '$lib/utils/avatar';
@@ -22,7 +22,7 @@
 
 	onMount(async () => {
 		try {
-			artist = library.getArtistById(artistId) ?? null;
+			artist = library.getArtistById(artistId) ?? await fetchArtistById(artistId);
 			albums = await fetchArtistAlbums(artistId);
 		} finally {
 			loading = false;
