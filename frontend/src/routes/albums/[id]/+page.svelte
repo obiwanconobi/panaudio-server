@@ -6,6 +6,7 @@
 	import EditModal from '$lib/components/ui/EditModal.svelte';
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import { fetchAlbumById, fetchAlbumSongs, setAlbumFavourite, updateAlbum, deleteAlbum, albumArtUrl } from '$lib/api';
+	import { avatarGradient } from '$lib/utils/avatar';
 	import { goto } from '$app/navigation';
 	import type { Album, Song } from '$lib/types';
 
@@ -13,6 +14,7 @@
 	let songs = $state<Song[]>([]);
 	let loading = $state(true);
 	let showEdit = $state(false);
+	let imageError = $state(false);
 	let editTitle = $state('');
 	let editArtist = $state('');
 	let editYear = $state<number | undefined>();
@@ -77,14 +79,17 @@
 {:else if album}
 	<div class="flex flex-col md:flex-row gap-8">
 		<div class="w-full md:w-72 shrink-0">
-			{#if album.picture}
-				<img src={albumArtUrl(album.id)} alt="{album.title} cover" class="w-full aspect-square object-cover rounded-xl shadow-2xl" />
-			{:else}
-				<div class="w-full aspect-square bg-zinc-800 rounded-xl flex items-center justify-center">
-					<svg class="w-20 h-20 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-					</svg>
+			{#if imageError}
+				<div
+					class="w-full aspect-square rounded-xl flex items-center justify-center"
+					style="background: {avatarGradient(album.title)}"
+				>
+					<span class="text-xl font-bold text-white/80 drop-shadow-md text-center px-4 leading-tight">
+						{album.title}
+					</span>
 				</div>
+			{:else}
+				<img src={albumArtUrl(album.id)} alt="{album.title} cover" class="w-full aspect-square object-cover rounded-xl shadow-2xl" onerror={() => (imageError = true)} />
 			{/if}
 
 			<div class="mt-4 space-y-1">
