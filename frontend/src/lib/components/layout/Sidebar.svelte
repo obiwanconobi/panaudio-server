@@ -54,7 +54,7 @@
 	</nav>
 
 	<div class="p-3 border-t border-zinc-800">
-		{#if !collapsed}
+		{#if !collapsed && (library.songs.length > 0 || library.albums.length > 0)}
 			<p class="text-xs text-zinc-500 truncate">
 				{library.songs.length} songs &middot; {library.albums.length} albums
 			</p>
