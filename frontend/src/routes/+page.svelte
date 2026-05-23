@@ -6,6 +6,7 @@
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import { fetchRecentAlbums, fetchRecentReleasedAlbums, fetchFavouriteSongs, fetchFavouriteAlbums, fetchFavouriteArtists } from '$lib/api';
 	import { library } from '$lib/stores/library.svelte';
+	import { queue } from '$lib/stores/queue.svelte';
 	import type { Album, Song, Artist } from '$lib/types';
 
 	let recentAlbums = $state<Album[]>([]);
@@ -33,6 +34,12 @@
 			loading = false;
 		}
 	});
+
+	function playFavouriteSongs() {
+		if (favouriteSongs.length === 0) return;
+		queue.clearQueue();
+		queue.addToQueue(favouriteSongs);
+	}
 </script>
 
 <svelte:head>
@@ -71,7 +78,17 @@
 	</section>
 
 	<section>
-		<h2 class="text-2xl font-bold mb-4">Favourite Songs</h2>
+		<div class="flex items-center justify-between mb-4">
+			<h2 class="text-2xl font-bold">Favourite Songs</h2>
+			{#if favouriteSongs.length > 0}
+				<button
+					onclick={playFavouriteSongs}
+					class="px-3 py-1.5 text-sm bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
+				>
+					Play All
+				</button>
+			{/if}
+		</div>
 		{#if favouriteSongs.length > 0}
 			<div class="divide-y divide-zinc-800/50">
 				{#each favouriteSongs.slice(0, 10) as song (song.id)}

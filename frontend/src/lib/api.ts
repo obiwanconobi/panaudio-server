@@ -67,11 +67,7 @@ export function updateAlbum(albumId: string, fields: UpdateAlbumRequest): Promis
 }
 
 export function deleteAlbum(albumId: string): Promise<void> {
-	return fetchVoid('/api/delete-album', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ albumId })
-	});
+	return fetchVoid(`/api/delete-album?albumId=${encodeURIComponent(albumId)}`, { method: 'POST' });
 }
 
 // ── Artists ──
@@ -103,11 +99,7 @@ export function updateArtist(artistId: string, fields: UpdateArtistRequest): Pro
 }
 
 export function deleteArtist(artistId: string): Promise<void> {
-	return fetchVoid('/api/delete-artist', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ artistId })
-	});
+	return fetchVoid(`/api/delete-artist?artistId=${encodeURIComponent(artistId)}`, { method: 'POST' });
 }
 
 // ── Songs ──
@@ -139,11 +131,7 @@ export function updateSong(songId: string, fields: UpdateSongRequest): Promise<S
 }
 
 export function deleteSong(songId: string): Promise<void> {
-	return fetchVoid('/api/delete-song', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ songId })
-	});
+	return fetchVoid(`/api/delete-song?songId=${encodeURIComponent(songId)}`, { method: 'POST' });
 }
 
 // ── Search ──
