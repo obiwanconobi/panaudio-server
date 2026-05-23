@@ -6,6 +6,8 @@ services:
     volumes:
       - ./Data:/Data
       - /mnt/nextcloud_2/conner/files/Music:/Music
+    ports:
+      - "6462:80"
     build:
       context: .
       dockerfile: Dockerfile
@@ -19,6 +21,6 @@ services:
       - GENERATED_ARTIST_AVATARS=${GENERATED_ARTIST_AVATARS:-true}
       - ENABLE_PLAYBACK_REPORTING=${ENABLE_PLAYBACK_REPORTING:-true}
     ports:
-      - "6462:80"
+      - "6633:80"
     depends_on:
       - panaudio-server
