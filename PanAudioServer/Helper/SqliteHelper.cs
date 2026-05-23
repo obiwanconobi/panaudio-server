@@ -37,8 +37,6 @@ namespace PanAudioServer.Helper
 
         public async Task<Album> GetAlbum(string artist, string album)
         {
-            var ff = "Get Album for " + artist;
-            SentrySdk.CaptureEvent(new SentryEvent(new Exception(ff)));
             return _context.Album.FirstOrDefault(x => x.Title == album && x.Artist == artist);
         }
 

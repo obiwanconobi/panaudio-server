@@ -47,9 +47,10 @@ namespace PanAudioServer.Helper
             var artist = await q.LookupArtistAsync(new Guid(musicBrainzArtistId) ,Include.ReleaseGroups);
 
             var album = artist.ReleaseGroups.Where(x => x.Title == albumName).ToList();
+            if (album.Count == 0) return "";
             var releases = await q.LookupReleaseGroupAsync(album[0].Id, Include.Releases);
             var rel = releases.Releases.OrderBy(x => x.Date).ToList();
-
+            if (rel.Count == 0) return "";
             return rel[0].Id.ToString();
         }
 
