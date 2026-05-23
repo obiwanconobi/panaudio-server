@@ -1,8 +1,7 @@
 <script lang="ts">
 	import type { Song } from '$lib/types';
 	import { queue } from '$lib/stores/queue.svelte';
-	import { player } from '$lib/stores/player.svelte';
-	import { setFavourite, audioStreamUrl } from '$lib/api';
+	import { setFavourite } from '$lib/api';
 	import { formatDuration } from '$lib/utils/format';
 	import PlaylistPicker from '$lib/components/ui/PlaylistPicker.svelte';
 
@@ -23,12 +22,8 @@
 	let showPlaylistPicker = $state(false);
 
 	function handlePlay() {
-		const audio = document.querySelector<HTMLAudioElement>('#audio-engine');
-		if (audio) {
-			player.setLoading(true);
-			audio.src = audioStreamUrl(song.id);
-			audio.play().catch(() => {});
-		}
+		queue.clearQueue();
+		queue.addToQueue([song]);
 	}
 
 	function handleAddToQueue() {

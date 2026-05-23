@@ -71,13 +71,17 @@
 		audioElement.src = audioStreamUrl(song.id);
 		audioElement.play().catch(() => {});
 	});
+
+	$effect(() => {
+		if (audioElement) {
+			audioElement.volume = player.volume;
+		}
+	});
 </script>
 
 <audio
 	id="audio-engine"
 	bind:this={audioElement}
-	bind:currentTime={player.currentTime}
-	bind:volume={player.volume}
 	onloadedmetadata={onLoadedMetadata}
 	ontimeupdate={onTimeUpdate}
 	onended={onEnded}
