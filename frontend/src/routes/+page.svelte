@@ -28,6 +28,7 @@
 			recentAlbums = recent;
 			recentReleased = released;
 			favouriteSongs = favs;
+			shuffle(favouriteSongs);
 			favouriteAlbums = favAlbums;
 			favouriteArtists = favArtists;
 		} finally {
@@ -39,6 +40,13 @@
 		if (favouriteSongs.length === 0) return;
 		queue.clearQueue();
 		queue.addToQueue(favouriteSongs);
+	}
+
+	function shuffle<T>(arr: T[]) {
+		for (let i = arr.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[arr[i], arr[j]] = [arr[j], arr[i]];
+		}
 	}
 </script>
 
@@ -78,7 +86,7 @@
 	</section>
 
 	<section>
-		<div class="flex items-center justify-between mb-4">
+		<div class="flex items-center gap-2 mb-4">
 			<h2 class="text-2xl font-bold">Favourite Songs</h2>
 			{#if favouriteSongs.length > 0}
 				<button
