@@ -53,4 +53,17 @@ public class ConfigController : Controller
         return Ok();
     }
 
+    [HttpGet("getListenBrainzToken")]
+    public async Task<string> GetListenBrainzToken()
+    {
+        return await _configHelper.GetListenBrainzToken();
+    }
+
+    [HttpPost("setListenBrainzToken")]
+    public async Task<IActionResult> SetListenBrainzToken(string token)
+    {
+        await _configHelper.SetListenBrainzToken(token);
+        return Ok();
+    }
+
 }
