@@ -6,7 +6,7 @@ namespace PanAudioServer.Helper
 {
     public class SqliteHelper
     {
-        private SqliteContext? _context;
+        internal SqliteContext? _context;
 
         public SqliteHelper()
         {
