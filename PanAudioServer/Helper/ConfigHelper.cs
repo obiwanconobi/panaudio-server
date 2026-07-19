@@ -58,5 +58,16 @@ public class ConfigHelper
     {
         await sqliteHelper.SetConfigValue("EnableTagWriting", value.ToString());
     }
+
+    public async Task<string> GetListenBrainzToken()
+    {
+        var value = await sqliteHelper.GetConfigValue("ListenBrainzToken");
+        return value ?? "";
+    }
+
+    public async Task SetListenBrainzToken(string token)
+    {
+        await sqliteHelper.SetConfigValue("ListenBrainzToken", token);
+    }
     
 }
