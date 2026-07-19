@@ -6,7 +6,9 @@
 		fetchArtistPictureConfig,
 		setArtistPictureConfig,
 		fetchTagWritingConfig,
-		setTagWritingConfig
+		setTagWritingConfig,
+		fetchListenBrainzToken,
+		setListenBrainzToken
 	} from '$lib/api';
 
 	let playbackTime = $state(0);
@@ -14,13 +16,15 @@
 	let tagWriting = $state(false);
 	let loading = $state(true);
 	let saving = $state<string | null>(null);
+	let listenbrainzToken = $state('');
 
 	onMount(async () => {
 		try {
-			[playbackTime, artistPictures, tagWriting] = await Promise.all([
+			[playbackTime, artistPictures, tagWriting, listenbrainzToken] = await Promise.all([
 				fetchPlaybackTimeConfig(),
 				fetchArtistPictureConfig(),
-				fetchTagWritingConfig()
+				fetchTagWritingConfig(),
+				fetchListenBrainzToken()
 			]);
 		} finally {
 			loading = false;
@@ -44,6 +48,12 @@
 		tagWriting = !tagWriting;
 		saving = 'tag';
 		await setTagWritingConfig(tagWriting);
+		saving = null;
+	}
+
+	async function saveListenBrainzToken() {
+		saving = 'token';
+		await setListenBrainzToken(listenbrainzToken);
 		saving = null;
 	}
 </script>
@@ -116,6 +126,30 @@
 					>
 						<span class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform {tagWriting ? 'translate-x-5' : ''}"></span>
 					</button>
+				</div>
+			</div>
+
+			<div class="p-6 bg-zinc-900 border border-zinc-800 rounded-xl">
+				<div class="flex items-center justify-between">
+					<div>
+						<h3 class="font-medium">ListenBrainz Token</h3>
+						<p class="text-sm text-zinc-400 mt-1">Submit listens to ListenBrainz</p>
+					</div>
+					<div class="flex items-center gap-2">
+						<input
+							type="password"
+							bind:value={listenbrainzToken}
+							placeholder="Token..."
+							class="w-48 px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:outline-none focus:border-violet-500"
+						/>
+						<button
+							onclick={saveListenBrainzToken}
+							disabled={saving === 'token'}
+							class="px-3 py-1.5 text-sm bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white rounded-lg transition-colors"
+						>
+							{saving === 'token' ? '...' : 'Save'}
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
