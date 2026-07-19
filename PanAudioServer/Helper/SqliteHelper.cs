@@ -437,11 +437,11 @@ namespace PanAudioServer.Helper
                 await _context.Database.BeginTransactionAsync();
                 var lastSong = await GetLastPlaySong();
                 var song = await GetSongById(songId);
-                int songLength = int.Parse(song.Length);
+                int songLength = ParseDuration(song.Length);
                 if (lastSong != null)
                 {
                     var fullSong = await GetSongById(lastSong.SongId);
-                    if (DateTime.UtcNow < lastSong.PlaybackStart.AddSeconds(int.Parse(fullSong.Length)))
+                    if (DateTime.UtcNow < lastSong.PlaybackStart.AddSeconds(ParseDuration(fullSong.Length)))
                     {
 
                         //update last song with seconds
@@ -457,7 +457,7 @@ namespace PanAudioServer.Helper
                     {
                         //Update the playback seconds for the last song
                         
-                       await  UpdateLastPlayback(lastSong, int.Parse(fullSong.Length));
+                       await  UpdateLastPlayback(lastSong, ParseDuration(fullSong.Length));
                         Console.WriteLine("Updated last Playback for: " + fullSong.Title + " With full song Length");
 
                         //add new song
@@ -686,7 +686,8 @@ namespace PanAudioServer.Helper
             var artist = await _context.Artists.FirstOrDefaultAsync(x => x.Id == artistId);
             if (artist == null)
                 return new List<Album>();
-            return await _context.Album.Where(x => x.Artist == artist.Name).ToListAsync();
+            var albumsUnsorted =  await _context.Album.Where(x => x.Artist == artist.Name).ToListAsync();
+            return albumsUnsorted.OrderBy(x => x.Year ?? 0).ToList();
         }
 
         public async Task<List<Songs>> SearchSongs(string query)
@@ -761,6 +762,19 @@ namespace PanAudioServer.Helper
         {
             await _context.Album.Where(a => a.Artist == originalArtistName)
                 .ExecuteUpdateAsync(a => a.SetProperty(x => x.Artist, newArtistName));
+        }
+
+        private static int ParseDuration(string length)
+        {
+            if (string.IsNullOrEmpty(length)) return 0;
+            if (length.Contains(':'))
+            {
+                var parts = length.Split(':');
+                if (parts.Length == 2 && int.TryParse(parts[0], out int min) && int.TryParse(parts[1], out int sec))
+                    return min * 60 + sec;
+                return 0;
+            }
+            return int.TryParse(length, out int s) ? s : 0;
         }
     }
 }
