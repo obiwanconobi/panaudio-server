@@ -446,7 +446,7 @@ namespace PanAudioServer.Helper
 
                         //update last song with seconds
                         var secondsLength = DateTime.UtcNow - lastSong.PlaybackStart;
-                        await UpdateLastPlayback(lastSong, secondsLength.Seconds);
+                        await UpdateLastPlayback(lastSong, (int)secondsLength.TotalSeconds);
                         Console.WriteLine("Updated last Playback for: " + fullSong.Title + " With Seconds: " + secondsLength);
                         //add new song
                         await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
