@@ -9,18 +9,20 @@ namespace PanAudioServer.Controllers
     public class PlaybackController : Controller
     {
         private SqliteHelper sqliteHelper;
+        private PlaybackHelper playbackHelper;
         private ConfigHelper configHelper;
 
-        public PlaybackController(SqliteHelper sqliteHelper, ConfigHelper configHelper)
+        public PlaybackController(SqliteHelper sqliteHelper, PlaybackHelper playbackHelper, ConfigHelper configHelper)
         {
             this.sqliteHelper = sqliteHelper;
+            this.playbackHelper = playbackHelper;
             this.configHelper = configHelper;
         }
 
         [HttpPut("start")]
         public async Task StartPlayback(string songId)
         {
-            await sqliteHelper.StartRecordPlayback(songId);
+            await playbackHelper.StartRecordPlayback(songId);
         }
 
         [HttpGet("history")]
@@ -53,6 +55,5 @@ namespace PanAudioServer.Controllers
         {
             return await sqliteHelper.GetPlaybackByDays(startDate, endDate);
         }
-
     }
 }
