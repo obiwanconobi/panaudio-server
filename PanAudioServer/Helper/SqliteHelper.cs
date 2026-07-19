@@ -425,69 +425,6 @@ namespace PanAudioServer.Helper
 
         }
 
-        //Playback
-        public async Task StartRecordPlayback(string songId)
-        {
-            
-            DateTime playbackStartTime = DateTime.UtcNow;
-            
-            try
-            {
-
-                await _context.Database.BeginTransactionAsync();
-                var lastSong = await GetLastPlaySong();
-                var song = await GetSongById(songId);
-                int songLength = ParseDuration(song.Length);
-                if (lastSong != null)
-                {
-                    var fullSong = await GetSongById(lastSong.SongId);
-                    if (DateTime.UtcNow < lastSong.PlaybackStart.AddSeconds(ParseDuration(fullSong.Length)))
-                    {
-
-                        //update last song with seconds
-                        var secondsLength = DateTime.UtcNow - lastSong.PlaybackStart;
-                        await UpdateLastPlayback(lastSong, (int)secondsLength.TotalSeconds);
-                        Console.WriteLine("Updated last Playback for: " + fullSong.Title + " With Seconds: " + secondsLength);
-                        //add new song
-                        await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
-                        Console.WriteLine("Playback logged for song: " + songId);
-
-                    }
-                    else
-                    {
-                        //Update the playback seconds for the last song
-                        
-                       await  UpdateLastPlayback(lastSong, ParseDuration(fullSong.Length));
-                        Console.WriteLine("Updated last Playback for: " + fullSong.Title + " With full song Length");
-
-                        //add new song
-                        await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime });
-                        Console.WriteLine("Playback logged for song: " + songId);
-                    }
-                }
-                else
-                {
-                    await _context.PlaybackHistory.AddAsync(new PlaybackHistory() { SongId = songId, PlaybackStart = playbackStartTime});
-                    Console.WriteLine("Playback logged for song: " + songId);
-                }
-
-                
-               
-                    
-                 await _context.SaveChangesAsync();
-                 await _context.Database.CommitTransactionAsync();
-                 
-               
-
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                Console.WriteLine("Error Logging Song: " + songId);
-                Console.WriteLine(ex.ToString());
-            }
-        }
-
         public async Task<DateTime> GetLastPlayDate(string songId)
         {
             

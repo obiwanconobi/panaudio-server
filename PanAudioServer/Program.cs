@@ -46,6 +46,7 @@ builder.Services.AddScoped<DatabaseHelper>();
 builder.Services.AddScoped<ImageHelper>();
 builder.Services.AddScoped<MusicBrainzHelper>();
 builder.Services.AddScoped<PlaybackHelper>();
+builder.Services.AddScoped<ListenBrainzClient>();
 builder.Services.AddScoped<TaggingService>();
 
 var app = builder.Build();
