@@ -98,5 +98,29 @@ namespace PanAudioServer.Tests.Helper
             Assert.DoesNotThrowAsync(async () => await _configHelper.SetArtistPictures(true));
             Assert.DoesNotThrowAsync(async () => await _configHelper.SetArtistPictures(false));
         }
+
+        [Test]
+        public async Task GetListenBrainzToken_ReturnsEmpty_WhenNoConfigValue()
+        {
+            string result = await _configHelper.GetListenBrainzToken();
+
+            Assert.AreEqual("", result);
+        }
+
+        [Test]
+        public async Task GetListenBrainzToken_ReturnsSetValue_WhenConfigValueExists()
+        {
+            await _configHelper.SetListenBrainzToken("test-token-123");
+
+            string result = await _configHelper.GetListenBrainzToken();
+
+            Assert.AreEqual("test-token-123", result);
+        }
+
+        [Test]
+        public async Task SetListenBrainzToken_DoesNotThrow()
+        {
+            Assert.DoesNotThrowAsync(async () => await _configHelper.SetListenBrainzToken("test-token"));
+        }
     }
 }
