@@ -232,6 +232,18 @@ export function setTagWritingConfig(value: boolean): Promise<void> {
 	});
 }
 
+// ── ListenBrainz ──
+
+export function fetchListenBrainzToken(): Promise<string> {
+	return fetchJson('/api/getListenBrainzToken');
+}
+
+export function setListenBrainzToken(token: string): Promise<void> {
+	return fetchVoid(`/api/setListenBrainzToken?token=${encodeURIComponent(token)}`, {
+		method: 'POST'
+	});
+}
+
 // ── Utility ──
 
 export function albumArtUrl(albumId: string): string {
