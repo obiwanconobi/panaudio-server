@@ -387,6 +387,46 @@ namespace PanAudioServer.Tests.Helper
             Assert.AreEqual(0, result.Failed);
         }
 
+        [Test]
+        public async Task Backfill_UsesImportListenType()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+            _httpHandler.SetResponse(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"status\":\"ok\"}")
+            });
+
+            SeedSong("song-bf-type", "Import Type", length: "240");
+            SeedPlaybackRow("song-bf-type", DateTime.UtcNow.AddHours(-1), 180);
+
+            await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.IsTrue(_httpHandler.LastRequestBody.Contains("\"listen_type\":\"import\""));
+        }
+
+        [Test]
+        public async Task Backfill_BatchesMultipleSongsInOneRequest()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+            _httpHandler.SetResponse(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"status\":\"ok\"}")
+            });
+
+            SeedSong("song-bf-b1", "Batch 1", length: "240");
+            SeedSong("song-bf-b2", "Batch 2", length: "240");
+            SeedPlaybackRow("song-bf-b1", DateTime.UtcNow.AddHours(-1), 180);
+            SeedPlaybackRow("song-bf-b2", DateTime.UtcNow.AddHours(-1), 180);
+
+            var result = await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.AreEqual(2, result.Submitted);
+            Assert.IsTrue(_httpHandler.LastRequestBody.Contains("Batch 1"));
+            Assert.IsTrue(_httpHandler.LastRequestBody.Contains("Batch 2"));
+        }
+
         private void SeedPlaybackRow(string songId, DateTime playbackStart, int seconds)
         {
             _context.PlaybackHistory.Add(new PlaybackHistory

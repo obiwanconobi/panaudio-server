@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using PanAudioServer.Models;
 
 namespace PanAudioServer.Helper;
@@ -93,60 +94,55 @@ public class PlaybackHelper
         var result = new BackfillResult();
 
         if (listenBrainzClient == null)
-        {
             return result;
-        }
 
         var token = await sqliteHelper.GetConfigValue("ListenBrainzToken");
         if (string.IsNullOrEmpty(token))
-        {
             return result;
-        }
 
         try
         {
             var records = await sqliteHelper.GetPlaybackHistoryRawByDate(startDate, endDate);
+            if (records.Count == 0)
+                return result;
+
+            var songIds = records.Select(r => r.SongId).Distinct().ToList();
+            var songs = await sqliteHelper._context.Songs
+                .Where(s => songIds.Contains(s.Id))
+                .ToDictionaryAsync(s => s.Id);
+
+            var qualified = new List<(Songs Song, DateTime PlaybackStart)>();
 
             foreach (var record in records)
             {
-                try
-                {
-                    var song = await sqliteHelper.GetSongById(record.SongId);
-                    if (song == null)
-                    {
-                        result.Failed++;
-                        continue;
-                    }
-
-                    var trackLengthSeconds = ParseDuration(song.Length);
-                    if (trackLengthSeconds == 0)
-                    {
-                        result.Failed++;
-                        continue;
-                    }
-
-                    int threshold = Math.Min(trackLengthSeconds / 2, 240);
-                    if (record.Seconds < threshold)
-                    {
-                        result.Skipped++;
-                        continue;
-                    }
-
-                    var submitted = await listenBrainzClient.SubmitListenAsync(song, record.PlaybackStart, record.Seconds);
-
-                    if (submitted)
-                    {
-                        result.Submitted++;
-                    }
-                    else
-                    {
-                        result.Failed++;
-                    }
-                }
-                catch
+                if (!songs.TryGetValue(record.SongId, out var song))
                 {
                     result.Failed++;
+                    continue;
                 }
+
+                var trackLengthSeconds = ParseDuration(song.Length);
+                if (trackLengthSeconds == 0)
+                {
+                    result.Failed++;
+                    continue;
+                }
+
+                int threshold = Math.Min(trackLengthSeconds / 2, 240);
+                if (record.Seconds < threshold)
+                {
+                    result.Skipped++;
+                    continue;
+                }
+
+                qualified.Add((song, record.PlaybackStart));
+            }
+
+            if (qualified.Count > 0)
+            {
+                var (submitted, failed) = await listenBrainzClient.SubmitImportListensAsync(qualified);
+                result.Submitted = submitted;
+                result.Failed += failed;
             }
         }
         catch (Exception ex)
