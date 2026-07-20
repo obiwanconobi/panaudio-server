@@ -88,6 +88,76 @@ public class PlaybackHelper
         }
     }
 
+    public async Task<BackfillResult> BackfillHistoricalListensAsync(DateTime startDate, DateTime endDate)
+    {
+        var result = new BackfillResult();
+
+        if (listenBrainzClient == null)
+        {
+            return result;
+        }
+
+        var token = await sqliteHelper.GetConfigValue("ListenBrainzToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            return result;
+        }
+
+        try
+        {
+            var records = await sqliteHelper.GetPlaybackHistoryRawByDate(startDate, endDate);
+
+            foreach (var record in records)
+            {
+                try
+                {
+                    var song = await sqliteHelper.GetSongById(record.SongId);
+                    if (song == null)
+                    {
+                        result.Failed++;
+                        continue;
+                    }
+
+                    var trackLengthSeconds = ParseDuration(song.Length);
+                    if (trackLengthSeconds == 0)
+                    {
+                        result.Failed++;
+                        continue;
+                    }
+
+                    int threshold = Math.Min(trackLengthSeconds / 2, 240);
+                    if (record.Seconds < threshold)
+                    {
+                        result.Skipped++;
+                        continue;
+                    }
+
+                    var submitted = await listenBrainzClient.SubmitListenAsync(song, record.PlaybackStart, record.Seconds);
+
+                    if (submitted)
+                    {
+                        result.Submitted++;
+                    }
+                    else
+                    {
+                        result.Failed++;
+                    }
+                }
+                catch
+                {
+                    result.Failed++;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            SentrySdk.CaptureException(ex);
+            Console.WriteLine($"BackfillHistoricalListensAsync error: {ex}");
+        }
+
+        return result;
+    }
+
     private static int ParseDuration(string length)
     {
         if (string.IsNullOrEmpty(length)) return 0;

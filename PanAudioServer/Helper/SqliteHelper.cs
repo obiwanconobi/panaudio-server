@@ -476,6 +476,18 @@ namespace PanAudioServer.Helper
             return songPlaybackCounts;
         }
 
+        public async Task<List<PlaybackHistory>> GetPlaybackHistoryRawByDate(DateTime startDate, DateTime endDate)
+        {
+
+            var records = await _context.PlaybackHistory
+                 .Where(x => x.PlaybackStart >= startDate &&
+                    x.PlaybackStart <= endDate &&
+                    x.Seconds > 0)
+                 .OrderBy(x => x.PlaybackStart)
+                 .ToListAsync();
+            return records;
+        }
+
         public async Task<List<PlaybackDays>> GetPlaybackByDays(DateOnly startDate, DateOnly endDate)
         {
             var playbackDays = _context.PlaybackHistory

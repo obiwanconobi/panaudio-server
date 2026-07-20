@@ -55,5 +55,11 @@ namespace PanAudioServer.Controllers
         {
             return await sqliteHelper.GetPlaybackByDays(startDate, endDate);
         }
+
+        [HttpPost("backfill")]
+        public async Task<BackfillResult> BackfillHistoricalListens(DateTime startDate, DateTime endDate)
+        {
+            return await playbackHelper.BackfillHistoricalListensAsync(startDate, endDate);
+        }
     }
 }

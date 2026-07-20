@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +20,11 @@ namespace PanAudioServer.Tests.Helper
         private SqliteHelper _sqliteHelper;
         private PlaybackHelper _playbackHelper;
 
+        private FakeLBHttpMessageHandler _httpHandler;
+        private HttpClient _httpClient;
+        private ConfigHelper _configHelper;
+        private PlaybackHelper _playbackHelperWithLB;
+
         [SetUp]
         public void SetUp()
         {
@@ -33,11 +40,19 @@ namespace PanAudioServer.Tests.Helper
 
             _sqliteHelper = new SqliteHelper(_context);
             _playbackHelper = new PlaybackHelper(_sqliteHelper);
+
+            _httpHandler = new FakeLBHttpMessageHandler();
+            _httpClient = new HttpClient(_httpHandler);
+            _configHelper = new ConfigHelper(_sqliteHelper);
+            var lbClient = new ListenBrainzClient(_httpClient, _configHelper);
+            _playbackHelperWithLB = new PlaybackHelper(_sqliteHelper, lbClient);
         }
 
         [TearDown]
         public void TearDown()
         {
+            _httpClient?.Dispose();
+            _httpHandler?.Dispose();
             _connection?.Dispose();
             _context?.Dispose();
         }
@@ -156,6 +171,231 @@ namespace PanAudioServer.Tests.Helper
 
             var updatedA = _context.PlaybackHistory.Where(x => x.SongId == fullSongId).First();
             Assert.AreEqual(90, updatedA.Seconds);
+        }
+
+        [Test]
+        public async Task Backfill_ReturnsAllZeros_WhenNoTokenConfigured()
+        {
+            SeedSong("song-bf-1", "Backfill Song", length: "240");
+            SeedPlaybackRow("song-bf-1", DateTime.UtcNow.AddHours(-1), 180);
+
+            var result = await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.AreEqual(0, result.Submitted);
+            Assert.AreEqual(0, result.Skipped);
+            Assert.AreEqual(0, result.Failed);
+        }
+
+        [Test]
+        public async Task Backfill_ReturnsAllZeros_WhenNoRecordsInRange()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+            _httpHandler.SetResponse(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"status\":\"ok\"}")
+            });
+
+            var result = await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.AreEqual(0, result.Submitted);
+            Assert.AreEqual(0, result.Skipped);
+            Assert.AreEqual(0, result.Failed);
+        }
+
+        [Test]
+        public async Task Backfill_CountsSubmitted_ForRecordsMeetingThreshold()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+            _httpHandler.SetResponse(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"status\":\"ok\"}")
+            });
+
+            SeedSong("song-bf-sub", "Submit Song", length: "240");
+            SeedPlaybackRow("song-bf-sub", DateTime.UtcNow.AddHours(-1), 180);
+
+            var result = await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.AreEqual(1, result.Submitted);
+            Assert.AreEqual(0, result.Skipped);
+            Assert.AreEqual(0, result.Failed);
+        }
+
+        [Test]
+        public async Task Backfill_CountsSkipped_ForRecordsBelowThreshold()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+
+            SeedSong("song-bf-skip", "Skip Song", length: "240");
+            SeedPlaybackRow("song-bf-skip", DateTime.UtcNow.AddHours(-1), 10);
+
+            var result = await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.AreEqual(0, result.Submitted);
+            Assert.AreEqual(1, result.Skipped);
+            Assert.AreEqual(0, result.Failed);
+        }
+
+        [Test]
+        public async Task Backfill_Threshold_IsMinOfHalfOr240()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+            _httpHandler.SetResponse(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"status\":\"ok\"}")
+            });
+
+            SeedSong("song-bf-long", "Long Song", length: "600");
+            SeedPlaybackRow("song-bf-long", DateTime.UtcNow.AddHours(-1), 240);
+
+            var result = await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.AreEqual(1, result.Submitted);
+            Assert.AreEqual(0, result.Skipped);
+            Assert.AreEqual(0, result.Failed);
+        }
+
+        [Test]
+        public async Task Backfill_CountsFailed_ForMissingSong()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+
+            _context.PlaybackHistory.Add(new PlaybackHistory
+            {
+                SongId = "nonexistent-song",
+                PlaybackStart = DateTime.UtcNow.AddHours(-1),
+                Seconds = 180
+            });
+            _context.SaveChanges();
+
+            var result = await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.AreEqual(0, result.Submitted);
+            Assert.AreEqual(0, result.Skipped);
+            Assert.AreEqual(1, result.Failed);
+        }
+
+        [Test]
+        public async Task Backfill_CountsFailed_OnServerError()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+            _httpHandler.SetResponse(new HttpResponseMessage(HttpStatusCode.BadRequest));
+
+            SeedSong("song-bf-fail", "Fail Song", length: "240");
+            SeedPlaybackRow("song-bf-fail", DateTime.UtcNow.AddHours(-1), 180);
+
+            var result = await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.AreEqual(0, result.Submitted);
+            Assert.AreEqual(0, result.Skipped);
+            Assert.AreEqual(1, result.Failed);
+        }
+
+        [Test]
+        public async Task Backfill_IgnoresRows_WithZeroSeconds()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+            _httpHandler.SetResponse(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"status\":\"ok\"}")
+            });
+
+            SeedSong("song-bf-zero", "Zero Sec Song", length: "240");
+            _context.PlaybackHistory.Add(new PlaybackHistory
+            {
+                SongId = "song-bf-zero",
+                PlaybackStart = DateTime.UtcNow.AddHours(-1),
+                Seconds = 0
+            });
+            _context.SaveChanges();
+
+            var result = await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.AreEqual(0, result.Submitted);
+            Assert.AreEqual(0, result.Skipped);
+            Assert.AreEqual(0, result.Failed);
+        }
+
+        [Test]
+        public async Task Backfill_UsesOriginalPlaybackStart()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+            _httpHandler.SetResponse(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"status\":\"ok\"}")
+            });
+
+            var originalTime = new DateTime(2026, 3, 15, 14, 30, 0, DateTimeKind.Utc);
+            SeedSong("song-bf-time", "Time Song", length: "240");
+            SeedPlaybackRow("song-bf-time", originalTime, 180);
+
+            await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                originalTime.AddDays(-1), originalTime.AddDays(1));
+
+            var unixTime = new DateTimeOffset(originalTime).ToUnixTimeSeconds();
+            Assert.IsTrue(_httpHandler.LastRequestBody.Contains(unixTime.ToString()));
+        }
+
+        [Test]
+        public async Task Backfill_MixedResults_ReturnsCorrectCounts()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+            _httpHandler.SetResponse(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"status\":\"ok\"}")
+            });
+
+            SeedSong("song-mix-sub", "Mix Submit", length: "240");
+            SeedSong("song-mix-skip", "Mix Skip", length: "240");
+
+            SeedPlaybackRow("song-mix-sub", DateTime.UtcNow.AddHours(-1), 180);
+            SeedPlaybackRow("song-mix-skip", DateTime.UtcNow.AddHours(-1), 10);
+
+            var result = await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.AreEqual(1, result.Submitted);
+            Assert.AreEqual(1, result.Skipped);
+            Assert.AreEqual(0, result.Failed);
+        }
+
+        [Test]
+        public async Task Backfill_ColonDelimitedDuration_MeetsThreshold()
+        {
+            await _configHelper.SetListenBrainzToken("test-token");
+            _httpHandler.SetResponse(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"status\":\"ok\"}")
+            });
+
+            SeedSong("song-bf-colon", "Colon Duration", length: "4:05");
+            SeedPlaybackRow("song-bf-colon", DateTime.UtcNow.AddHours(-1), 180);
+
+            var result = await _playbackHelperWithLB.BackfillHistoricalListensAsync(
+                DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+
+            Assert.AreEqual(1, result.Submitted);
+            Assert.AreEqual(0, result.Skipped);
+            Assert.AreEqual(0, result.Failed);
+        }
+
+        private void SeedPlaybackRow(string songId, DateTime playbackStart, int seconds)
+        {
+            _context.PlaybackHistory.Add(new PlaybackHistory
+            {
+                SongId = songId,
+                PlaybackStart = playbackStart,
+                Seconds = seconds
+            });
+            _context.SaveChanges();
         }
     }
 }
