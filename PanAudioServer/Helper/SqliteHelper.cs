@@ -713,6 +713,48 @@ namespace PanAudioServer.Helper
                 .ExecuteUpdateAsync(a => a.SetProperty(x => x.Artist, newArtistName));
         }
 
+        public async Task<string?> GetSongIdByMusicBrainzId(string mbid)
+        {
+            if (string.IsNullOrEmpty(mbid)) return null;
+            var song = await _context.Songs
+                .FirstOrDefaultAsync(x => x.MusicBrainzId == mbid);
+            return song?.Id;
+        }
+
+        public async Task<string?> GetSongIdByTitleAndArtist(string title, string artist)
+        {
+            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(artist)) return null;
+            var song = await _context.Songs
+                .FirstOrDefaultAsync(x => x.Title.ToLower() == title.ToLower() &&
+                                           x.Artist.ToLower() == artist.ToLower());
+            return song?.Id;
+        }
+
+        public async Task SetSongMusicBrainzId(string songId, string mbid)
+        {
+            await _context.Songs
+                .Where(x => x.Id == songId && (x.MusicBrainzId == null || x.MusicBrainzId == ""))
+                .ExecuteUpdateAsync(s => s.SetProperty(x => x.MusicBrainzId, mbid));
+        }
+
+        public async Task<Playlists> CreatePlaylistFromJspf(string playlistName, List<string> songIds)
+        {
+            var playlistId = Guid.NewGuid().ToString();
+            var playlist = new Playlists { PlaylistId = playlistId, PlaylistName = playlistName };
+            _context.Playlists.Add(playlist);
+            foreach (var songId in songIds)
+            {
+                _context.PlaylistItems.Add(new PlaylistItems
+                {
+                    PlaylistItemId = Guid.NewGuid().ToString(),
+                    PlaylistId = playlistId,
+                    SongId = songId
+                });
+            }
+            await _context.SaveChangesAsync();
+            return await GetPlaylist(playlistId);
+        }
+
         private static int ParseDuration(string length)
         {
             if (string.IsNullOrEmpty(length)) return 0;

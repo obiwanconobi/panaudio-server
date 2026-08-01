@@ -2,13 +2,15 @@
 	import { onMount } from 'svelte';
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import EditModal from '$lib/components/ui/EditModal.svelte';
-	import { fetchPlaylists, createPlaylist, deletePlaylist } from '$lib/api';
+	import { fetchPlaylists, createPlaylist, deletePlaylist, uploadPlaylist } from '$lib/api';
 	import type { Playlist } from '$lib/types';
 
 	let playlists = $state<Playlist[]>([]);
 	let loading = $state(true);
 	let showCreate = $state(false);
 	let newName = $state('');
+	let uploading = $state(false);
+	let fileInput: HTMLInputElement;
 
 	onMount(async () => {
 		try {
@@ -31,6 +33,19 @@
 		await deletePlaylist(playlist.playlistId);
 		playlists = playlists.filter((p) => p.playlistId !== playlist.playlistId);
 	}
+
+	async function handleUpload() {
+		const file = fileInput?.files?.[0];
+		if (!file) return;
+		uploading = true;
+		try {
+			await uploadPlaylist(file);
+			playlists = await fetchPlaylists();
+		} finally {
+			uploading = false;
+			fileInput.value = '';
+		}
+	}
 </script>
 
 <svelte:head>
@@ -40,15 +55,38 @@
 <div>
 	<div class="flex items-center justify-between mb-6">
 		<h1 class="text-2xl font-bold">Playlists</h1>
-		<button
-			onclick={() => (showCreate = true)}
-			class="flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg text-sm font-medium transition-colors"
-		>
-			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-			</svg>
-			New Playlist
-		</button>
+		<div class="flex items-center gap-2">
+			<input
+				type="file"
+				accept=".jspf"
+				class="hidden"
+				bind:this={fileInput}
+				onchange={handleUpload}
+			/>
+			<button
+				onclick={() => fileInput?.click()}
+				disabled={uploading}
+				class="flex items-center gap-1.5 px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+			>
+				{#if uploading}
+					<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+				{:else}
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+					</svg>
+				{/if}
+				Upload Playlist
+			</button>
+			<button
+				onclick={() => (showCreate = true)}
+				class="flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg text-sm font-medium transition-colors"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+				</svg>
+				New Playlist
+			</button>
+		</div>
 	</div>
 
 	{#if loading}

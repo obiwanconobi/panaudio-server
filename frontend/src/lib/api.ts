@@ -186,6 +186,12 @@ export function deletePlaylist(playlistId: string): Promise<void> {
 	return fetchVoid(`/api/playlist?playlistId=${encodeURIComponent(playlistId)}`, { method: 'DELETE' });
 }
 
+export function uploadPlaylist(file: File): Promise<Playlist> {
+	const formData = new FormData();
+	formData.append('file', file);
+	return fetchJson('/api/upload-playlist', { method: 'POST', body: formData });
+}
+
 // ── Playback ──
 
 export function startPlayback(songId: string): Promise<void> {
