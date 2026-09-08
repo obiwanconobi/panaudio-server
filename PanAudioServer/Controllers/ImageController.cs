@@ -19,6 +19,7 @@ namespace PanAudioServer.Controllers
         }
 
         [HttpGet("albumArt")]
+        [ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Any)]
         public async Task<IActionResult> GetAlbumArt(string albumId)
         {
             string albumArtPath = await imageHelper.ImagePath(albumId);
