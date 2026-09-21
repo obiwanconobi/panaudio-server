@@ -9,6 +9,12 @@ namespace PanAudioServer.Controllers
     [Route("sync")]
     public class SyncController : Controller
     {
+        // Process-wide lock so only one library scan runs at a time. DirectoryHelper
+        // is Scoped (one instance per request), so without this two concurrent
+        // /sync/all requests each walk the tree with their own in-memory dedup state
+        // and insert the full library twice.
+        private static readonly SemaphoreSlim _scanLock = new SemaphoreSlim(1, 1);
+
         private readonly string _basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         private DirectoryHelper dirHelper;
         private DatabaseHelper dbHelper;
@@ -22,11 +28,23 @@ namespace PanAudioServer.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> Sync()
         {
-            string _totalPath = _basePath + @"/Music/";
+            if (!await _scanLock.WaitAsync(TimeSpan.Zero))
+            {
+                return Conflict("A library scan is already in progress.");
+            }
 
-            await dirHelper.directoryGetter(_totalPath);
-            await dirHelper.saveData();
-            return Ok();
+            try
+            {
+                string _totalPath = _basePath + @"/Music/";
+
+                await dirHelper.directoryGetter(_totalPath);
+                await dirHelper.saveData();
+                return Ok();
+            }
+            finally
+            {
+                _scanLock.Release();
+            }
         }
 
         [HttpGet("clear")]
