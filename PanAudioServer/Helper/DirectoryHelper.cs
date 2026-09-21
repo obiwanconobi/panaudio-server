@@ -321,11 +321,17 @@ namespace PanAudioServer.Helper
                         }
                         
                         var songTitle = removeShittyCharacters(file.Title);
+                        var songPath = f;
                     //    var song = await sqliteHelper.GetSong(artistName, file.Tag.Album, file.Tag.Title);
-                           var song = dbSongs.Where(x => x.Artist.ToLower() == artistName.ToLower()
+                           // Dedup primarily by file path (matches the unique index on Songs.Path),
+                           // falling back to artist/title/album so that a track which appears on
+                           // several releases is still only kept once.
+                           var song = dbSongs.Where(x => x.Path == songPath).FirstOrDefault()
+                                   ?? dbSongs.Where(x => x.Artist.ToLower() == artistName.ToLower()
                                                        && x.Title.ToLower() == songTitle.ToLower()
                                                        && x.Album.ToLower() == albumTitle.ToLower())
                                               .FirstOrDefault()
+                                   ?? songs.Where(x => x.Path == songPath).FirstOrDefault()
                                    ?? songs.Where(x => x.Artist.ToLower() == artistName.ToLower()
                                                     && x.Title.ToLower() == songTitle.ToLower()
                                                     && x.Album.ToLower() == albumTitle.ToLower())
@@ -350,7 +356,7 @@ namespace PanAudioServer.Helper
                                 BitRate = file.Bitrate.ToString(),
                                 BitDepth = file.BitDepth.ToString(),
                                 SampleRate = file.SampleRate.ToString(),
-                                Path = f.ToString()
+                                Path = songPath
 
 
                             };
