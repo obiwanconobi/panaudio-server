@@ -315,12 +315,9 @@ namespace PanAudioServer.Helper
                         }
 
 
-                        if(file.Title == null)
-                        {
-                            continue;
-                        }
-                        
-                        var songTitle = removeShittyCharacters(file.Title);
+                        // Fall back to the file name when the title tag is missing/empty so
+                        // tracks that have artist/album tags but no title are still imported.
+                        var songTitle = removeShittyCharacters(string.IsNullOrEmpty(file.Title) ? Path.GetFileNameWithoutExtension(f) : file.Title);
                         var songPath = f;
                     //    var song = await sqliteHelper.GetSong(artistName, file.Tag.Album, file.Tag.Title);
                            // Dedup primarily by file path (matches the unique index on Songs.Path),
