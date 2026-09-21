@@ -89,6 +89,66 @@ namespace PanAudioServer.Helper
             return input;
         }
 
+        // ATL can't read the FLAC stream info (duration/bitrate/bit depth/sample rate)
+        // when a FLAC file has a non-standard prepended ID3 tag. Fall back to parsing the
+        // FLAC STREAMINFO block directly in that case.
+        private static (int durationSeconds, int bitrateKbps, int bitDepth, int sampleRate)? ReadFlacStreamInfo(string filePath)
+        {
+            try
+            {
+                using var fs = File.OpenRead(filePath);
+                var buffer = new byte[Math.Min(fs.Length, 1_000_000)];
+                int read = fs.Read(buffer, 0, buffer.Length);
+
+                // Locate the "fLaC" marker (it may be preceded by a stray ID3 tag).
+                int flacIdx = -1;
+                for (int i = 0; i + 4 <= read; i++)
+                {
+                    if (buffer[i] == 0x66 && buffer[i + 1] == 0x4C && buffer[i + 2] == 0x61 && buffer[i + 3] == 0x43)
+                    {
+                        flacIdx = i;
+                        break;
+                    }
+                }
+
+                if (flacIdx < 0)
+                {
+                    return null;
+                }
+
+                int hdr = flacIdx + 4;
+                if (hdr + 4 + 34 > read || (buffer[hdr] & 0x7F) != 0)
+                {
+                    return null;
+                }
+
+                int data = hdr + 4;
+                ulong combined = 0;
+                for (int i = 0; i < 8; i++)
+                {
+                    combined = (combined << 8) | buffer[data + 10 + i];
+                }
+
+                int sampleRate = (int)((combined >> 44) & 0xFFFFF);
+                int bitDepth = (int)((combined >> 36) & 0x1F) + 1;
+                ulong totalSamples = combined & 0xFFFFFFFFFUL;
+
+                if (sampleRate == 0)
+                {
+                    return null;
+                }
+
+                int durationSeconds = (int)(totalSamples / (ulong)sampleRate);
+                int bitrateKbps = (int)(fs.Length * 8L / (totalSamples / (double)sampleRate) / 1000.0);
+
+                return (durationSeconds, bitrateKbps, bitDepth, sampleRate);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public async Task directoryGetter(String directory)
         {
             try
@@ -339,6 +399,25 @@ namespace PanAudioServer.Helper
 
                         if (song == null)
                         {
+                            int duration = file.Duration;
+                            int bitrate = file.Bitrate;
+                            int bitDepth = file.BitDepth;
+                            int sampleRate = (int)file.SampleRate;
+
+                            // ATL reports 0/sentinel stream info for FLAC files with a prepended
+                            // ID3 tag; recover the real values from the FLAC STREAMINFO block.
+                            if (sampleRate <= 0 || bitDepth <= 0 || duration <= 0)
+                            {
+                                var info = ReadFlacStreamInfo(songPath);
+                                if (info != null)
+                                {
+                                    duration = info.Value.durationSeconds;
+                                    bitrate = info.Value.bitrateKbps;
+                                    bitDepth = info.Value.bitDepth;
+                                    sampleRate = info.Value.sampleRate;
+                                }
+                            }
+
                             var songAdd = new Songs()
                             {
                                 Id = songId,
@@ -351,11 +430,11 @@ namespace PanAudioServer.Helper
                                 AlbumPicture = "",
                                 DiscNumber =  file.DiscNumber ?? 1,
                                 Favourite = false,
-                                Length = file.Duration.ToString(),
+                                Length = duration.ToString(),
                                 Codec = file.AudioFormat.ShortName,
-                                BitRate = file.Bitrate.ToString(),
-                                BitDepth = file.BitDepth.ToString(),
-                                SampleRate = file.SampleRate.ToString(),
+                                BitRate = bitrate.ToString(),
+                                BitDepth = bitDepth.ToString(),
+                                SampleRate = sampleRate.ToString(),
                                 Path = songPath
 
 
