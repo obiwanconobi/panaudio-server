@@ -59,19 +59,20 @@ namespace PanAudioServer.Tests.Helper
 
         private Songs SeedSong(string id = null, string title = "Test Song", string artist = "Test Artist",
             string album = "Test Album", string albumId = null, string artistId = null,
-            string path = "/music/test/song.mp3", bool favourite = false, int? trackNumber = null,
+            string path = null, bool favourite = false, int? trackNumber = null,
             string length = "240", string musicBrainzId = null)
         {
+            var songId = id ?? Guid.NewGuid().ToString();
             var song = new Songs
             {
-                Id = id ?? Guid.NewGuid().ToString(),
+                Id = songId,
                 Title = title,
                 Artist = artist,
                 Album = album,
                 AlbumId = albumId ?? Guid.NewGuid().ToString(),
                 ArtistId = artistId ?? Guid.NewGuid().ToString(),
                 AlbumPicture = "",
-                Path = path,
+                Path = path ?? "/music/" + songId + ".mp3",
                 Favourite = favourite,
                 TrackNumber = trackNumber,
                 Length = length,

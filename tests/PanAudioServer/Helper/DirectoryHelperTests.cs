@@ -104,7 +104,7 @@ namespace PanAudioServer.Tests.Helper
             var subFolder = Path.Combine(_tempRoot, "a", "b");
             Directory.CreateDirectory(subFolder);
 
-            await _helper.getDirectory(_tempRoot, 0);
+            await _helper.getDirectory(_tempRoot);
         }
 
         [Test]

@@ -93,7 +93,7 @@ namespace PanAudioServer.Helper
         {
             try
             {
-                await getDirectory(directory, 1);
+                await getDirectory(directory);
             }
             catch (Exception e)
             {
@@ -101,46 +101,22 @@ namespace PanAudioServer.Helper
             }
         }
 
-        public async Task getDirectory(String directory, int depth)
+        public async Task getDirectory(String directory)
         {
-            string _totalPath = directory;
+            // Scan the files in this folder first: an album folder may contain its
+            // own audio files alongside subfolders (e.g. "Disk 1" / "Disk 2").
+            await getSongs(directory);
 
-            var directories = getDirectories(_totalPath);
-
-            if(directories == null)
+            var directories = getDirectories(directory);
+            if (directories == null)
             {
-                //get songs
-                 await getSongs(directory);
-
+                return;
             }
-            else
+
+            foreach (var d in directories)
             {
-                Console.WriteLine("Total number of directories witin: " + directories.Length + " within " + directory);
-
-                foreach (var d in directories)
-                {
-                    // var directories = Directory.GetDirectories(d);
-                    var dd = getDirectories(d);
-
-                    
-                        //get songs
-                        await getSongs(d);
-                    if(dd != null)
-                    {
-                        foreach (var dir in dd)
-                        {
-                            await getDirectory(dir, depth++);
-                        }
-                    }
-
-
-
-                    Console.WriteLine();
-                }
-
-
+                await getDirectory(d);
             }
-            
         }
 
         //remove
@@ -294,7 +270,7 @@ namespace PanAudioServer.Helper
                         string artistName = removeShittyCharacters(file.AlbumArtist);
                         if(artistName == "")
                         {
-                            artistName = file.Artist;
+                            artistName = removeShittyCharacters(file.Artist ?? "");
                         }
                         var artist = dbArtists.Where(x => x.Name.ToLower() == artistName.ToLower()).FirstOrDefault() ?? artists.Where(x => x.Name.ToLower() == artistName.ToLower()).FirstOrDefault();
 
@@ -322,15 +298,16 @@ namespace PanAudioServer.Helper
                         }
 
 
-                        var album = dbAlbums.Where(x => x.Artist.ToLower() == artistName.ToLower() && x.Title == file.Album).FirstOrDefault() ?? albums.Where(x => x.Artist.ToLower() == artistName.ToLower() && x.Title == file.Album).FirstOrDefault();
+                        var albumTitle = removeShittyCharacters(file.Album ?? "");
+                        var album = dbAlbums.Where(x => x.Artist.ToLower() == artistName.ToLower() && x.Title.ToLower() == albumTitle.ToLower()).FirstOrDefault() ?? albums.Where(x => x.Artist.ToLower() == artistName.ToLower() && x.Title.ToLower() == albumTitle.ToLower()).FirstOrDefault();
                         
                         if (album == null)
                         {
 
                             //sqliteHelper.UploadAlbum(new Album(id: albumId, title: file.Tag.Album, artist: artistName, picture: ""));
                             albumId = Guid.NewGuid().ToString();
-                            albums.Add(new Album(id: albumId, title:removeShittyCharacters(file.Album), artist: artistName, picture: Path.GetFileName(returnLikelyImage(imagesInFolder)), albumPath: directory, year: file.Year ?? null, favourite: false));
-                            Console.WriteLine("Info: Inserted Album: " + file.Album);
+                            albums.Add(new Album(id: albumId, title:albumTitle, artist: artistName, picture: Path.GetFileName(returnLikelyImage(imagesInFolder)), albumPath: directory, year: file.Year ?? null, favourite: false));
+                            Console.WriteLine("Info: Inserted Album: " + albumTitle);
                         }
                         else
                         {
@@ -343,17 +320,25 @@ namespace PanAudioServer.Helper
                             continue;
                         }
                         
+                        var songTitle = removeShittyCharacters(file.Title);
                     //    var song = await sqliteHelper.GetSong(artistName, file.Tag.Album, file.Tag.Title);
-                           var song = dbSongs.Where(x => x.Artist.ToLower() == artistName.ToLower() && x.Title == file.Title && x.Album == file.Album).FirstOrDefault();
+                           var song = dbSongs.Where(x => x.Artist.ToLower() == artistName.ToLower()
+                                                       && x.Title.ToLower() == songTitle.ToLower()
+                                                       && x.Album.ToLower() == albumTitle.ToLower())
+                                              .FirstOrDefault()
+                                   ?? songs.Where(x => x.Artist.ToLower() == artistName.ToLower()
+                                                    && x.Title.ToLower() == songTitle.ToLower()
+                                                    && x.Album.ToLower() == albumTitle.ToLower())
+                                           .FirstOrDefault();
 
                         if (song == null)
                         {
                             var songAdd = new Songs()
                             {
                                 Id = songId,
-                                Title = removeShittyCharacters(file.Title),
+                                Title = songTitle,
                                 TrackNumber = Convert.ToInt32(file.TrackNumber),
-                                Album = file.Album,
+                                Album = albumTitle,
                                 AlbumId = albumId,
                                 Artist = artistName,    
                                 ArtistId = artistId,
@@ -373,8 +358,9 @@ namespace PanAudioServer.Helper
                             //sqliteHelper.UploadSong(songAdd);
                             Console.WriteLine("Info: Inserted Song:" + songAdd.Title + " : " + songAdd.Artist );
                         }
-                        else
+                        else if (!songs.Contains(song))
                         {
+                            // Existing DB song: refresh its disc number.
                             song.DiscNumber = file.DiscNumber ?? 1;
                             await sqliteHelper.UpdateSong(song);
                         }

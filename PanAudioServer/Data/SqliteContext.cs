@@ -29,6 +29,7 @@ namespace PanAudioServer.Data
         {
 
             modelBuilder.Entity<Songs>().HasKey(x => x.Id);
+            modelBuilder.Entity<Songs>().HasIndex(x => x.Path).IsUnique();
             modelBuilder.Entity<Album>().HasKey(x => x.Id);
             modelBuilder.Entity<Artists>().HasKey(x => x.Id);
             modelBuilder.Entity<Playlists>().HasKey(x => x.PlaylistId);
